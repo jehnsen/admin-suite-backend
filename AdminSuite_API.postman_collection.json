@@ -1,0 +1,3888 @@
+{
+	"info": {
+		"_postman_id": "adminsuite-api-collection",
+		"name": "AdminSuite API - DepEd School Management",
+		"description": "Complete API collection for AdminSuite - School Management System for DepEd Administrative Officers\n\n**Base URL:** http://localhost:8000\n\n**Authentication:** Bearer Token (Laravel Sanctum)\n\n**Default Test Credentials:**\n- Super Admin: superadmin@deped.gov.ph / SuperAdmin123!\n- School Head: schoolhead@deped.gov.ph / SchoolHead123!\n- Admin Officer: adminofficer@deped.gov.ph / AdminOfficer123!\n- Teacher: teacher@deped.gov.ph / Teacher123!",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Authentication",
+			"item": [
+				{
+					"name": "Register User",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    const response = pm.response.json();",
+									"    pm.environment.set(\"auth_token\", response.token);",
+									"    pm.environment.set(\"user_id\", response.user.id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Test User\",\n    \"email\": \"testuser@deped.gov.ph\",\n    \"password\": \"Password123!\",\n    \"password_confirmation\": \"Password123!\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/auth/register",
+							"host": ["{{base_url}}"],
+							"path": ["api", "auth", "register"]
+						},
+						"description": "Register a new user account. Default role: Teacher/Staff"
+					},
+					"response": []
+				},
+				{
+					"name": "Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    const response = pm.response.json();",
+									"    pm.environment.set(\"auth_token\", response.token);",
+									"    pm.environment.set(\"user_id\", response.user.id);",
+									"    console.log(\"Token saved:\", response.token);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"adminofficer@deped.gov.ph\",\n    \"password\": \"AdminOfficer123!\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/auth/login",
+							"host": ["{{base_url}}"],
+							"path": ["api", "auth", "login"]
+						},
+						"description": "Login and receive Bearer token"
+					},
+					"response": []
+				},
+				{
+					"name": "Logout",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/auth/logout",
+							"host": ["{{base_url}}"],
+							"path": ["api", "auth", "logout"]
+						},
+						"description": "Logout and revoke current token"
+					},
+					"response": []
+				}
+			],
+			"description": "Authentication endpoints using Laravel Sanctum"
+		},
+		{
+			"name": "HR - Employees",
+			"item": [
+				{
+					"name": "Get All Employees",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/employees?per_page=15&status=Active",
+							"host": ["{{base_url}}"],
+							"path": ["api", "employees"],
+							"query": [
+								{
+									"key": "per_page",
+									"value": "15",
+									"description": "Items per page"
+								},
+								{
+									"key": "status",
+									"value": "Active",
+									"description": "Filter by status"
+								},
+								{
+									"key": "position",
+									"value": "Teacher I",
+									"description": "Filter by position",
+									"disabled": true
+								},
+								{
+									"key": "search",
+									"value": "Juan",
+									"description": "Search by name/employee number",
+									"disabled": true
+								}
+							]
+						},
+						"description": "Get paginated list of employees with optional filters"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Employee by ID",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/employees/1",
+							"host": ["{{base_url}}"],
+							"path": ["api", "employees", "1"]
+						},
+						"description": "Get detailed employee information"
+					},
+					"response": []
+				},
+				{
+					"name": "Create Employee",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    const response = pm.response.json();",
+									"    pm.environment.set(\"employee_id\", response.data.id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"first_name\": \"Pedro\",\n    \"middle_name\": \"Cruz\",\n    \"last_name\": \"Santos\",\n    \"date_of_birth\": \"1985-05-15\",\n    \"gender\": \"Male\",\n    \"civil_status\": \"Married\",\n    \"email\": \"pedro.santos@deped.gov.ph\",\n    \"mobile_number\": \"+63917-555-1234\",\n    \"address\": \"123 Rizal St., Brgy. San Antonio\",\n    \"city\": \"Manila\",\n    \"province\": \"Metro Manila\",\n    \"zip_code\": \"1000\",\n    \"plantilla_item_no\": \"ITEM-2024-9999\",\n    \"position\": \"Teacher I\",\n    \"salary_grade\": 11,\n    \"step_increment\": 1,\n    \"monthly_salary\": 25000.00,\n    \"employment_status\": \"Permanent\",\n    \"date_hired\": \"2024-06-01\",\n    \"tin\": \"123-456-789-000\",\n    \"gsis_number\": \"1234567890\",\n    \"philhealth_number\": \"12-345678901-2\",\n    \"pagibig_number\": \"1234-5678-9012\",\n    \"status\": \"Active\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/employees",
+							"host": ["{{base_url}}"],
+							"path": ["api", "employees"]
+						},
+						"description": "Create a new employee record"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Employee",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"mobile_number\": \"+63917-555-9999\",\n    \"address\": \"456 Nueva St., Brgy. Poblacion\",\n    \"civil_status\": \"Married\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/employees/3",
+							"host": ["{{base_url}}"],
+							"path": ["api", "employees", "3"]
+						},
+						"description": "Update employee information"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Employee",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/employees/99",
+							"host": ["{{base_url}}"],
+							"path": ["api", "employees", "99"]
+						},
+						"description": "Soft delete an employee"
+					},
+					"response": []
+				},
+				{
+					"name": "Promote Employee",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"new_position\": \"Teacher II\",\n    \"new_salary_grade\": 12,\n    \"new_step_increment\": 1,\n    \"new_monthly_salary\": 29000.00,\n    \"effective_date\": \"2024-07-01\",\n    \"appointment_authority\": \"DepEd Order No. 123-2024\",\n    \"appointment_date\": \"2024-06-15\",\n    \"remarks\": \"Promoted based on performance evaluation\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/employees/3/promote",
+							"host": ["{{base_url}}"],
+							"path": ["api", "employees", "3", "promote"]
+						},
+						"description": "Promote employee to new position (auto-creates service record)"
+					},
+					"response": []
+				},
+				{
+					"name": "Search Employees",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/employees/search?search=Juan",
+							"host": ["{{base_url}}"],
+							"path": ["api", "employees", "search"],
+							"query": [
+								{
+									"key": "search",
+									"value": "Juan"
+								}
+							]
+						},
+						"description": "Search employees by name"
+					},
+					"response": []
+				},
+				{
+					"name": "Employee Statistics",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/employees/statistics",
+							"host": ["{{base_url}}"],
+							"path": ["api", "employees", "statistics"]
+						},
+						"description": "Get employee statistics (counts by status, position)"
+					},
+					"response": []
+				}
+			],
+			"description": "Employee management endpoints"
+		},
+		{
+			"name": "HR - Leave Requests",
+			"item": [
+				{
+					"name": "Get All Leave Requests",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/leave-requests?status=Pending&per_page=15",
+							"host": ["{{base_url}}"],
+							"path": ["api", "leave-requests"],
+							"query": [
+								{
+									"key": "status",
+									"value": "Pending",
+									"description": "Pending, Approved, Disapproved, Cancelled"
+								},
+								{
+									"key": "per_page",
+									"value": "15"
+								},
+								{
+									"key": "leave_type",
+									"value": "Vacation Leave",
+									"disabled": true
+								},
+								{
+									"key": "employee_id",
+									"value": "3",
+									"disabled": true
+								}
+							]
+						},
+						"description": "Get paginated leave requests with filters"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Leave Request by ID",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/leave-requests/1",
+							"host": ["{{base_url}}"],
+							"path": ["api", "leave-requests", "1"]
+						},
+						"description": "Get detailed leave request information"
+					},
+					"response": []
+				},
+				{
+					"name": "Create Leave Request",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    const response = pm.response.json();",
+									"    pm.environment.set(\"leave_request_id\", response.data.id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"employee_id\": 3,\n    \"leave_type\": \"Vacation Leave\",\n    \"start_date\": \"2024-12-20\",\n    \"end_date\": \"2024-12-22\",\n    \"reason\": \"Christmas vacation with family in the province\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/leave-requests",
+							"host": ["{{base_url}}"],
+							"path": ["api", "leave-requests"]
+						},
+						"description": "Create leave request (auto-validates leave credits)"
+					},
+					"response": []
+				},
+				{
+					"name": "Create Sick Leave Request",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"employee_id\": 3,\n    \"leave_type\": \"Sick Leave\",\n    \"start_date\": \"2024-12-15\",\n    \"end_date\": \"2024-12-17\",\n    \"sick_leave_type\": \"Out Patient\",\n    \"illness\": \"Flu and fever\",\n    \"reason\": \"Medical consultation and rest\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/leave-requests",
+							"host": ["{{base_url}}"],
+							"path": ["api", "leave-requests"]
+						},
+						"description": "Create sick leave request with illness details"
+					},
+					"response": []
+				},
+				{
+					"name": "Recommend Leave",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"recommended_by\": 2,\n    \"remarks\": \"Employee has good attendance record. Recommended for approval.\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/leave-requests/1/recommend",
+							"host": ["{{base_url}}"],
+							"path": ["api", "leave-requests", "1", "recommend"]
+						},
+						"description": "Immediate supervisor recommends leave approval"
+					},
+					"response": []
+				},
+				{
+					"name": "Approve Leave",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"approved_by\": 1,\n    \"remarks\": \"Approved. Enjoy your vacation!\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/leave-requests/1/approve",
+							"host": ["{{base_url}}"],
+							"path": ["api", "leave-requests", "1", "approve"]
+						},
+						"description": "Final approval (auto-deducts leave credits)"
+					},
+					"response": []
+				},
+				{
+					"name": "Disapprove Leave",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"disapproved_by\": 1,\n    \"reason\": \"Insufficient manpower during examination period\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/leave-requests/1/disapprove",
+							"host": ["{{base_url}}"],
+							"path": ["api", "leave-requests", "1", "disapprove"]
+						},
+						"description": "Disapprove leave request with reason"
+					},
+					"response": []
+				},
+				{
+					"name": "Cancel Leave",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/leave-requests/1/cancel",
+							"host": ["{{base_url}}"],
+							"path": ["api", "leave-requests", "1", "cancel"]
+						},
+						"description": "Cancel leave request (auto-restores credits if already approved)"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Pending Leaves",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/leave-requests/pending",
+							"host": ["{{base_url}}"],
+							"path": ["api", "leave-requests", "pending"]
+						},
+						"description": "Get all pending leave requests requiring action"
+					},
+					"response": []
+				},
+				{
+					"name": "Leave Statistics",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/leave-requests/statistics?employee_id=3",
+							"host": ["{{base_url}}"],
+							"path": ["api", "leave-requests", "statistics"],
+							"query": [
+								{
+									"key": "employee_id",
+									"value": "3"
+								}
+							]
+						},
+						"description": "Get leave statistics for specific employee"
+					},
+					"response": []
+				}
+			],
+			"description": "Leave request management with approval workflow"
+		},
+		{
+			"name": "HR - Service Records",
+			"item": [
+				{
+					"name": "Get Service Records by Employee",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/service-records/employee/3",
+							"host": ["{{base_url}}"],
+							"path": ["api", "service-records", "employee", "3"]
+						},
+						"description": "Get all service records (201 file) for specific employee"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Service Record by ID",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/service-records/1",
+							"host": ["{{base_url}}"],
+							"path": ["api", "service-records", "1"]
+						},
+						"description": "Get specific service record details"
+					},
+					"response": []
+				},
+				{
+					"name": "Create Service Record",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"employee_id\": 3,\n    \"date_from\": \"2024-07-01\",\n    \"designation\": \"Teacher II\",\n    \"status_of_appointment\": \"Permanent\",\n    \"salary_grade\": 12,\n    \"step_increment\": 1,\n    \"monthly_salary\": 29000.00,\n    \"station_place_of_assignment\": \"Manila High School\",\n    \"office_entity\": \"Department of Education\",\n    \"government_service\": \"Yes\",\n    \"action_type\": \"Promotion\",\n    \"appointment_authority\": \"DepEd Order No. 123-2024\",\n    \"appointment_date\": \"2024-06-15\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/service-records",
+							"host": ["{{base_url}}"],
+							"path": ["api", "service-records"]
+						},
+						"description": "Create new service record entry"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Service Record",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"date_to\": \"2024-06-30\",\n    \"remarks\": \"End of assignment period\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/service-records/1",
+							"host": ["{{base_url}}"],
+							"path": ["api", "service-records", "1"]
+						},
+						"description": "Update service record"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Service Record",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/service-records/99",
+							"host": ["{{base_url}}"],
+							"path": ["api", "service-records", "99"]
+						},
+						"description": "Delete service record"
+					},
+					"response": []
+				}
+			],
+			"description": "Service record (201 file) management"
+		},
+		{
+			"name": "Procurement - Suppliers",
+			"item": [
+				{
+					"name": "List All Suppliers",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/suppliers",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"suppliers"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create New Supplier",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Manila Office Supplies Corporation\",\n    \"owner\": \"John Doe\",\n    \"business_type\": \"Corporation\",\n    \"address\": \"123 Business Park, Manila\",\n    \"email\": \"sales@manilasupplies.com\",\n    \"phone_number\": \"(02) 8888-1234\",\n    \"tin\": \"123-456-789-001\",\n    \"philgeps_number\": \"PHIL-123456\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/suppliers",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"suppliers"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Supplier Details",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/suppliers/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"suppliers",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Supplier",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"new.sales@manilasupplies.com\",\n    \"status\": \"Active\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/suppliers/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"suppliers",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Supplier",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/suppliers/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"suppliers",
+								"1"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"description": "Manage vendor information and track supplier performance."
+		},
+		{
+			"name": "Procurement - Purchase Requests",
+			"item": [
+				{
+					"name": "List All Purchase Requests",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/purchase-requests",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"purchase-requests"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create New Purchase Request",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"purpose\": \"Office Supplies Replenishment for Q1\",\n    \"procurement_mode\": \"Small Value Procurement\",\n    \"fund_source\": \"MOOE\",\n    \"items\": [\n        {\n            \"description\": \"Bond Paper, A4, 70gsm\",\n            \"quantity\": 10,\n            \"unit_of_measure\": \"ream\",\n            \"unit_cost\": 250.00\n        },\n        {\n            \"description\": \"Black Ballpen, 0.5mm\",\n            \"quantity\": 5,\n            \"unit_of_measure\": \"box\",\n            \"unit_cost\": 120.00\n        }\n    ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/purchase-requests",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"purchase-requests"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Purchase Request Details",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/purchase-requests/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"purchase-requests",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Submit Purchase Request",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/purchase-requests/1/submit",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"purchase-requests",
+								"1",
+								"submit"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Approve Purchase Request",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/purchase-requests/1/approve",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"purchase-requests",
+								"1",
+								"approve"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"description": "Create and manage purchase requests following DepEd procurement procedures."
+		},
+		{
+			"name": "Procurement - Purchase Orders",
+			"item": [
+				{
+					"name": "List All Purchase Orders",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/purchase-orders",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"purchase-orders"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create New Purchase Order",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"purchase_request_id\": 1,\n    \"supplier_id\": 1,\n    \"quotation_id\": 1,\n    \"delivery_address\": \"Manila High School, Intramuros, Manila\",\n    \"delivery_date\": \"2025-01-30\",\n    \"payment_term\": \"30 days upon delivery\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/purchase-orders",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"purchase-orders"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Purchase Order Details",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/purchase-orders/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"purchase-orders",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Approve Purchase Order",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/purchase-orders/1/approve",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"purchase-orders",
+								"1",
+								"approve"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"description": "Generate and manage purchase orders to suppliers."
+		},
+		{
+			"name": "Procurement - Quotations",
+			"item": [
+				{
+					"name": "List All Quotations",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/quotations",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"quotations"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create New Quotation",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"purchase_request_id\": 1,\n    \"supplier_id\": 1,\n    \"validity_until\": \"2025-01-15\",\n    \"items\": [\n        {\n            \"purchase_request_item_id\": 1,\n            \"unit_price\": 245.00\n        },\n        {\n            \"purchase_request_item_id\": 2,\n            \"unit_price\": 115.00\n        }\n    ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/quotations",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"quotations"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Quotations for a PR",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/quotations/purchase-request/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"quotations",
+								"purchase-request",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Select Winning Quotation",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/quotations/1/select",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"quotations",
+								"1",
+								"select"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"description": "Manage supplier quotations and bid evaluation."
+		},
+		{
+			"name": "Procurement - Deliveries",
+			"item": [
+				{
+					"name": "List All Deliveries",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/deliveries",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"deliveries"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create New Delivery",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"purchase_order_id\": 1,\n    \"supplier_dr_number\": \"DR-54321\",\n    \"delivery_date\": \"2025-01-25\",\n    \"items\": [\n        {\n            \"purchase_order_item_id\": 1,\n            \"delivered_quantity\": 10\n        },\n        {\n            \"purchase_order_item_id\": 2,\n            \"delivered_quantity\": 5\n        }\n    ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/deliveries",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"deliveries"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Delivery Details",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/deliveries/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"deliveries",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Accept Delivery",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/deliveries/1/accept",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"deliveries",
+								"1",
+								"accept"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"description": "Track and manage item deliveries and acceptance."
+		},
+		{
+			"name": "Inventory - Items",
+			"item": [
+				{
+					"name": "Get All Inventory Items",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/inventory-items?per_page=15",
+							"host": ["{{base_url}}"],
+							"path": ["api", "inventory-items"],
+							"query": [
+								{
+									"key": "per_page",
+									"value": "15"
+								},
+								{
+									"key": "category",
+									"value": "Office Supplies",
+									"disabled": true
+								},
+								{
+									"key": "status",
+									"value": "In Stock",
+									"disabled": true
+								},
+								{
+									"key": "condition",
+									"value": "Serviceable",
+									"disabled": true
+								}
+							]
+						},
+						"description": "Get paginated list of all inventory items with optional filters"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Inventory Items with Balances",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/inventory-items/with-balances",
+							"host": ["{{base_url}}"],
+							"path": ["api", "inventory-items", "with-balances"]
+						},
+						"description": "Get all inventory items with their current stock balances from stock cards"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Low Stock Items",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/inventory-items/low-stock?threshold=10",
+							"host": ["{{base_url}}"],
+							"path": ["api", "inventory-items", "low-stock"],
+							"query": [
+								{
+									"key": "threshold",
+									"value": "10"
+								}
+							]
+						},
+						"description": "Get items with stock levels below the specified threshold"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Inventory Statistics",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/inventory-items/statistics",
+							"host": ["{{base_url}}"],
+							"path": ["api", "inventory-items", "statistics"]
+						},
+						"description": "Get inventory statistics including total items, values, and category breakdown"
+					},
+					"response": []
+				},
+				{
+					"name": "Search Inventory Items",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/inventory-items/search?q=laptop&per_page=15",
+							"host": ["{{base_url}}"],
+							"path": ["api", "inventory-items", "search"],
+							"query": [
+								{
+									"key": "q",
+									"value": "laptop"
+								},
+								{
+									"key": "per_page",
+									"value": "15"
+								}
+							]
+						},
+						"description": "Search inventory items by code, name, description, property number, or serial number"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Inventory Item by ID",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/inventory-items/1",
+							"host": ["{{base_url}}"],
+							"path": ["api", "inventory-items", "1"]
+						},
+						"description": "Get specific inventory item details by ID"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Inventory Item with Balance",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/inventory-items/1/with-balance",
+							"host": ["{{base_url}}"],
+							"path": ["api", "inventory-items", "1", "with-balance"]
+						},
+						"description": "Get specific inventory item with its current stock balance"
+					},
+					"response": []
+				},
+				{
+					"name": "Create Inventory Item",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"item_code\": \"INV-2025-001\",\n    \"item_name\": \"Laptop - Dell Latitude 5420\",\n    \"description\": \"14-inch business laptop with Intel Core i5\",\n    \"category\": \"ICT Equipment\",\n    \"unit_of_measure\": \"Unit\",\n    \"serial_number\": \"DL5420-SN-12345\",\n    \"property_number\": \"PROP-2025-001\",\n    \"model\": \"Latitude 5420\",\n    \"brand\": \"Dell\",\n    \"unit_cost\": 45000.00,\n    \"quantity\": 5,\n    \"fund_source\": \"MOOE\",\n    \"supplier\": \"Dell Philippines\",\n    \"date_acquired\": \"2025-01-15\",\n    \"po_number\": \"PO-2025-001\",\n    \"invoice_number\": \"INV-DELL-001\",\n    \"condition\": \"Serviceable\",\n    \"status\": \"In Stock\",\n    \"location\": \"ICT Room - Building A\",\n    \"estimated_useful_life_years\": 5,\n    \"depreciation_rate\": 20.00,\n    \"remarks\": \"For computer laboratory use\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/inventory-items",
+							"host": ["{{base_url}}"],
+							"path": ["api", "inventory-items"]
+						},
+						"description": "Create a new inventory item"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Inventory Item",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"location\": \"Computer Lab - Building B\",\n    \"condition\": \"Serviceable\",\n    \"status\": \"In Stock\",\n    \"remarks\": \"Transferred to new computer lab\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/inventory-items/1",
+							"host": ["{{base_url}}"],
+							"path": ["api", "inventory-items", "1"]
+						},
+						"description": "Update inventory item details"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Inventory Item",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/inventory-items/1",
+							"host": ["{{base_url}}"],
+							"path": ["api", "inventory-items", "1"]
+						},
+						"description": "Soft delete an inventory item"
+					},
+					"response": []
+				}
+			],
+			"description": "Manage inventory items including CRUD operations, stock balance tracking, and statistics."
+		},
+		{
+			"name": "Inventory - Stock Cards",
+			"item": [
+				{
+					"name": "Get All Stock Cards",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/stock-cards?per_page=15",
+							"host": ["{{base_url}}"],
+							"path": ["api", "stock-cards"],
+							"query": [
+								{
+									"key": "per_page",
+									"value": "15"
+								},
+								{
+									"key": "inventory_item_id",
+									"value": "1",
+									"disabled": true
+								},
+								{
+									"key": "transaction_type",
+									"value": "Stock In",
+									"disabled": true
+								}
+							]
+						},
+						"description": "Get paginated list of stock card entries"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Stock Card by ID",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/stock-cards/1",
+							"host": ["{{base_url}}"],
+							"path": ["api", "stock-cards", "1"]
+						},
+						"description": "Get specific stock card entry details"
+					},
+					"response": []
+				},
+				{
+					"name": "Record Stock In",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"inventory_item_id\": 1,\n    \"quantity_in\": 50,\n    \"transaction_type\": \"Stock In\",\n    \"reference_number\": \"DEL-001\",\n    \"delivery_id\": 1,\n    \"remarks\": \"Delivery from supplier - Office supplies\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/stock-cards/stock-in",
+							"host": ["{{base_url}}"],
+							"path": ["api", "stock-cards", "stock-in"]
+						},
+						"description": "Record inventory stock in transaction"
+					},
+					"response": []
+				},
+				{
+					"name": "Record Stock Out",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"inventory_item_id\": 1,\n    \"quantity_out\": 10,\n    \"transaction_type\": \"Stock Out\",\n    \"reference_number\": \"ISS-001\",\n    \"issuance_id\": 1,\n    \"remarks\": \"Issued to Grade 10 Section A\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/stock-cards/stock-out",
+							"host": ["{{base_url}}"],
+							"path": ["api", "stock-cards", "stock-out"]
+						},
+						"description": "Record inventory stock out transaction (validates sufficient balance)"
+					},
+					"response": []
+				},
+				{
+					"name": "Record Donation",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"inventory_item_id\": 2,\n    \"quantity_in\": 25,\n    \"transaction_type\": \"Donation\",\n    \"reference_number\": \"DON-2025-001\",\n    \"donor_name\": \"Manila Lions Club\",\n    \"remarks\": \"Donated laptops for computer laboratory\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/stock-cards/donation",
+							"host": ["{{base_url}}"],
+							"path": ["api", "stock-cards", "donation"]
+						},
+						"description": "Record donated equipment/supplies"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Stock Cards by Item",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/stock-cards/item/1",
+							"host": ["{{base_url}}"],
+							"path": ["api", "stock-cards", "item", "1"]
+						},
+						"description": "Get all stock card entries for specific inventory item"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Current Balance",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/stock-cards/item/1/balance",
+							"host": ["{{base_url}}"],
+							"path": ["api", "stock-cards", "item", "1", "balance"]
+						},
+						"description": "Get current inventory balance for specific item"
+					},
+					"response": []
+				}
+			],
+			"description": "Double-entry inventory ledger system for tracking all inventory movements"
+		},
+		{
+			"name": "Inventory - Adjustments",
+			"item": [
+				{
+					"name": "Get All Adjustments",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/inventory-adjustments?status=Pending",
+							"host": ["{{base_url}}"],
+							"path": ["api", "inventory-adjustments"],
+							"query": [
+								{
+									"key": "status",
+									"value": "Pending"
+								},
+								{
+									"key": "adjustment_type",
+									"value": "Increase",
+									"disabled": true
+								}
+							]
+						},
+						"description": "Get paginated list of inventory adjustments"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Adjustment by ID",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/inventory-adjustments/1",
+							"host": ["{{base_url}}"],
+							"path": ["api", "inventory-adjustments", "1"]
+						},
+						"description": "Get specific adjustment details"
+					},
+					"response": []
+				},
+				{
+					"name": "Create Adjustment",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"inventory_item_id\": 1,\n    \"adjustment_type\": \"Correction\",\n    \"quantity_before\": 100,\n    \"quantity_adjusted\": -5,\n    \"quantity_after\": 95,\n    \"reason\": \"Found 5 damaged items during inspection\",\n    \"adjusted_by\": 1\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/inventory-adjustments",
+							"host": ["{{base_url}}"],
+							"path": ["api", "inventory-adjustments"]
+						},
+						"description": "Create new inventory adjustment (requires approval)"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Adjustment",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"reason\": \"Updated reason: Found 5 expired items\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/inventory-adjustments/1",
+							"host": ["{{base_url}}"],
+							"path": ["api", "inventory-adjustments", "1"]
+						},
+						"description": "Update pending adjustment"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Adjustment",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/inventory-adjustments/1",
+							"host": ["{{base_url}}"],
+							"path": ["api", "inventory-adjustments", "1"]
+						},
+						"description": "Delete adjustment"
+					},
+					"response": []
+				},
+				{
+					"name": "Approve Adjustment",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"approved_by\": 1\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/inventory-adjustments/1/approve",
+							"host": ["{{base_url}}"],
+							"path": ["api", "inventory-adjustments", "1", "approve"]
+						},
+						"description": "Approve adjustment (auto-creates stock card entry)"
+					},
+					"response": []
+				},
+				{
+					"name": "Reject Adjustment",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"rejected_by\": 1,\n    \"reason\": \"Insufficient documentation\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/inventory-adjustments/1/reject",
+							"host": ["{{base_url}}"],
+							"path": ["api", "inventory-adjustments", "1", "reject"]
+						},
+						"description": "Reject adjustment with reason"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Pending Adjustments",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/inventory-adjustments/pending",
+							"host": ["{{base_url}}"],
+							"path": ["api", "inventory-adjustments", "pending"]
+						},
+						"description": "Get all pending adjustments requiring approval"
+					},
+					"response": []
+				}
+			],
+			"description": "Inventory adjustments for corrections, donations, disposals with approval workflow"
+		},
+		{
+			"name": "Inventory - Physical Counts",
+			"item": [
+				{
+					"name": "Get All Physical Counts",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/physical-counts",
+							"host": ["{{base_url}}"],
+							"path": ["api", "physical-counts"],
+							"query": [
+								{
+									"key": "variance_type",
+									"value": "Shortage",
+									"disabled": true
+								}
+							]
+						},
+						"description": "Get paginated list of physical count records"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Physical Count by ID",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/physical-counts/1",
+							"host": ["{{base_url}}"],
+							"path": ["api", "physical-counts", "1"]
+						},
+						"description": "Get specific physical count details"
+					},
+					"response": []
+				},
+				{
+					"name": "Create Physical Count",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"inventory_item_id\": 1,\n    \"count_date\": \"2025-12-10\",\n    \"system_quantity\": 100,\n    \"actual_quantity\": 95,\n    \"counted_by\": 1,\n    \"verified_by\": 2,\n    \"remarks\": \"Annual physical inventory - Q4 2025\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/physical-counts",
+							"host": ["{{base_url}}"],
+							"path": ["api", "physical-counts"]
+						},
+						"description": "Record physical count (auto-calculates variance)"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Physical Count",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"actual_quantity\": 96,\n    \"remarks\": \"Recount: Found 1 additional item\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/physical-counts/1",
+							"host": ["{{base_url}}"],
+							"path": ["api", "physical-counts", "1"]
+						},
+						"description": "Update physical count record"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Physical Count",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/physical-counts/1",
+							"host": ["{{base_url}}"],
+							"path": ["api", "physical-counts", "1"]
+						},
+						"description": "Delete physical count record"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Items with Variances",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/physical-counts/with-variances",
+							"host": ["{{base_url}}"],
+							"path": ["api", "physical-counts", "with-variances"]
+						},
+						"description": "Get all items with inventory variances (shortage/overage)"
+					},
+					"response": []
+				}
+			],
+			"description": "Physical inventory verification with automatic variance tracking"
+		},
+		{
+			"name": "Financial - Cash Advances",
+			"item": [
+				{
+					"name": "Get All Cash Advances",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/cash-advances?status=Pending",
+							"host": ["{{base_url}}"],
+							"path": ["api", "cash-advances"],
+							"query": [
+								{
+									"key": "status",
+									"value": "Pending"
+								},
+								{
+									"key": "employee_id",
+									"value": "1",
+									"disabled": true
+								}
+							]
+						},
+						"description": "Get paginated list of cash advances"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Cash Advance by ID",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/cash-advances/1",
+							"host": ["{{base_url}}"],
+							"path": ["api", "cash-advances", "1"]
+						},
+						"description": "Get specific cash advance details"
+					},
+					"response": []
+				},
+				{
+					"name": "Create Cash Advance",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"employee_id\": 3,\n    \"ca_number\": \"CA-2025-001\",\n    \"purpose\": \"Official travel to Division Office for training\",\n    \"amount\": 5000.00,\n    \"date_needed\": \"2025-12-15\",\n    \"due_date_liquidation\": \"2025-12-25\",\n    \"requested_by\": 3\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/cash-advances",
+							"host": ["{{base_url}}"],
+							"path": ["api", "cash-advances"]
+						},
+						"description": "Create new cash advance request"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Cash Advance",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"amount\": 6000.00,\n    \"purpose\": \"Official travel to Division Office for training and meeting\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/cash-advances/1",
+							"host": ["{{base_url}}"],
+							"path": ["api", "cash-advances", "1"]
+						},
+						"description": "Update cash advance details"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Cash Advance",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/cash-advances/1",
+							"host": ["{{base_url}}"],
+							"path": ["api", "cash-advances", "1"]
+						},
+						"description": "Delete cash advance"
+					},
+					"response": []
+				},
+				{
+					"name": "Approve Cash Advance",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"approved_by\": 1\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/cash-advances/1/approve",
+							"host": ["{{base_url}}"],
+							"path": ["api", "cash-advances", "1", "approve"]
+						},
+						"description": "Approve cash advance request"
+					},
+					"response": []
+				},
+				{
+					"name": "Release Cash Advance",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"released_by\": 2\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/cash-advances/1/release",
+							"host": ["{{base_url}}"],
+							"path": ["api", "cash-advances", "1", "release"]
+						},
+						"description": "Release approved cash advance"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Pending Cash Advances",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/cash-advances/pending",
+							"host": ["{{base_url}}"],
+							"path": ["api", "cash-advances", "pending"]
+						},
+						"description": "Get all pending cash advances"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Overdue Cash Advances",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/cash-advances/overdue",
+							"host": ["{{base_url}}"],
+							"path": ["api", "cash-advances", "overdue"]
+						},
+						"description": "Get all overdue cash advances requiring liquidation"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Cash Advances by Employee",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/cash-advances/employee/3",
+							"host": ["{{base_url}}"],
+							"path": ["api", "cash-advances", "employee", "3"]
+						},
+						"description": "Get all cash advances for specific employee"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Cash Advance Statistics",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/cash-advances/statistics",
+							"host": ["{{base_url}}"],
+							"path": ["api", "cash-advances", "statistics"]
+						},
+						"description": "Get cash advance statistics (counts, amounts by status)"
+					},
+					"response": []
+				}
+			],
+			"description": "Employee cash advance tracking with overdue monitoring and liquidation management"
+		},
+		{
+			"name": "Financial - Disbursements",
+			"item": [
+				{
+					"name": "Get All Disbursements",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/disbursements?fund_source=MOOE",
+							"host": ["{{base_url}}"],
+							"path": ["api", "disbursements"],
+							"query": [
+								{
+									"key": "fund_source",
+									"value": "MOOE"
+								},
+								{
+									"key": "status",
+									"value": "Pending",
+									"disabled": true
+								}
+							]
+						},
+						"description": "Get paginated list of disbursement vouchers"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Disbursement by ID",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/disbursements/1",
+							"host": ["{{base_url}}"],
+							"path": ["api", "disbursements", "1"]
+						},
+						"description": "Get specific disbursement voucher details"
+					},
+					"response": []
+				},
+				{
+					"name": "Create Disbursement Voucher",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"dv_number\": \"DV-2025-001\",\n    \"payee\": \"Manila Office Supplies Corporation\",\n    \"purpose\": \"Payment for office supplies - PR-2025-001\",\n    \"fund_source\": \"MOOE\",\n    \"gross_amount\": 5000.00,\n    \"tax_withheld\": 50.00,\n    \"net_amount\": 4950.00,\n    \"purchase_order_id\": 1,\n    \"prepared_by\": 2\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/disbursements",
+							"host": ["{{base_url}}"],
+							"path": ["api", "disbursements"]
+						},
+						"description": "Create new disbursement voucher"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Disbursement Voucher",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"tax_withheld\": 75.00,\n    \"net_amount\": 4925.00\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/disbursements/1",
+							"host": ["{{base_url}}"],
+							"path": ["api", "disbursements", "1"]
+						},
+						"description": "Update disbursement voucher"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Disbursement Voucher",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/disbursements/1",
+							"host": ["{{base_url}}"],
+							"path": ["api", "disbursements", "1"]
+						},
+						"description": "Delete disbursement voucher"
+					},
+					"response": []
+				},
+				{
+					"name": "Certify Disbursement",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"certified_by\": 2\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/disbursements/1/certify",
+							"host": ["{{base_url}}"],
+							"path": ["api", "disbursements", "1", "certify"]
+						},
+						"description": "Certify disbursement voucher (Budget Officer)"
+					},
+					"response": []
+				},
+				{
+					"name": "Approve Disbursement",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"approved_by\": 1\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/disbursements/1/approve",
+							"host": ["{{base_url}}"],
+							"path": ["api", "disbursements", "1", "approve"]
+						},
+						"description": "Approve disbursement voucher (School Head)"
+					},
+					"response": []
+				},
+				{
+					"name": "Mark as Paid",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"paid_by\": 2,\n    \"payment_date\": \"2025-12-10\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/disbursements/1/mark-paid",
+							"host": ["{{base_url}}"],
+							"path": ["api", "disbursements", "1", "mark-paid"]
+						},
+						"description": "Mark disbursement as paid"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Pending Disbursements",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/disbursements/pending",
+							"host": ["{{base_url}}"],
+							"path": ["api", "disbursements", "pending"]
+						},
+						"description": "Get all pending disbursements"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Disbursement Statistics",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/disbursements/statistics",
+							"host": ["{{base_url}}"],
+							"path": ["api", "disbursements", "statistics"]
+						},
+						"description": "Get disbursement statistics (counts, amounts by status and fund source)"
+					},
+					"response": []
+				}
+			],
+			"description": "Disbursement voucher (DV) system with multi-level approval workflow for MOOE tracking"
+		},
+		{
+			"name": "Financial - Liquidations",
+			"item": [
+				{
+					"name": "Get All Liquidations",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/liquidations?status=Pending",
+							"host": ["{{base_url}}"],
+							"path": ["api", "liquidations"],
+							"query": [
+								{
+									"key": "status",
+									"value": "Pending"
+								}
+							]
+						},
+						"description": "Get paginated list of liquidations"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Liquidation by ID",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/liquidations/1",
+							"host": ["{{base_url}}"],
+							"path": ["api", "liquidations", "1"]
+						},
+						"description": "Get specific liquidation details with items"
+					},
+					"response": []
+				},
+				{
+					"name": "Create Liquidation",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"cash_advance_id\": 1,\n    \"employee_id\": 3,\n    \"liquidation_number\": \"LIQ-2025-001\",\n    \"liquidation_date\": \"2025-12-10\",\n    \"cash_advance_amount\": 5000.00,\n    \"items\": [\n        {\n            \"expense_date\": \"2025-12-08\",\n            \"description\": \"Transportation - Manila to Division Office\",\n            \"category\": \"Transportation\",\n            \"amount\": 800.00,\n            \"official_receipt_number\": \"OR-12345\"\n        },\n        {\n            \"expense_date\": \"2025-12-08\",\n            \"description\": \"Meals and accommodation\",\n            \"category\": \"Meals\",\n            \"amount\": 1200.00,\n            \"official_receipt_number\": \"OR-54321\"\n        }\n    ]\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/liquidations",
+							"host": ["{{base_url}}"],
+							"path": ["api", "liquidations"]
+						},
+						"description": "Create liquidation (auto-calculates refund/additional payment needed)"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Liquidation",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"liquidation_date\": \"2025-12-11\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/liquidations/1",
+							"host": ["{{base_url}}"],
+							"path": ["api", "liquidations", "1"]
+						},
+						"description": "Update liquidation details"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Liquidation",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/liquidations/1",
+							"host": ["{{base_url}}"],
+							"path": ["api", "liquidations", "1"]
+						},
+						"description": "Delete liquidation"
+					},
+					"response": []
+				},
+				{
+					"name": "Add Liquidation Item",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"expense_date\": \"2025-12-09\",\n    \"description\": \"Internet access for online meeting\",\n    \"category\": \"Telecommunications\",\n    \"amount\": 200.00,\n    \"official_receipt_number\": \"OR-99999\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/liquidations/1/items",
+							"host": ["{{base_url}}"],
+							"path": ["api", "liquidations", "1", "items"]
+						},
+						"description": "Add expense item to liquidation (auto-recalculates totals)"
+					},
+					"response": []
+				},
+				{
+					"name": "Approve Liquidation",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"approved_by\": 1\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/liquidations/1/approve",
+							"host": ["{{base_url}}"],
+							"path": ["api", "liquidations", "1", "approve"]
+						},
+						"description": "Approve liquidation (auto-updates cash advance status)"
+					},
+					"response": []
+				},
+				{
+					"name": "Reject Liquidation",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"rejected_by\": 1,\n    \"reason\": \"Missing official receipts for some expenses\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/liquidations/1/reject",
+							"host": ["{{base_url}}"],
+							"path": ["api", "liquidations", "1", "reject"]
+						},
+						"description": "Reject liquidation with reason"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Pending Liquidations",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/liquidations/pending",
+							"host": ["{{base_url}}"],
+							"path": ["api", "liquidations", "pending"]
+						},
+						"description": "Get all pending liquidations requiring approval"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Liquidations by Cash Advance",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/liquidations/cash-advance/1",
+							"host": ["{{base_url}}"],
+							"path": ["api", "liquidations", "cash-advance", "1"]
+						},
+						"description": "Get all liquidations for specific cash advance"
+					},
+					"response": []
+				}
+			],
+			"description": "Cash advance liquidation with automatic calculations and cash advance status updates"
+		},
+		{
+			"name": "Utilities",
+			"item": [
+				{
+					"name": "Health Check",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/health",
+							"host": ["{{base_url}}"],
+							"path": ["api", "health"]
+						},
+						"description": "Check if API is running"
+					},
+					"response": []
+				},
+				{
+					"name": "API Root",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/",
+							"host": ["{{base_url}}"],
+							"path": [""]
+						},
+						"description": "API welcome message"
+					},
+					"response": []
+				}
+			],
+			"description": "Utility endpoints"
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:8000",
+			"type": "string"
+		}
+	]
+}

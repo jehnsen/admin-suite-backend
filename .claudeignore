@@ -1,0 +1,35 @@
+# Ignore node_modules and dependencies
+node_modules/
+vendor/
+
+# Ignore environment files
+.env
+.env.*
+
+# Ignore build and dist folders
+dist/
+build/
+
+# Ignore logs and temp files
+*.log
+*.tmp
+
+# Ignore OS generated files
+.DS_Store
+Thumbs.db
+
+# Ignore IDE/editor folders
+.vscode/
+.idea/
+*.swp
+
+# Ignore test coverage
+coverage/
+
+# Ignore database files
+*.sqlite
+*.db
+
+# Ignore compiled files
+*.pyc
+*.class

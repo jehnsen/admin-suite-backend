@@ -21,6 +21,8 @@ class DatabaseSeeder extends Seeder
             IssuanceSeeder::class,
             BudgetSeeder::class,
             ExpenseSeeder::class,
+            SupplierSeeder::class,
+            ProcurementSeeder::class,
         ]);
     }
 }
