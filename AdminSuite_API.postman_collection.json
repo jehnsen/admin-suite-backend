@@ -977,6 +977,375 @@
 			"description": "Service record (201 file) management"
 		},
 		{
+			"name": "HR - Trainings",
+			"item": [
+				{
+					"name": "Get All Trainings",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/trainings?per_page=15",
+							"host": ["{{base_url}}"],
+							"path": ["api", "trainings"],
+							"query": [
+								{
+									"key": "per_page",
+									"value": "15"
+								},
+								{
+									"key": "employee_id",
+									"value": "1",
+									"disabled": true
+								},
+								{
+									"key": "training_type",
+									"value": "Seminar",
+									"disabled": true
+								},
+								{
+									"key": "status",
+									"value": "Completed",
+									"disabled": true
+								},
+								{
+									"key": "year",
+									"value": "2024",
+									"disabled": true
+								},
+								{
+									"key": "search",
+									"value": "LAC",
+									"disabled": true
+								}
+							]
+						},
+						"description": "Get paginated list of all training records with optional filters"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Training by ID",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/trainings/1",
+							"host": ["{{base_url}}"],
+							"path": ["api", "trainings", "1"]
+						},
+						"description": "Get specific training details by ID"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Trainings by Employee",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/trainings/employee/1?per_page=15",
+							"host": ["{{base_url}}"],
+							"path": ["api", "trainings", "employee", "1"],
+							"query": [
+								{
+									"key": "per_page",
+									"value": "15"
+								}
+							]
+						},
+						"description": "Get all training records for a specific employee"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Completed Trainings by Employee",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/trainings/employee/1/completed",
+							"host": ["{{base_url}}"],
+							"path": ["api", "trainings", "employee", "1", "completed"]
+						},
+						"description": "Get only completed training records for a specific employee"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Trainings by Type",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/trainings/type/Seminar?per_page=15",
+							"host": ["{{base_url}}"],
+							"path": ["api", "trainings", "type", "Seminar"],
+							"query": [
+								{
+									"key": "per_page",
+									"value": "15"
+								}
+							]
+						},
+						"description": "Get trainings filtered by type (Seminar, Workshop, Conference, etc.)"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Trainings by Year",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/trainings/year/2024?per_page=15",
+							"host": ["{{base_url}}"],
+							"path": ["api", "trainings", "year", "2024"],
+							"query": [
+								{
+									"key": "per_page",
+									"value": "15"
+								}
+							]
+						},
+						"description": "Get trainings conducted in a specific year"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Training Statistics",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/trainings/statistics",
+							"host": ["{{base_url}}"],
+							"path": ["api", "trainings", "statistics"],
+							"query": [
+								{
+									"key": "employee_id",
+									"value": "1",
+									"description": "Optional: Get stats for specific employee",
+									"disabled": true
+								}
+							]
+						},
+						"description": "Get training statistics (total trainings, hours, LD units, type breakdown, yearly breakdown)"
+					},
+					"response": []
+				},
+				{
+					"name": "Create Training Record",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"employee_id\": 1,\n    \"training_title\": \"Classroom Assessment Literacy Training\",\n    \"description\": \"Training on developing and implementing effective classroom assessments aligned with K-12 curriculum.\",\n    \"training_type\": \"Workshop\",\n    \"conducted_by\": \"DepEd Assessment Division\",\n    \"venue\": \"Division Office Training Room\",\n    \"venue_type\": \"External\",\n    \"date_from\": \"2024-11-10\",\n    \"date_to\": \"2024-11-12\",\n    \"number_of_hours\": 24.00,\n    \"ld_units\": 3.00,\n    \"certificate_number\": \"CAL-2024-789\",\n    \"certificate_date\": \"2024-11-12\",\n    \"sponsorship\": \"Government\",\n    \"status\": \"Completed\",\n    \"remarks\": \"Excellent facilitator, highly applicable to teaching practice\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/trainings",
+							"host": ["{{base_url}}"],
+							"path": ["api", "trainings"]
+						},
+						"description": "Create a new training record"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Training Record",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"certificate_number\": \"CAL-2024-789-REV\",\n    \"certificate_date\": \"2024-11-15\",\n    \"status\": \"Completed\",\n    \"remarks\": \"Certificate received and verified\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/trainings/1",
+							"host": ["{{base_url}}"],
+							"path": ["api", "trainings", "1"]
+						},
+						"description": "Update training record details"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Training Record",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/trainings/99",
+							"host": ["{{base_url}}"],
+							"path": ["api", "trainings", "99"]
+						},
+						"description": "Soft delete a training record"
+					},
+					"response": []
+				}
+			],
+			"description": "Employee training and professional development records management"
+		},
+		{
 			"name": "Procurement - Suppliers",
 			"item": [
 				{

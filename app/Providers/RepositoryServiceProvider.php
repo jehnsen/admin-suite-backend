@@ -11,6 +11,8 @@ use App\Interfaces\HR\LeaveRequestRepositoryInterface;
 use App\Repositories\HR\LeaveRequestRepository;
 use App\Interfaces\HR\ServiceRecordRepositoryInterface;
 use App\Repositories\HR\ServiceRecordRepository;
+use App\Interfaces\HR\TrainingRepositoryInterface;
+use App\Repositories\HR\TrainingRepository;
 
 // Procurement Module
 use App\Interfaces\Procurement\SupplierRepositoryInterface;
@@ -53,6 +55,7 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(EmployeeRepositoryInterface::class, EmployeeRepository::class);
         $this->app->bind(LeaveRequestRepositoryInterface::class, LeaveRequestRepository::class);
         $this->app->bind(ServiceRecordRepositoryInterface::class, ServiceRecordRepository::class);
+        $this->app->bind(TrainingRepositoryInterface::class, TrainingRepository::class);
 
         // Procurement Module Repository Bindings
         $this->app->bind(SupplierRepositoryInterface::class, SupplierRepository::class);
