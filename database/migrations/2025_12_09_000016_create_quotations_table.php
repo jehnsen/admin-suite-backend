@@ -17,7 +17,7 @@ return new class extends Migration
             $table->foreignId('supplier_id')->constrained()->onDelete('restrict');
 
             $table->string('quotation_number')->unique();
-            $table->date('quotation_date');
+            $table->date('quotation_date')->nullable();
             $table->date('validity_date')->nullable(); // Quote valid until
 
             // Pricing Summary

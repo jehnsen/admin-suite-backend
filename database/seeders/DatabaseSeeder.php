@@ -25,6 +25,7 @@ class DatabaseSeeder extends Seeder
             ProcurementSeeder::class,
             PurchaseOrderSeeder::class,
             TrainingSeeder::class,
+            FinancialSeeder::class,
         ]);
     }
 }
