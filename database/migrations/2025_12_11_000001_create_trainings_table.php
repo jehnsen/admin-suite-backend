@@ -31,7 +31,7 @@ return new class extends Migration
             ]);
 
             // Provider/Organizer Information
-            $table->string('conducted_by'); // Training provider/organizer
+            $table->string('conducted_by')->nullable(); // Training provider/organizer
             $table->string('venue')->nullable();
             $table->enum('venue_type', ['In-house', 'External', 'Online'])->default('External');
 

@@ -23,6 +23,8 @@ class DatabaseSeeder extends Seeder
             ExpenseSeeder::class,
             SupplierSeeder::class,
             ProcurementSeeder::class,
+            PurchaseOrderSeeder::class,
+            TrainingSeeder::class,
         ]);
     }
 }

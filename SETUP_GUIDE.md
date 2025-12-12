@@ -185,6 +185,9 @@ Replace `app/Models/User.php` with the provided User model that includes Spatie 
 # Run all migrations (this will create all tables)
 php artisan migrate
 
+#specific file
+php artisan migrate --path=database/migrations/2025_12_11_000001_create_trainings_table.php
+
 # If you encounter errors, try fresh migration
 php artisan migrate:fresh
 ```

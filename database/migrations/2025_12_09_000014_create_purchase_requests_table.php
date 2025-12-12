@@ -38,7 +38,7 @@ return new class extends Migration
                 'Negotiated Procurement'
             ])->default('Small Value Procurement');
 
-            $table->decimal('estimated_budget', 15, 2);
+            $table->decimal('estimated_budget', 15, 2)->default(0.00);
             $table->decimal('total_amount', 15, 2)->default(0.00);
 
             // Dates
