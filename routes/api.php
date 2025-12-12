@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\Auth\LogoutController;
 use App\Http\Controllers\Api\HR\EmployeeController;
 use App\Http\Controllers\Api\HR\LeaveRequestController;
 use App\Http\Controllers\Api\HR\ServiceRecordController;
+use App\Http\Controllers\Api\HR\TrainingController;
 use App\Http\Controllers\Api\Procurement\SupplierController;
 use App\Http\Controllers\Api\Procurement\PurchaseRequestController;
 use App\Http\Controllers\Api\Procurement\QuotationController;
@@ -74,6 +75,20 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/{id}', [ServiceRecordController::class, 'show']);
         Route::put('/{id}', [ServiceRecordController::class, 'update']);
         Route::delete('/{id}', [ServiceRecordController::class, 'destroy']);
+    });
+
+    // HR Management - Trainings
+    Route::prefix('trainings')->group(function () {
+        Route::get('/', [TrainingController::class, 'index']);
+        Route::post('/', [TrainingController::class, 'store']);
+        Route::get('/statistics', [TrainingController::class, 'statistics']);
+        Route::get('/type/{type}', [TrainingController::class, 'byType']);
+        Route::get('/year/{year}', [TrainingController::class, 'byYear']);
+        Route::get('/employee/{employeeId}', [TrainingController::class, 'byEmployee']);
+        Route::get('/employee/{employeeId}/completed', [TrainingController::class, 'completedByEmployee']);
+        Route::get('/{id}', [TrainingController::class, 'show']);
+        Route::put('/{id}', [TrainingController::class, 'update']);
+        Route::delete('/{id}', [TrainingController::class, 'destroy']);
     });
 
     // Procurement - Suppliers

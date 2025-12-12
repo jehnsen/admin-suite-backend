@@ -38,7 +38,9 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
         if (!empty($filters['search'])) {
             $query->where(function ($q) use ($filters) {
                 $q->where('po_number', 'LIKE', "%{$filters['search']}%")
-                  ->orWhere('supplier_name', 'LIKE', "%{$filters['search']}%");
+                  ->orWhereHas('supplier', function ($supplierQuery) use ($filters) {
+                      $supplierQuery->where('business_name', 'LIKE', "%{$filters['search']}%");
+                  });
             });
         }
 

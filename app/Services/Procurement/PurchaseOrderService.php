@@ -80,12 +80,6 @@ class PurchaseOrderService
                 $data['po_number'] = $this->generatePONumber();
             }
 
-            // Snapshot supplier details
-            $data['supplier_name'] = $supplier->display_name;
-            $data['supplier_address'] = $supplier->address . ', ' . $supplier->city;
-            $data['supplier_contact'] = $supplier->phone_number;
-            $data['supplier_tin'] = $supplier->tin;
-
             // Copy fund source from PR if not provided
             if (empty($data['fund_source'])) {
                 $data['fund_source'] = $pr->fund_source;

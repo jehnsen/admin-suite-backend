@@ -63,13 +63,13 @@ API will be available at: `http://localhost:8000`
 - **Leave Requests:** 12 leave types with approval workflow and automatic credit calculation
 - **Service Records:** Employment history tracking with promotions and transfers
 
-### =æ Inventory Management
+### =ï¿½ Inventory Management
 - Asset tracking with serial numbers and property numbers
 - Fund source tracking (MOOE, SEF, DepEd Central)
 - Custodianship via Issuances
 - Depreciation calculation
 
-### =° Financial Management
+### =ï¿½ Financial Management
 - Budget allocation tracking (SIP/AIP)
 - Real-time utilization monitoring
 - Expense tracking with approval workflow
@@ -180,8 +180,6 @@ See [ARCHITECTURE.md](ARCHITECTURE.md) for detailed architecture documentation.
 
 ## License
 
-MIT
+php artisan migrate --path=database/migrations/2025_12_12_000001_remove_supplier_details_from_purchase_orders_table.php
 
-## Support
-
-For issues and questions, please refer to the documentation files in this repository.
+php artisan migrate:fresh --seed

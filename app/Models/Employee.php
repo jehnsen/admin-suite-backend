@@ -91,6 +91,14 @@ class Employee extends Model
     }
 
     /**
+     * Get all trainings attended by the employee.
+     */
+    public function trainings(): HasMany
+    {
+        return $this->hasMany(Training::class);
+    }
+
+    /**
      * Get all issuances where this employee is the recipient.
      */
     public function issuances(): HasMany
