@@ -91,3 +91,8 @@ yarn.lock
 # Claude Code
 .claude/
 CLAUDE.md
+
+# docu
+ARCHITECTURE.md
+COMPLETE_SYSTEM_GUIDE.md
+SYSTEM_OVERVIEW.md
