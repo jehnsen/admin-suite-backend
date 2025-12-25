@@ -37,6 +37,8 @@ use App\Interfaces\Inventory\PhysicalCountRepositoryInterface;
 use App\Repositories\Inventory\PhysicalCountRepository;
 
 // Financial Module
+use App\Interfaces\Financial\BudgetRepositoryInterface;
+use App\Repositories\Financial\BudgetRepository;
 use App\Interfaces\Financial\CashAdvanceRepositoryInterface;
 use App\Repositories\Financial\CashAdvanceRepository;
 use App\Interfaces\Financial\DisbursementRepositoryInterface;
@@ -71,6 +73,7 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(PhysicalCountRepositoryInterface::class, PhysicalCountRepository::class);
 
         // Financial Module Repository Bindings
+        $this->app->bind(BudgetRepositoryInterface::class, BudgetRepository::class);
         $this->app->bind(CashAdvanceRepositoryInterface::class, CashAdvanceRepository::class);
         $this->app->bind(DisbursementRepositoryInterface::class, DisbursementRepository::class);
         $this->app->bind(LiquidationRepositoryInterface::class, LiquidationRepository::class);

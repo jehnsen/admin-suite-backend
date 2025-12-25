@@ -17,9 +17,12 @@ use App\Http\Controllers\Api\Inventory\InventoryItemController;
 use App\Http\Controllers\Api\Inventory\StockCardController;
 use App\Http\Controllers\Api\Inventory\InventoryAdjustmentController;
 use App\Http\Controllers\Api\Inventory\PhysicalCountController;
+use App\Http\Controllers\Api\Financial\BudgetController;
 use App\Http\Controllers\Api\Financial\CashAdvanceController;
 use App\Http\Controllers\Api\Financial\DisbursementController;
 use App\Http\Controllers\Api\Financial\LiquidationController;
+use App\Http\Controllers\Api\Financial\TransactionController;
+use App\Http\Controllers\Api\User\ProfileController;
 
 /*
 |--------------------------------------------------------------------------
@@ -42,6 +45,24 @@ Route::prefix('auth')->group(function () {
 Route::middleware('auth:sanctum')->group(function () {
     // Authentication
     Route::post('/auth/logout', [LogoutController::class, 'logout']);
+
+    // User Profile / My Account
+    Route::prefix('profile')->group(function () {
+        Route::get('/', [ProfileController::class, 'show']);
+        Route::put('/', [ProfileController::class, 'update']);
+        Route::put('/change-password', [ProfileController::class, 'changePassword']);
+        Route::get('/statistics', [ProfileController::class, 'statistics']);
+        Route::get('/activities', [ProfileController::class, 'activities']);
+    });
+
+    // Alias routes for My Account
+    Route::prefix('my-account')->group(function () {
+        Route::get('/', [ProfileController::class, 'show']);
+        Route::put('/', [ProfileController::class, 'update']);
+        Route::put('/change-password', [ProfileController::class, 'changePassword']);
+        Route::get('/statistics', [ProfileController::class, 'statistics']);
+        Route::get('/activities', [ProfileController::class, 'activities']);
+    });
 
     // HR Management - Employees
     Route::prefix('employees')->group(function () {
@@ -207,6 +228,37 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::delete('/{id}', [PhysicalCountController::class, 'destroy']);
     });
 
+    // Financial Management - Budgets
+    Route::prefix('budgets')->group(function () {
+        Route::get('/', [BudgetController::class, 'index']);
+        Route::post('/', [BudgetController::class, 'store']);
+        Route::get('/active', [BudgetController::class, 'active']);
+        Route::get('/utilization', [BudgetController::class, 'utilization']);
+        Route::get('/nearly-depleted', [BudgetController::class, 'nearlyDepleted']);
+        Route::get('/statistics', [BudgetController::class, 'statistics']);
+        Route::get('/fiscal-year/{year}', [BudgetController::class, 'byFiscalYear']);
+        Route::get('/fund-source/{fundSource}', [BudgetController::class, 'byFundSource']);
+        Route::get('/{id}', [BudgetController::class, 'show']);
+        Route::put('/{id}', [BudgetController::class, 'update']);
+        Route::delete('/{id}', [BudgetController::class, 'destroy']);
+        Route::put('/{id}/approve', [BudgetController::class, 'approve']);
+        Route::put('/{id}/activate', [BudgetController::class, 'activate']);
+        Route::put('/{id}/close', [BudgetController::class, 'close']);
+        Route::put('/{id}/update-utilization', [BudgetController::class, 'updateUtilization']);
+    });
+
+    // Budget Allocations (Alias for Budgets - for frontend compatibility)
+    Route::prefix('budget-allocations')->group(function () {
+        Route::get('/', [BudgetController::class, 'index']);
+        Route::post('/', [BudgetController::class, 'store']);
+        Route::get('/active', [BudgetController::class, 'active']);
+        Route::get('/utilization', [BudgetController::class, 'utilization']);
+        Route::get('/statistics', [BudgetController::class, 'statistics']);
+        Route::get('/{id}', [BudgetController::class, 'show']);
+        Route::put('/{id}', [BudgetController::class, 'update']);
+        Route::delete('/{id}', [BudgetController::class, 'destroy']);
+    });
+
     // Financial Management - Cash Advances
     Route::prefix('cash-advances')->group(function () {
         Route::get('/', [CashAdvanceController::class, 'index']);
@@ -248,6 +300,18 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/{id}/items', [LiquidationController::class, 'addItem']);
         Route::put('/{id}/approve', [LiquidationController::class, 'approve']);
         Route::put('/{id}/reject', [LiquidationController::class, 'reject']);
+    });
+
+    // Financial Management - Transactions
+    Route::prefix('transactions')->group(function () {
+        Route::get('/', [TransactionController::class, 'index']);
+        Route::post('/', [TransactionController::class, 'store']);
+        Route::get('/recent', [TransactionController::class, 'recent']);
+        Route::get('/statistics', [TransactionController::class, 'statistics']);
+        Route::get('/{id}', [TransactionController::class, 'show']);
+        Route::put('/{id}', [TransactionController::class, 'update']);
+        Route::delete('/{id}', [TransactionController::class, 'destroy']);
+        Route::put('/{id}/verify', [TransactionController::class, 'verify']);
     });
 });
 

@@ -1,0 +1,4430 @@
+openapi: 3.0.3
+info:
+  title: 'AdminSuite API API Documentation'
+  description: ''
+  version: 1.0.0
+servers:
+  -
+    url: 'http://localhost:8000'
+tags:
+  -
+    name: Authentication
+    description: "\nUser registration endpoint."
+  -
+    name: Endpoints
+    description: ''
+  -
+    name: 'HR Management - Employees'
+    description: "\nAPIs for managing employee records, including creation, updates, promotions, and leave credit management."
+  -
+    name: 'HR Management - Leave Requests'
+    description: "\nAPIs for managing employee leave requests with approval workflow."
+  -
+    name: 'HR Management - Service Records'
+    description: "\nAPIs for managing employee service records (201 files)."
+paths:
+  /api/auth/register:
+    post:
+      summary: Register
+      operationId: register
+      description: 'Create a new user account.'
+      parameters: []
+      responses:
+        201:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Registration successful'
+                  token: 1|xxxxxxxxxxxxxxxxxxx
+                  user:
+                    id: 1
+                    name: 'Juan dela Cruz'
+                    email: juan.delacruz@deped.gov.ph
+                properties:
+                  message:
+                    type: string
+                    example: 'Registration successful'
+                  token:
+                    type: string
+                    example: 1|xxxxxxxxxxxxxxxxxxx
+                  user:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 1
+                      name:
+                        type: string
+                        example: 'Juan dela Cruz'
+                      email:
+                        type: string
+                        example: juan.delacruz@deped.gov.ph
+        422:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Validation error'
+                  errors: {  }
+                properties:
+                  message:
+                    type: string
+                    example: 'Validation error'
+                  errors:
+                    type: object
+                    properties: {  }
+      tags:
+        - Authentication
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: 'Full name.'
+                  example: 'Juan dela Cruz'
+                email:
+                  type: string
+                  description: 'Email address.'
+                  example: juan.delacruz@deped.gov.ph
+                password:
+                  type: string
+                  description: 'Password (min 8 characters).'
+                  example: Password123!
+                password_confirmation:
+                  type: string
+                  description: 'Password confirmation.'
+                  example: Password123!
+              required:
+                - name
+                - email
+                - password
+                - password_confirmation
+      security: []
+  /api/auth/login:
+    post:
+      summary: Login
+      operationId: login
+      description: 'Authenticate user and generate API token.'
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Login successful'
+                  token: 1|xxxxxxxxxxxxxxxxxxx
+                  user:
+                    id: 1
+                    name: 'Juan dela Cruz'
+                    email: juan.delacruz@deped.gov.ph
+                properties:
+                  message:
+                    type: string
+                    example: 'Login successful'
+                  token:
+                    type: string
+                    example: 1|xxxxxxxxxxxxxxxxxxx
+                  user:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 1
+                      name:
+                        type: string
+                        example: 'Juan dela Cruz'
+                      email:
+                        type: string
+                        example: juan.delacruz@deped.gov.ph
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Invalid credentials'
+                properties:
+                  message:
+                    type: string
+                    example: 'Invalid credentials'
+      tags:
+        - Authentication
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  description: "User's email address."
+                  example: juan.delacruz@deped.gov.ph
+                password:
+                  type: string
+                  description: "User's password."
+                  example: Password123!
+              required:
+                - email
+                - password
+      security: []
+  /api/auth/logout:
+    post:
+      summary: Logout
+      operationId: logout
+      description: "Revoke the user's current API token."
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Logout successful'
+                properties:
+                  message:
+                    type: string
+                    example: 'Logout successful'
+      tags:
+        - Authentication
+  /api/trainings:
+    get:
+      summary: 'Get all trainings'
+      operationId: getAllTrainings
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Endpoints
+      security: []
+    post:
+      summary: 'Create new training record'
+      operationId: createNewTrainingRecord
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+  /api/trainings/statistics:
+    get:
+      summary: 'Get training statistics'
+      operationId: getTrainingStatistics
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Endpoints
+      security: []
+  '/api/trainings/type/{type}':
+    get:
+      summary: 'Get trainings by type'
+      operationId: getTrainingsByType
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: type
+        description: 'The type.'
+        example: architecto
+        required: true
+        schema:
+          type: string
+  '/api/trainings/year/{year}':
+    get:
+      summary: 'Get trainings by year'
+      operationId: getTrainingsByYear
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: year
+        description: 'The year.'
+        example: architecto
+        required: true
+        schema:
+          type: string
+  '/api/trainings/employee/{employeeId}':
+    get:
+      summary: 'Get trainings by employee ID'
+      operationId: getTrainingsByEmployeeID
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: employeeId
+        description: ''
+        example: architecto
+        required: true
+        schema:
+          type: string
+  '/api/trainings/employee/{employeeId}/completed':
+    get:
+      summary: 'Get completed trainings for an employee'
+      operationId: getCompletedTrainingsForAnEmployee
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: employeeId
+        description: ''
+        example: architecto
+        required: true
+        schema:
+          type: string
+  '/api/trainings/{id}':
+    get:
+      summary: 'Get training by ID'
+      operationId: getTrainingByID
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Endpoints
+      security: []
+    put:
+      summary: 'Update training record'
+      operationId: updateTrainingRecord
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+    delete:
+      summary: 'Delete training record'
+      operationId: deleteTrainingRecord
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the training.'
+        example: architecto
+        required: true
+        schema:
+          type: string
+  /api/suppliers:
+    get:
+      summary: 'Get all suppliers'
+      operationId: getAllSuppliers
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Endpoints
+      security: []
+    post:
+      summary: 'Create new supplier'
+      operationId: createNewSupplier
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+  /api/suppliers/active:
+    get:
+      summary: 'Get active suppliers'
+      operationId: getActiveSuppliers
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Endpoints
+      security: []
+  /api/suppliers/search:
+    get:
+      summary: 'Search suppliers'
+      operationId: searchSuppliers
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Endpoints
+      security: []
+  /api/suppliers/statistics:
+    get:
+      summary: 'Get supplier statistics'
+      operationId: getSupplierStatistics
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Endpoints
+      security: []
+  '/api/suppliers/{id}':
+    get:
+      summary: 'Get supplier by ID'
+      operationId: getSupplierByID
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Endpoints
+      security: []
+    put:
+      summary: 'Update supplier'
+      operationId: updateSupplier
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+    delete:
+      summary: 'Delete supplier'
+      operationId: deleteSupplier
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the supplier.'
+        example: architecto
+        required: true
+        schema:
+          type: string
+  /api/purchase-requests:
+    get:
+      summary: 'Get all purchase requests'
+      operationId: getAllPurchaseRequests
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Endpoints
+      security: []
+    post:
+      summary: 'Create new purchase request'
+      operationId: createNewPurchaseRequest
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+  /api/purchase-requests/pending:
+    get:
+      summary: 'Get pending purchase requests'
+      operationId: getPendingPurchaseRequests
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Endpoints
+      security: []
+  /api/purchase-requests/statistics:
+    get:
+      summary: 'Get purchase request statistics'
+      operationId: getPurchaseRequestStatistics
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Endpoints
+      security: []
+  '/api/purchase-requests/{id}':
+    get:
+      summary: 'Get purchase request by ID'
+      operationId: getPurchaseRequestByID
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Endpoints
+      security: []
+    put:
+      summary: 'Update purchase request'
+      operationId: updatePurchaseRequest
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+    delete:
+      summary: 'Delete purchase request'
+      operationId: deletePurchaseRequest
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the purchase request.'
+        example: architecto
+        required: true
+        schema:
+          type: string
+  '/api/purchase-requests/{id}/submit':
+    put:
+      summary: 'Submit purchase request'
+      operationId: submitPurchaseRequest
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the purchase request.'
+        example: architecto
+        required: true
+        schema:
+          type: string
+  '/api/purchase-requests/{id}/recommend':
+    put:
+      summary: 'Recommend purchase request'
+      operationId: recommendPurchaseRequest
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the purchase request.'
+        example: architecto
+        required: true
+        schema:
+          type: string
+  '/api/purchase-requests/{id}/approve':
+    put:
+      summary: 'Approve purchase request'
+      operationId: approvePurchaseRequest
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the purchase request.'
+        example: architecto
+        required: true
+        schema:
+          type: string
+  '/api/purchase-requests/{id}/disapprove':
+    put:
+      summary: 'Disapprove purchase request'
+      operationId: disapprovePurchaseRequest
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the purchase request.'
+        example: architecto
+        required: true
+        schema:
+          type: string
+  '/api/purchase-requests/{id}/cancel':
+    put:
+      summary: 'Cancel purchase request'
+      operationId: cancelPurchaseRequest
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the purchase request.'
+        example: architecto
+        required: true
+        schema:
+          type: string
+  /api/quotations:
+    get:
+      summary: 'Get all quotations'
+      operationId: getAllQuotations
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Endpoints
+      security: []
+    post:
+      summary: 'Create new quotation'
+      operationId: createNewQuotation
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+  '/api/quotations/purchase-request/{prId}':
+    get:
+      summary: 'Get quotations by purchase request'
+      operationId: getQuotationsByPurchaseRequest
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: prId
+        description: ''
+        example: architecto
+        required: true
+        schema:
+          type: string
+  '/api/quotations/{id}':
+    get:
+      summary: 'Get quotation by ID'
+      operationId: getQuotationByID
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Endpoints
+      security: []
+    put:
+      summary: 'Update quotation'
+      operationId: updateQuotation
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+    delete:
+      summary: 'Delete quotation'
+      operationId: deleteQuotation
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the quotation.'
+        example: architecto
+        required: true
+        schema:
+          type: string
+  '/api/quotations/{id}/select':
+    put:
+      summary: 'Select quotation (award)'
+      operationId: selectQuotationaward
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the quotation.'
+        example: architecto
+        required: true
+        schema:
+          type: string
+  '/api/quotations/purchase-request/{prId}/evaluate':
+    put:
+      summary: 'Evaluate quotations for a purchase request'
+      operationId: evaluateQuotationsForAPurchaseRequest
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: prId
+        description: ''
+        example: architecto
+        required: true
+        schema:
+          type: string
+  /api/purchase-orders:
+    get:
+      summary: 'Get all purchase orders'
+      operationId: getAllPurchaseOrders
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Endpoints
+      security: []
+    post:
+      summary: 'Create new purchase order'
+      operationId: createNewPurchaseOrder
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+  /api/purchase-orders/pending:
+    get:
+      summary: 'Get pending purchase orders'
+      operationId: getPendingPurchaseOrders
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Endpoints
+      security: []
+  /api/purchase-orders/statistics:
+    get:
+      summary: 'Get purchase order statistics'
+      operationId: getPurchaseOrderStatistics
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Endpoints
+      security: []
+  '/api/purchase-orders/{id}':
+    get:
+      summary: 'Get purchase order by ID'
+      operationId: getPurchaseOrderByID
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Endpoints
+      security: []
+    put:
+      summary: 'Update purchase order'
+      operationId: updatePurchaseOrder
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+    delete:
+      summary: 'Delete purchase order'
+      operationId: deletePurchaseOrder
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the purchase order.'
+        example: architecto
+        required: true
+        schema:
+          type: string
+  '/api/purchase-orders/{id}/approve':
+    put:
+      summary: 'Approve purchase order'
+      operationId: approvePurchaseOrder
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the purchase order.'
+        example: architecto
+        required: true
+        schema:
+          type: string
+  '/api/purchase-orders/{id}/send-to-supplier':
+    put:
+      summary: 'Send PO to supplier'
+      operationId: sendPOToSupplier
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the purchase order.'
+        example: architecto
+        required: true
+        schema:
+          type: string
+  '/api/purchase-orders/{id}/cancel':
+    put:
+      summary: 'Cancel purchase order'
+      operationId: cancelPurchaseOrder
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the purchase order.'
+        example: architecto
+        required: true
+        schema:
+          type: string
+  /api/deliveries:
+    get:
+      summary: 'Get all deliveries'
+      operationId: getAllDeliveries
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Endpoints
+      security: []
+    post:
+      summary: 'Create new delivery'
+      operationId: createNewDelivery
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+  /api/deliveries/pending:
+    get:
+      summary: 'Get pending deliveries'
+      operationId: getPendingDeliveries
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Endpoints
+      security: []
+  /api/deliveries/statistics:
+    get:
+      summary: 'Get delivery statistics'
+      operationId: getDeliveryStatistics
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Endpoints
+      security: []
+  '/api/deliveries/purchase-order/{poId}':
+    get:
+      summary: 'Get deliveries by purchase order'
+      operationId: getDeliveriesByPurchaseOrder
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: poId
+        description: ''
+        example: architecto
+        required: true
+        schema:
+          type: string
+  '/api/deliveries/{id}':
+    get:
+      summary: 'Get delivery by ID'
+      operationId: getDeliveryByID
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Endpoints
+      security: []
+    put:
+      summary: 'Update delivery'
+      operationId: updateDelivery
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+    delete:
+      summary: 'Delete delivery'
+      operationId: deleteDelivery
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the delivery.'
+        example: architecto
+        required: true
+        schema:
+          type: string
+  '/api/deliveries/{id}/inspect':
+    put:
+      summary: 'Inspect delivery'
+      operationId: inspectDelivery
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the delivery.'
+        example: architecto
+        required: true
+        schema:
+          type: string
+  '/api/deliveries/{id}/accept':
+    put:
+      summary: 'Accept delivery'
+      operationId: acceptDelivery
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the delivery.'
+        example: architecto
+        required: true
+        schema:
+          type: string
+  '/api/deliveries/{id}/reject':
+    put:
+      summary: 'Reject delivery'
+      operationId: rejectDelivery
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the delivery.'
+        example: architecto
+        required: true
+        schema:
+          type: string
+  /api/inventory-items:
+    get:
+      summary: 'Get all inventory items'
+      operationId: getAllInventoryItems
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Endpoints
+      security: []
+    post:
+      summary: 'Create new inventory item'
+      operationId: createNewInventoryItem
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+  /api/inventory-items/search:
+    get:
+      summary: 'Search inventory items'
+      operationId: searchInventoryItems
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Endpoints
+      security: []
+  /api/inventory-items/with-balances:
+    get:
+      summary: 'Get all inventory items with current stock balances'
+      operationId: getAllInventoryItemsWithCurrentStockBalances
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Endpoints
+      security: []
+  /api/inventory-items/low-stock:
+    get:
+      summary: 'Get low stock items'
+      operationId: getLowStockItems
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Endpoints
+      security: []
+  /api/inventory-items/statistics:
+    get:
+      summary: 'Get inventory statistics'
+      operationId: getInventoryStatistics
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Endpoints
+      security: []
+  '/api/inventory-items/{id}':
+    get:
+      summary: 'Get inventory item by ID'
+      operationId: getInventoryItemByID
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Endpoints
+      security: []
+    put:
+      summary: 'Update inventory item'
+      operationId: updateInventoryItem
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+    delete:
+      summary: 'Delete inventory item'
+      operationId: deleteInventoryItem
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the inventory item.'
+        example: architecto
+        required: true
+        schema:
+          type: string
+  '/api/inventory-items/{id}/with-balance':
+    get:
+      summary: 'Get inventory item with current stock balance'
+      operationId: getInventoryItemWithCurrentStockBalance
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the inventory item.'
+        example: architecto
+        required: true
+        schema:
+          type: string
+  /api/stock-cards:
+    get:
+      summary: 'Get all stock cards'
+      operationId: getAllStockCards
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Endpoints
+      security: []
+  '/api/stock-cards/{id}':
+    get:
+      summary: 'Get stock card by ID'
+      operationId: getStockCardByID
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the stock card.'
+        example: architecto
+        required: true
+        schema:
+          type: string
+  /api/stock-cards/stock-in:
+    post:
+      summary: 'Record stock in'
+      operationId: recordStockIn
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+  /api/stock-cards/stock-out:
+    post:
+      summary: 'Record stock out'
+      operationId: recordStockOut
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+  /api/stock-cards/donation:
+    post:
+      summary: 'Record donation received'
+      operationId: recordDonationReceived
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+  '/api/stock-cards/item/{itemId}':
+    get:
+      summary: 'Get stock cards by inventory item'
+      operationId: getStockCardsByInventoryItem
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: itemId
+        description: ''
+        example: architecto
+        required: true
+        schema:
+          type: string
+  '/api/stock-cards/item/{itemId}/balance':
+    get:
+      summary: 'Get current balance for an inventory item'
+      operationId: getCurrentBalanceForAnInventoryItem
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: itemId
+        description: ''
+        example: architecto
+        required: true
+        schema:
+          type: string
+  /api/inventory-adjustments:
+    get:
+      summary: 'Get all inventory adjustments'
+      operationId: getAllInventoryAdjustments
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Endpoints
+      security: []
+    post:
+      summary: 'Create new inventory adjustment'
+      operationId: createNewInventoryAdjustment
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+  /api/inventory-adjustments/pending:
+    get:
+      summary: 'Get pending adjustments'
+      operationId: getPendingAdjustments
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Endpoints
+      security: []
+  '/api/inventory-adjustments/{id}':
+    get:
+      summary: 'Get adjustment by ID'
+      operationId: getAdjustmentByID
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Endpoints
+      security: []
+    put:
+      summary: 'Update inventory adjustment'
+      operationId: updateInventoryAdjustment
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+    delete:
+      summary: 'Delete inventory adjustment'
+      operationId: deleteInventoryAdjustment
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the inventory adjustment.'
+        example: architecto
+        required: true
+        schema:
+          type: string
+  '/api/inventory-adjustments/{id}/approve':
+    put:
+      summary: 'Approve inventory adjustment'
+      operationId: approveInventoryAdjustment
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the inventory adjustment.'
+        example: architecto
+        required: true
+        schema:
+          type: string
+  '/api/inventory-adjustments/{id}/reject':
+    put:
+      summary: 'Reject inventory adjustment'
+      operationId: rejectInventoryAdjustment
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the inventory adjustment.'
+        example: architecto
+        required: true
+        schema:
+          type: string
+  /api/physical-counts:
+    get:
+      summary: 'Get all physical counts'
+      operationId: getAllPhysicalCounts
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Endpoints
+      security: []
+    post:
+      summary: 'Create new physical count'
+      operationId: createNewPhysicalCount
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+  /api/physical-counts/with-variances:
+    get:
+      summary: 'Get items with variances'
+      operationId: getItemsWithVariances
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Endpoints
+      security: []
+  '/api/physical-counts/{id}':
+    get:
+      summary: 'Get physical count by ID'
+      operationId: getPhysicalCountByID
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Endpoints
+      security: []
+    put:
+      summary: 'Update physical count'
+      operationId: updatePhysicalCount
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+    delete:
+      summary: 'Delete physical count'
+      operationId: deletePhysicalCount
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the physical count.'
+        example: architecto
+        required: true
+        schema:
+          type: string
+  /api/budgets:
+    get:
+      summary: 'Get all budgets with filters'
+      operationId: getAllBudgetsWithFilters
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Endpoints
+      security: []
+    post:
+      summary: 'Create new budget'
+      operationId: createNewBudget
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+  /api/budgets/active:
+    get:
+      summary: 'Get active budgets'
+      operationId: getActiveBudgets
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Endpoints
+      security: []
+  /api/budgets/utilization:
+    get:
+      summary: 'Get budget utilization breakdown by fund source'
+      operationId: getBudgetUtilizationBreakdownByFundSource
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Endpoints
+      security: []
+  /api/budgets/nearly-depleted:
+    get:
+      summary: 'Get nearly depleted budgets (>= 90% utilized)'
+      operationId: getNearlyDepletedBudgets90Utilized
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Endpoints
+      security: []
+  /api/budgets/statistics:
+    get:
+      summary: 'Get budget statistics'
+      operationId: getBudgetStatistics
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Endpoints
+      security: []
+  '/api/budgets/fiscal-year/{year}':
+    get:
+      summary: 'Get budgets by fiscal year'
+      operationId: getBudgetsByFiscalYear
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: year
+        description: ''
+        example: architecto
+        required: true
+        schema:
+          type: string
+  '/api/budgets/fund-source/{fundSource}':
+    get:
+      summary: 'Get budgets by fund source'
+      operationId: getBudgetsByFundSource
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: fundSource
+        description: ''
+        example: architecto
+        required: true
+        schema:
+          type: string
+  '/api/budgets/{id}':
+    get:
+      summary: 'Get budget by ID'
+      operationId: getBudgetByID
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Endpoints
+      security: []
+    put:
+      summary: 'Update budget'
+      operationId: updateBudget
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+    delete:
+      summary: 'Delete budget'
+      operationId: deleteBudget
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the budget.'
+        example: architecto
+        required: true
+        schema:
+          type: string
+  '/api/budgets/{id}/approve':
+    put:
+      summary: 'Approve budget'
+      operationId: approveBudget
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the budget.'
+        example: architecto
+        required: true
+        schema:
+          type: string
+  '/api/budgets/{id}/activate':
+    put:
+      summary: 'Activate budget'
+      operationId: activateBudget
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the budget.'
+        example: architecto
+        required: true
+        schema:
+          type: string
+  '/api/budgets/{id}/close':
+    put:
+      summary: 'Close budget'
+      operationId: closeBudget
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the budget.'
+        example: architecto
+        required: true
+        schema:
+          type: string
+  '/api/budgets/{id}/update-utilization':
+    put:
+      summary: 'Manually update budget utilization from expenses'
+      operationId: manuallyUpdateBudgetUtilizationFromExpenses
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the budget.'
+        example: architecto
+        required: true
+        schema:
+          type: string
+  /api/cash-advances:
+    get:
+      summary: 'Get all cash advances'
+      operationId: getAllCashAdvances
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Endpoints
+      security: []
+    post:
+      summary: 'Create new cash advance'
+      operationId: createNewCashAdvance
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+  /api/cash-advances/pending:
+    get:
+      summary: 'Get pending cash advances'
+      operationId: getPendingCashAdvances
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Endpoints
+      security: []
+  /api/cash-advances/overdue:
+    get:
+      summary: 'Get overdue cash advances'
+      operationId: getOverdueCashAdvances
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Endpoints
+      security: []
+  /api/cash-advances/statistics:
+    get:
+      summary: 'Get cash advance statistics'
+      operationId: getCashAdvanceStatistics
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Endpoints
+      security: []
+  '/api/cash-advances/employee/{employeeId}':
+    get:
+      summary: 'Get cash advances by employee'
+      operationId: getCashAdvancesByEmployee
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: employeeId
+        description: ''
+        example: architecto
+        required: true
+        schema:
+          type: string
+  '/api/cash-advances/{id}':
+    get:
+      summary: 'Get cash advance by ID'
+      operationId: getCashAdvanceByID
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Endpoints
+      security: []
+    put:
+      summary: 'Update cash advance'
+      operationId: updateCashAdvance
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+    delete:
+      summary: 'Delete cash advance'
+      operationId: deleteCashAdvance
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the cash advance.'
+        example: architecto
+        required: true
+        schema:
+          type: string
+  '/api/cash-advances/{id}/approve':
+    put:
+      summary: 'Approve cash advance'
+      operationId: approveCashAdvance
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the cash advance.'
+        example: architecto
+        required: true
+        schema:
+          type: string
+  '/api/cash-advances/{id}/release':
+    put:
+      summary: 'Release cash advance'
+      operationId: releaseCashAdvance
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the cash advance.'
+        example: architecto
+        required: true
+        schema:
+          type: string
+  /api/disbursements:
+    get:
+      summary: 'Get all disbursements'
+      operationId: getAllDisbursements
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Endpoints
+      security: []
+    post:
+      summary: 'Create new disbursement voucher'
+      operationId: createNewDisbursementVoucher
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+  /api/disbursements/pending:
+    get:
+      summary: 'Get pending disbursements'
+      operationId: getPendingDisbursements
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Endpoints
+      security: []
+  /api/disbursements/statistics:
+    get:
+      summary: 'Get disbursement statistics'
+      operationId: getDisbursementStatistics
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Endpoints
+      security: []
+  '/api/disbursements/{id}':
+    get:
+      summary: 'Get disbursement by ID'
+      operationId: getDisbursementByID
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Endpoints
+      security: []
+    put:
+      summary: 'Update disbursement voucher'
+      operationId: updateDisbursementVoucher
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+    delete:
+      summary: 'Delete disbursement voucher'
+      operationId: deleteDisbursementVoucher
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the disbursement.'
+        example: architecto
+        required: true
+        schema:
+          type: string
+  '/api/disbursements/{id}/certify':
+    put:
+      summary: 'Certify disbursement voucher'
+      operationId: certifyDisbursementVoucher
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the disbursement.'
+        example: architecto
+        required: true
+        schema:
+          type: string
+  '/api/disbursements/{id}/approve':
+    put:
+      summary: 'Approve disbursement voucher'
+      operationId: approveDisbursementVoucher
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the disbursement.'
+        example: architecto
+        required: true
+        schema:
+          type: string
+  '/api/disbursements/{id}/mark-paid':
+    put:
+      summary: 'Mark disbursement as paid'
+      operationId: markDisbursementAsPaid
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the disbursement.'
+        example: architecto
+        required: true
+        schema:
+          type: string
+  /api/liquidations:
+    get:
+      summary: 'Get all liquidations'
+      operationId: getAllLiquidations
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Endpoints
+      security: []
+    post:
+      summary: 'Create new liquidation'
+      operationId: createNewLiquidation
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+  /api/liquidations/pending:
+    get:
+      summary: 'Get pending liquidations'
+      operationId: getPendingLiquidations
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Endpoints
+      security: []
+  '/api/liquidations/cash-advance/{caId}':
+    get:
+      summary: 'Get liquidations by cash advance'
+      operationId: getLiquidationsByCashAdvance
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: caId
+        description: ''
+        example: architecto
+        required: true
+        schema:
+          type: string
+  '/api/liquidations/{id}':
+    get:
+      summary: 'Get liquidation by ID'
+      operationId: getLiquidationByID
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Endpoints
+      security: []
+    put:
+      summary: 'Update liquidation'
+      operationId: updateLiquidation
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+    delete:
+      summary: 'Delete liquidation'
+      operationId: deleteLiquidation
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the liquidation.'
+        example: architecto
+        required: true
+        schema:
+          type: string
+  '/api/liquidations/{id}/items':
+    post:
+      summary: 'Add item to liquidation'
+      operationId: addItemToLiquidation
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the liquidation.'
+        example: architecto
+        required: true
+        schema:
+          type: string
+  '/api/liquidations/{id}/approve':
+    put:
+      summary: 'Approve liquidation'
+      operationId: approveLiquidation
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the liquidation.'
+        example: architecto
+        required: true
+        schema:
+          type: string
+  '/api/liquidations/{id}/reject':
+    put:
+      summary: 'Reject liquidation'
+      operationId: rejectLiquidation
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the liquidation.'
+        example: architecto
+        required: true
+        schema:
+          type: string
+  /api/health:
+    get:
+      summary: ''
+      operationId: getApiHealth
+      description: ''
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  status: OK
+                  message: 'AdminSuite API is running'
+                  timestamp: '2025-12-19T14:11:34.775188Z'
+                properties:
+                  status:
+                    type: string
+                    example: OK
+                  message:
+                    type: string
+                    example: 'AdminSuite API is running'
+                  timestamp:
+                    type: string
+                    example: '2025-12-19T14:11:34.775188Z'
+      tags:
+        - Endpoints
+      security: []
+  /api/employees:
+    get:
+      summary: 'Get all employees'
+      operationId: getAllEmployees
+      description: 'Retrieve a paginated list of all employees with optional filtering.'
+      parameters:
+        -
+          in: query
+          name: status
+          description: 'Filter by status (Active, Inactive, On Leave, Retired, Resigned).'
+          example: Active
+          required: false
+          schema:
+            type: string
+            description: 'Filter by status (Active, Inactive, On Leave, Retired, Resigned).'
+            example: Active
+        -
+          in: query
+          name: position
+          description: 'Filter by position.'
+          example: 'Teacher I'
+          required: false
+          schema:
+            type: string
+            description: 'Filter by position.'
+            example: 'Teacher I'
+        -
+          in: query
+          name: employment_status
+          description: 'Filter by employment status (Permanent, Temporary, etc.).'
+          example: Permanent
+          required: false
+          schema:
+            type: string
+            description: 'Filter by employment status (Permanent, Temporary, etc.).'
+            example: Permanent
+        -
+          in: query
+          name: search
+          description: 'Search by name or employee number.'
+          example: Juan
+          required: false
+          schema:
+            type: string
+            description: 'Search by name or employee number.'
+            example: Juan
+        -
+          in: query
+          name: per_page
+          description: 'Number of items per page.'
+          example: 15
+          required: false
+          schema:
+            type: integer
+            description: 'Number of items per page.'
+            example: 15
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    -
+                      id: 1
+                      employee_number: EMP-2024-0001
+                      full_name: 'Juan dela Cruz'
+                      position: 'Teacher I'
+                      status: Active
+                  links: {  }
+                  meta: {  }
+                properties:
+                  data:
+                    type: array
+                    example:
+                      -
+                        id: 1
+                        employee_number: EMP-2024-0001
+                        full_name: 'Juan dela Cruz'
+                        position: 'Teacher I'
+                        status: Active
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          example: 1
+                        employee_number:
+                          type: string
+                          example: EMP-2024-0001
+                        full_name:
+                          type: string
+                          example: 'Juan dela Cruz'
+                        position:
+                          type: string
+                          example: 'Teacher I'
+                        status:
+                          type: string
+                          example: Active
+                  links:
+                    type: object
+                    properties: {  }
+                  meta:
+                    type: object
+                    properties: {  }
+      tags:
+        - 'HR Management - Employees'
+      security: []
+    post:
+      summary: 'Create a new employee'
+      operationId: createANewEmployee
+      description: 'Create a new employee record with optional initial service record.'
+      parameters: []
+      responses:
+        201:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    id: 1
+                    employee_number: EMP-2024-0001
+                    full_name: 'Juan Santos dela Cruz'
+                    status: Active
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 1
+                      employee_number:
+                        type: string
+                        example: EMP-2024-0001
+                      full_name:
+                        type: string
+                        example: 'Juan Santos dela Cruz'
+                      status:
+                        type: string
+                        example: Active
+      tags:
+        - 'HR Management - Employees'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                first_name:
+                  type: string
+                  description: "Employee's first name."
+                  example: Juan
+                middle_name:
+                  type: string
+                  description: "Employee's middle name."
+                  example: Santos
+                  nullable: true
+                last_name:
+                  type: string
+                  description: "Employee's last name."
+                  example: 'dela Cruz'
+                suffix:
+                  type: string
+                  description: 'Must not be greater than 10 characters.'
+                  example: zmiyvd
+                  nullable: true
+                date_of_birth:
+                  type: string
+                  description: 'Must be a valid date. Must be a date before <code>today</code>.'
+                  example: '2022-01-12'
+                gender:
+                  type: string
+                  description: ''
+                  example: Female
+                  enum:
+                    - Male
+                    - Female
+                civil_status:
+                  type: string
+                  description: ''
+                  example: Single
+                  enum:
+                    - Single
+                    - Married
+                    - Widowed
+                    - Separated
+                    - Divorced
+                email:
+                  type: string
+                  description: 'Email address.'
+                  example: juan.delacruz@deped.gov.ph
+                mobile_number:
+                  type: string
+                  description: 'Must match the regex /^[0-9+()-]+$/. Must not be greater than 20 characters.'
+                  example: iyvdljnikhwaykcm
+                address:
+                  type: string
+                  description: ''
+                  example: architecto
+                city:
+                  type: string
+                  description: 'Must not be greater than 255 characters.'
+                  example: 'n'
+                province:
+                  type: string
+                  description: 'Must not be greater than 255 characters.'
+                  example: g
+                zip_code:
+                  type: string
+                  description: 'Must not be greater than 10 characters.'
+                  example: zmiyvd
+                employee_number:
+                  type: string
+                  description: 'Must not be greater than 255 characters.'
+                  example: l
+                  nullable: true
+                plantilla_item_no:
+                  type: string
+                  description: 'Plantilla Item Number.'
+                  example: ITEM-2024-001
+                position:
+                  type: string
+                  description: 'Position title.'
+                  example: 'Teacher I'
+                position_title:
+                  type: string
+                  description: 'Must not be greater than 255 characters.'
+                  example: i
+                  nullable: true
+                salary_grade:
+                  type: integer
+                  description: 'Must be at least 1. Must not be greater than 33.'
+                  example: 8
+                  nullable: true
+                step_increment:
+                  type: integer
+                  description: 'Must be at least 1. Must not be greater than 8.'
+                  example: 4
+                  nullable: true
+                monthly_salary:
+                  type: number
+                  description: 'Must be at least 0.'
+                  example: 87
+                  nullable: true
+                employment_status:
+                  type: string
+                  description: 'Employment status.'
+                  example: Permanent
+                date_hired:
+                  type: string
+                  description: 'Date hired (Y-m-d format).'
+                  example: '2024-01-15'
+                date_separated:
+                  type: string
+                  description: 'Must be a valid date. Must be a date after <code>date_hired</code>.'
+                  example: '2052-01-12'
+                  nullable: true
+                tin:
+                  type: string
+                  description: 'Must match the regex /^[0-9-]+$/. Must not be greater than 20 characters.'
+                  example: ngzmiyvdljnikhwa
+                  nullable: true
+                gsis_number:
+                  type: string
+                  description: 'Must match the regex /^[0-9-]+$/. Must not be greater than 20 characters.'
+                  example: ykcmyuwpwlvqwrsi
+                  nullable: true
+                philhealth_number:
+                  type: string
+                  description: 'Must match the regex /^[0-9-]+$/. Must not be greater than 20 characters.'
+                  example: tcpscqldzsnrwtuj
+                  nullable: true
+                pagibig_number:
+                  type: string
+                  description: 'Must match the regex /^[0-9-]+$/. Must not be greater than 20 characters.'
+                  example: wvlxjklqppwqbewt
+                  nullable: true
+                sss_number:
+                  type: string
+                  description: 'Must match the regex /^[0-9-]+$/. Must not be greater than 20 characters.'
+                  example: nnoqitpxntltcvip
+                  nullable: true
+                status:
+                  type: string
+                  description: ''
+                  example: 'On Leave'
+                  enum:
+                    - Active
+                    - Inactive
+                    - 'On Leave'
+                    - Retired
+                    - Resigned
+                  nullable: true
+                user_id:
+                  type: integer
+                  description: 'The <code>id</code> of an existing record in the users table.'
+                  example: 16
+                  nullable: true
+              required:
+                - first_name
+                - last_name
+                - date_of_birth
+                - gender
+                - civil_status
+                - email
+                - mobile_number
+                - address
+                - city
+                - province
+                - zip_code
+                - plantilla_item_no
+                - position
+                - employment_status
+                - date_hired
+      security: []
+  /api/employees/search:
+    get:
+      summary: 'Search employees'
+      operationId: searchEmployees
+      description: 'Search employees by name.'
+      parameters:
+        -
+          in: query
+          name: search
+          description: 'Search term.'
+          example: Juan
+          required: true
+          schema:
+            type: string
+            description: 'Search term.'
+            example: Juan
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data: []
+                properties:
+                  data:
+                    type: array
+                    example: []
+      tags:
+        - 'HR Management - Employees'
+      security: []
+  /api/employees/statistics:
+    get:
+      summary: 'Get employee statistics'
+      operationId: getEmployeeStatistics
+      description: 'Retrieve overall employee statistics including counts by status and position.'
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    total_employees: 50
+                    active_employees: 45
+                    by_status:
+                      Active: 45
+                      Inactive: 3
+                      Retired: 2
+                    by_position:
+                      'Teacher I': 20
+                      'Teacher II': 15
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      total_employees:
+                        type: integer
+                        example: 50
+                      active_employees:
+                        type: integer
+                        example: 45
+                      by_status:
+                        type: object
+                        properties:
+                          Active:
+                            type: integer
+                            example: 45
+                          Inactive:
+                            type: integer
+                            example: 3
+                          Retired:
+                            type: integer
+                            example: 2
+                      by_position:
+                        type: object
+                        properties:
+                          'Teacher I':
+                            type: integer
+                            example: 20
+                          'Teacher II':
+                            type: integer
+                            example: 15
+      tags:
+        - 'HR Management - Employees'
+      security: []
+  '/api/employees/{id}':
+    get:
+      summary: 'Get employee details'
+      operationId: getEmployeeDetails
+      description: 'Retrieve detailed information for a specific employee.'
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    id: 1
+                    employee_number: EMP-2024-0001
+                    full_name: 'Juan dela Cruz'
+                    position: 'Teacher I'
+                    vacation_leave_credits: 15.0
+                    sick_leave_credits: 15.0
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 1
+                      employee_number:
+                        type: string
+                        example: EMP-2024-0001
+                      full_name:
+                        type: string
+                        example: 'Juan dela Cruz'
+                      position:
+                        type: string
+                        example: 'Teacher I'
+                      vacation_leave_credits:
+                        type: number
+                        example: 15.0
+                      sick_leave_credits:
+                        type: number
+                        example: 15.0
+        404:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Employee not found.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Employee not found.'
+      tags:
+        - 'HR Management - Employees'
+      security: []
+    put:
+      summary: 'Update employee'
+      operationId: updateEmployee
+      description: "Update an existing employee's information."
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Employee updated successfully.'
+                  data: {  }
+                properties:
+                  message:
+                    type: string
+                    example: 'Employee updated successfully.'
+                  data:
+                    type: object
+                    properties: {  }
+      tags:
+        - 'HR Management - Employees'
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                first_name:
+                  type: string
+                  description: 'Must not be greater than 255 characters.'
+                  example: b
+                middle_name:
+                  type: string
+                  description: 'Must not be greater than 255 characters.'
+                  example: 'n'
+                  nullable: true
+                last_name:
+                  type: string
+                  description: 'Must not be greater than 255 characters.'
+                  example: g
+                suffix:
+                  type: string
+                  description: 'Must not be greater than 10 characters.'
+                  example: zmiyvd
+                  nullable: true
+                date_of_birth:
+                  type: string
+                  description: 'Must be a valid date. Must be a date before <code>today</code>.'
+                  example: '2022-01-12'
+                gender:
+                  type: string
+                  description: ''
+                  example: Male
+                  enum:
+                    - Male
+                    - Female
+                civil_status:
+                  type: string
+                  description: ''
+                  example: Single
+                  enum:
+                    - Single
+                    - Married
+                    - Widowed
+                    - Separated
+                    - Divorced
+                email:
+                  type: string
+                  description: 'Must be a valid email address. Must not be greater than 255 characters.'
+                  example: zbailey@example.net
+                mobile_number:
+                  type: string
+                  description: 'Must match the regex /^[0-9+()-]+$/. Must not be greater than 20 characters.'
+                  example: iyvdljnikhwaykcm
+                address:
+                  type: string
+                  description: ''
+                  example: architecto
+                city:
+                  type: string
+                  description: 'Must not be greater than 255 characters.'
+                  example: 'n'
+                province:
+                  type: string
+                  description: 'Must not be greater than 255 characters.'
+                  example: g
+                zip_code:
+                  type: string
+                  description: 'Must not be greater than 10 characters.'
+                  example: zmiyvd
+                plantilla_item_no:
+                  type: string
+                  description: 'Must not be greater than 255 characters.'
+                  example: l
+                position:
+                  type: string
+                  description: 'Must not be greater than 255 characters.'
+                  example: j
+                position_title:
+                  type: string
+                  description: 'Must not be greater than 255 characters.'
+                  example: 'n'
+                  nullable: true
+                salary_grade:
+                  type: integer
+                  description: 'Must be at least 1. Must not be greater than 33.'
+                  example: 5
+                  nullable: true
+                step_increment:
+                  type: integer
+                  description: 'Must be at least 1. Must not be greater than 8.'
+                  example: 7
+                  nullable: true
+                monthly_salary:
+                  type: number
+                  description: 'Must be at least 0.'
+                  example: 7
+                  nullable: true
+                employment_status:
+                  type: string
+                  description: ''
+                  example: Casual
+                  enum:
+                    - Permanent
+                    - Temporary
+                    - Casual
+                    - Contractual
+                    - Substitute
+                date_hired:
+                  type: string
+                  description: 'Must be a valid date.'
+                  example: '2025-12-19T14:11:34'
+                date_separated:
+                  type: string
+                  description: 'Must be a valid date. Must be a date after <code>date_hired</code>.'
+                  example: '2052-01-12'
+                  nullable: true
+                tin:
+                  type: string
+                  description: 'Must match the regex /^[0-9-]+$/. Must not be greater than 20 characters.'
+                  example: ngzmiyvdljnikhwa
+                  nullable: true
+                gsis_number:
+                  type: string
+                  description: 'Must match the regex /^[0-9-]+$/. Must not be greater than 20 characters.'
+                  example: ykcmyuwpwlvqwrsi
+                  nullable: true
+                philhealth_number:
+                  type: string
+                  description: 'Must match the regex /^[0-9-]+$/. Must not be greater than 20 characters.'
+                  example: tcpscqldzsnrwtuj
+                  nullable: true
+                pagibig_number:
+                  type: string
+                  description: 'Must match the regex /^[0-9-]+$/. Must not be greater than 20 characters.'
+                  example: wvlxjklqppwqbewt
+                  nullable: true
+                sss_number:
+                  type: string
+                  description: 'Must match the regex /^[0-9-]+$/. Must not be greater than 20 characters.'
+                  example: nnoqitpxntltcvip
+                  nullable: true
+                vacation_leave_credits:
+                  type: number
+                  description: 'Must be at least 0.'
+                  example: 1
+                  nullable: true
+                sick_leave_credits:
+                  type: number
+                  description: 'Must be at least 0.'
+                  example: 87
+                  nullable: true
+                status:
+                  type: string
+                  description: ''
+                  example: Inactive
+                  enum:
+                    - Active
+                    - Inactive
+                    - 'On Leave'
+                    - Retired
+                    - Resigned
+      security: []
+    delete:
+      summary: 'Delete employee'
+      operationId: deleteEmployee
+      description: 'Soft delete an employee record.'
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Employee deleted successfully.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Employee deleted successfully.'
+      tags:
+        - 'HR Management - Employees'
+      security: []
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'Employee ID.'
+        example: 1
+        required: true
+        schema:
+          type: integer
+  '/api/employees/{id}/promote':
+    post:
+      summary: 'Promote employee'
+      operationId: promoteEmployee
+      description: 'Promote an employee to a new position with updated salary grade.'
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Employee promoted successfully.'
+                  data: {  }
+                properties:
+                  message:
+                    type: string
+                    example: 'Employee promoted successfully.'
+                  data:
+                    type: object
+                    properties: {  }
+      tags:
+        - 'HR Management - Employees'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                new_position:
+                  type: string
+                  description: 'New position title.'
+                  example: 'Teacher II'
+                new_salary_grade:
+                  type: integer
+                  description: 'New salary grade.'
+                  example: 12
+                new_step_increment:
+                  type: integer
+                  description: 'Must be at least 1. Must not be greater than 8.'
+                  example: 7
+                  nullable: true
+                new_monthly_salary:
+                  type: number
+                  description: 'New monthly salary.'
+                  example: 35000.0
+                effective_date:
+                  type: string
+                  description: 'Effective date (Y-m-d).'
+                  example: '2024-07-01'
+                station:
+                  type: string
+                  description: ''
+                  example: architecto
+                  nullable: true
+                office_entity:
+                  type: string
+                  description: ''
+                  example: architecto
+                  nullable: true
+                appointment_authority:
+                  type: string
+                  description: ''
+                  example: architecto
+                  nullable: true
+                appointment_date:
+                  type: string
+                  description: 'Must be a valid date.'
+                  example: '2025-12-19T14:11:34'
+                  nullable: true
+                remarks:
+                  type: string
+                  description: ''
+                  example: architecto
+                  nullable: true
+              required:
+                - new_position
+                - new_salary_grade
+                - new_monthly_salary
+                - effective_date
+      security: []
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'Employee ID.'
+        example: 1
+        required: true
+        schema:
+          type: integer
+  /api/leave-requests:
+    get:
+      summary: 'Get all leave requests'
+      operationId: getAllLeaveRequests
+      description: 'Retrieve a paginated list of leave requests with optional filtering.'
+      parameters:
+        -
+          in: query
+          name: status
+          description: 'Filter by status.'
+          example: Pending
+          required: false
+          schema:
+            type: string
+            description: 'Filter by status.'
+            example: Pending
+        -
+          in: query
+          name: leave_type
+          description: 'Filter by leave type.'
+          example: 'Vacation Leave'
+          required: false
+          schema:
+            type: string
+            description: 'Filter by leave type.'
+            example: 'Vacation Leave'
+        -
+          in: query
+          name: employee_id
+          description: 'Filter by employee ID.'
+          example: 1
+          required: false
+          schema:
+            type: integer
+            description: 'Filter by employee ID.'
+            example: 1
+        -
+          in: query
+          name: start_date
+          description: 'Filter by start date.'
+          example: '2024-01-01'
+          required: false
+          schema:
+            type: string
+            description: 'Filter by start date.'
+            example: '2024-01-01'
+        -
+          in: query
+          name: end_date
+          description: 'Filter by end date.'
+          example: '2024-12-31'
+          required: false
+          schema:
+            type: string
+            description: 'Filter by end date.'
+            example: '2024-12-31'
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data: []
+                properties:
+                  data:
+                    type: array
+                    example: []
+      tags:
+        - 'HR Management - Leave Requests'
+      security: []
+    post:
+      summary: 'Create leave request'
+      operationId: createLeaveRequest
+      description: 'Create a new leave request with automatic leave credit validation.'
+      parameters: []
+      responses:
+        201:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Leave request created successfully.'
+                  data: {  }
+                properties:
+                  message:
+                    type: string
+                    example: 'Leave request created successfully.'
+                  data:
+                    type: object
+                    properties: {  }
+        422:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Insufficient vacation leave credits. Available: 10.5 days.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Insufficient vacation leave credits. Available: 10.5 days.'
+      tags:
+        - 'HR Management - Leave Requests'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                employee_id:
+                  type: integer
+                  description: 'Employee ID.'
+                  example: 1
+                leave_type:
+                  type: string
+                  description: 'Type of leave.'
+                  example: 'Vacation Leave'
+                start_date:
+                  type: string
+                  description: 'Start date (Y-m-d).'
+                  example: '2024-07-01'
+                end_date:
+                  type: string
+                  description: 'End date (Y-m-d).'
+                  example: '2024-07-05'
+                days_requested:
+                  type: number
+                  description: 'Must be at least 0.5.'
+                  example: 39
+                  nullable: true
+                sick_leave_type:
+                  type: string
+                  description: ''
+                  example: 'In Hospital'
+                  enum:
+                    - 'In Hospital'
+                    - 'Out Patient'
+                  nullable: true
+                illness:
+                  type: string
+                  description: 'Must not be greater than 500 characters.'
+                  example: g
+                  nullable: true
+                reason:
+                  type: string
+                  description: 'Reason for leave.'
+                  example: 'Family vacation'
+                  nullable: true
+              required:
+                - employee_id
+                - leave_type
+                - start_date
+                - end_date
+      security: []
+  /api/leave-requests/pending:
+    get:
+      summary: 'Get pending leave requests'
+      operationId: getPendingLeaveRequests
+      description: 'Retrieve all pending leave requests requiring action.'
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data: []
+                properties:
+                  data:
+                    type: array
+                    example: []
+      tags:
+        - 'HR Management - Leave Requests'
+      security: []
+  /api/leave-requests/statistics:
+    get:
+      summary: 'Get leave statistics'
+      operationId: getLeaveStatistics
+      description: 'Get leave statistics for a specific employee.'
+      parameters:
+        -
+          in: query
+          name: employee_id
+          description: 'Employee ID.'
+          example: 1
+          required: true
+          schema:
+            type: integer
+            description: 'Employee ID.'
+            example: 1
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    total_leaves: 15
+                    approved_leaves: 12
+                    pending_leaves: 2
+                    current_year_leaves: 8
+                    total_days_used: 45.5
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      total_leaves:
+                        type: integer
+                        example: 15
+                      approved_leaves:
+                        type: integer
+                        example: 12
+                      pending_leaves:
+                        type: integer
+                        example: 2
+                      current_year_leaves:
+                        type: integer
+                        example: 8
+                      total_days_used:
+                        type: number
+                        example: 45.5
+      tags:
+        - 'HR Management - Leave Requests'
+      security: []
+  '/api/leave-requests/{id}':
+    get:
+      summary: 'Get leave request details'
+      operationId: getLeaveRequestDetails
+      description: ''
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data: {  }
+                properties:
+                  data:
+                    type: object
+                    properties: {  }
+      tags:
+        - 'HR Management - Leave Requests'
+      security: []
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'Leave request ID.'
+        example: 1
+        required: true
+        schema:
+          type: integer
+  '/api/leave-requests/{id}/recommend':
+    put:
+      summary: 'Recommend leave request'
+      operationId: recommendLeaveRequest
+      description: 'Immediate supervisor recommends approval of leave request.'
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Leave request recommended successfully.'
+                  data: {  }
+                properties:
+                  message:
+                    type: string
+                    example: 'Leave request recommended successfully.'
+                  data:
+                    type: object
+                    properties: {  }
+      tags:
+        - 'HR Management - Leave Requests'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                recommended_by:
+                  type: integer
+                  description: 'Employee ID of recommender.'
+                  example: 5
+                remarks:
+                  type: string
+                  description: 'Optional remarks.'
+                  example: 'Approved by immediate supervisor'
+                  nullable: true
+              required:
+                - recommended_by
+      security: []
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'Leave request ID.'
+        example: 1
+        required: true
+        schema:
+          type: integer
+  '/api/leave-requests/{id}/approve':
+    put:
+      summary: 'Approve leave request'
+      operationId: approveLeaveRequest
+      description: 'Final approval of leave request with automatic leave credit deduction.'
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Leave request approved successfully.'
+                  data: {  }
+                properties:
+                  message:
+                    type: string
+                    example: 'Leave request approved successfully.'
+                  data:
+                    type: object
+                    properties: {  }
+        422:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Insufficient leave credits.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Insufficient leave credits.'
+      tags:
+        - 'HR Management - Leave Requests'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                approved_by:
+                  type: integer
+                  description: 'Employee ID of approver.'
+                  example: 2
+                remarks:
+                  type: string
+                  description: 'Optional remarks.'
+                  example: Approved
+                  nullable: true
+              required:
+                - approved_by
+      security: []
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'Leave request ID.'
+        example: 1
+        required: true
+        schema:
+          type: integer
+  '/api/leave-requests/{id}/disapprove':
+    put:
+      summary: 'Disapprove leave request'
+      operationId: disapproveLeaveRequest
+      description: 'Reject a leave request with reason.'
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Leave request disapproved.'
+                  data: {  }
+                properties:
+                  message:
+                    type: string
+                    example: 'Leave request disapproved.'
+                  data:
+                    type: object
+                    properties: {  }
+      tags:
+        - 'HR Management - Leave Requests'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                disapproved_by:
+                  type: integer
+                  description: 'Employee ID of disapprover.'
+                  example: 2
+                reason:
+                  type: string
+                  description: 'Reason for disapproval.'
+                  example: 'Insufficient manpower'
+              required:
+                - disapproved_by
+                - reason
+      security: []
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'Leave request ID.'
+        example: 1
+        required: true
+        schema:
+          type: integer
+  '/api/leave-requests/{id}/cancel':
+    put:
+      summary: 'Cancel leave request'
+      operationId: cancelLeaveRequest
+      description: 'Cancel a leave request with automatic leave credit restoration if already approved.'
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Leave request cancelled successfully.'
+                  data: {  }
+                properties:
+                  message:
+                    type: string
+                    example: 'Leave request cancelled successfully.'
+                  data:
+                    type: object
+                    properties: {  }
+      tags:
+        - 'HR Management - Leave Requests'
+      security: []
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'Leave request ID.'
+        example: 1
+        required: true
+        schema:
+          type: integer
+  '/api/service-records/employee/{employeeId}':
+    get:
+      summary: 'Get service records by employee'
+      operationId: getServiceRecordsByEmployee
+      description: 'Retrieve all service records for a specific employee.'
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data: []
+                properties:
+                  data:
+                    type: array
+                    example: []
+      tags:
+        - 'HR Management - Service Records'
+      security: []
+    parameters:
+      -
+        in: path
+        name: employeeId
+        description: 'Employee ID.'
+        example: 1
+        required: true
+        schema:
+          type: integer
+  /api/service-records:
+    post:
+      summary: 'Create service record'
+      operationId: createServiceRecord
+      description: 'Add a new service record for an employee.'
+      parameters: []
+      responses:
+        201:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Service record created successfully.'
+                  data: {  }
+                properties:
+                  message:
+                    type: string
+                    example: 'Service record created successfully.'
+                  data:
+                    type: object
+                    properties: {  }
+      tags:
+        - 'HR Management - Service Records'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                employee_id:
+                  type: integer
+                  description: 'Employee ID.'
+                  example: 1
+                date_from:
+                  type: string
+                  description: 'Start date (Y-m-d).'
+                  example: '2024-01-01'
+                date_to:
+                  type: string
+                  description: 'Must be a valid date. Must be a date after <code>date_from</code>.'
+                  example: '2052-01-12'
+                  nullable: true
+                designation:
+                  type: string
+                  description: 'Position title.'
+                  example: 'Teacher II'
+                status_of_appointment:
+                  type: string
+                  description: ''
+                  example: Permanent
+                  enum:
+                    - Permanent
+                    - Temporary
+                    - Casual
+                    - Contractual
+                    - Substitute
+                salary_grade:
+                  type: integer
+                  description: 'Salary grade.'
+                  example: 12
+                step_increment:
+                  type: integer
+                  description: 'Must be at least 1. Must not be greater than 8.'
+                  example: 6
+                monthly_salary:
+                  type: number
+                  description: 'Monthly salary.'
+                  example: 35000.0
+                station_place_of_assignment:
+                  type: string
+                  description: 'Must not be greater than 255 characters.'
+                  example: i
+                office_entity:
+                  type: string
+                  description: 'Must not be greater than 255 characters.'
+                  example: 'y'
+                government_service:
+                  type: string
+                  description: ''
+                  example: 'Yes'
+                  enum:
+                    - 'Yes'
+                    - 'No'
+                action_type:
+                  type: string
+                  description: ''
+                  example: Secondment
+                  enum:
+                    - 'New Appointment'
+                    - Promotion
+                    - Transfer
+                    - Reclassification
+                    - Demotion
+                    - Detail
+                    - Secondment
+                    - Reassignment
+                appointment_authority:
+                  type: string
+                  description: 'Must not be greater than 255 characters.'
+                  example: v
+                  nullable: true
+                appointment_date:
+                  type: string
+                  description: 'Must be a valid date.'
+                  example: '2025-12-19T14:11:34'
+                  nullable: true
+                remarks:
+                  type: string
+                  description: 'Must not be greater than 1000 characters.'
+                  example: d
+                  nullable: true
+              required:
+                - employee_id
+                - date_from
+                - designation
+                - status_of_appointment
+                - salary_grade
+                - step_increment
+                - monthly_salary
+                - station_place_of_assignment
+                - office_entity
+                - government_service
+                - action_type
+      security: []
+  '/api/service-records/{id}':
+    get:
+      summary: 'Get service record details'
+      operationId: getServiceRecordDetails
+      description: ''
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data: {  }
+                properties:
+                  data:
+                    type: object
+                    properties: {  }
+      tags:
+        - 'HR Management - Service Records'
+      security: []
+    put:
+      summary: 'Update service record'
+      operationId: updateServiceRecord
+      description: ''
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Service record updated successfully.'
+                  data: {  }
+                properties:
+                  message:
+                    type: string
+                    example: 'Service record updated successfully.'
+                  data:
+                    type: object
+                    properties: {  }
+      tags:
+        - 'HR Management - Service Records'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                employee_id:
+                  type: integer
+                  description: 'The <code>id</code> of an existing record in the employees table.'
+                  example: 16
+                date_from:
+                  type: string
+                  description: 'Must be a valid date.'
+                  example: '2025-12-19T14:11:34'
+                date_to:
+                  type: string
+                  description: 'Must be a valid date. Must be a date after <code>date_from</code>.'
+                  example: '2052-01-12'
+                  nullable: true
+                designation:
+                  type: string
+                  description: 'Must not be greater than 255 characters.'
+                  example: 'n'
+                status_of_appointment:
+                  type: string
+                  description: ''
+                  example: Temporary
+                  enum:
+                    - Permanent
+                    - Temporary
+                    - Casual
+                    - Contractual
+                    - Substitute
+                salary_grade:
+                  type: integer
+                  description: 'Must be at least 1. Must not be greater than 33.'
+                  example: 7
+                step_increment:
+                  type: integer
+                  description: 'Must be at least 1. Must not be greater than 8.'
+                  example: 6
+                monthly_salary:
+                  type: number
+                  description: 'Must be at least 0.'
+                  example: 77
+                station_place_of_assignment:
+                  type: string
+                  description: 'Must not be greater than 255 characters.'
+                  example: i
+                office_entity:
+                  type: string
+                  description: 'Must not be greater than 255 characters.'
+                  example: 'y'
+                government_service:
+                  type: string
+                  description: ''
+                  example: 'No'
+                  enum:
+                    - 'Yes'
+                    - 'No'
+                action_type:
+                  type: string
+                  description: ''
+                  example: 'New Appointment'
+                  enum:
+                    - 'New Appointment'
+                    - Promotion
+                    - Transfer
+                    - Reclassification
+                    - Demotion
+                    - Detail
+                    - Secondment
+                    - Reassignment
+                appointment_authority:
+                  type: string
+                  description: 'Must not be greater than 255 characters.'
+                  example: v
+                  nullable: true
+                appointment_date:
+                  type: string
+                  description: 'Must be a valid date.'
+                  example: '2025-12-19T14:11:34'
+                  nullable: true
+                remarks:
+                  type: string
+                  description: 'Must not be greater than 1000 characters.'
+                  example: d
+                  nullable: true
+              required:
+                - employee_id
+                - date_from
+                - designation
+                - status_of_appointment
+                - salary_grade
+                - step_increment
+                - monthly_salary
+                - station_place_of_assignment
+                - office_entity
+                - government_service
+                - action_type
+      security: []
+    delete:
+      summary: 'Delete service record'
+      operationId: deleteServiceRecord
+      description: ''
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Service record deleted successfully.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Service record deleted successfully.'
+      tags:
+        - 'HR Management - Service Records'
+      security: []
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'Service record ID.'
+        example: 1
+        required: true
+        schema:
+          type: integer
