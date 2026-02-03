@@ -5,10 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\Activitylog\LogOptions;
 
 class PurchaseRequest extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, SoftDeletes, LogsActivity;
 
     protected $fillable = [
         'pr_number',
@@ -105,6 +107,27 @@ class PurchaseRequest extends Model
     public function purchaseOrder()
     {
         return $this->hasOne(PurchaseOrder::class);
+    }
+
+    /**
+     * Get all documents for this purchase request
+     */
+    public function documents()
+    {
+        return $this->morphMany(Document::class, 'documentable');
+    }
+
+    /**
+     * Get activity log options
+     */
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logOnly(['pr_number', 'requested_by', 'total_amount', 'status', 'recommended_by', 'approved_by'])
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs()
+            ->setDescriptionForEvent(fn(string $eventName) => "Purchase Request {$eventName}")
+            ->useLogName('procurement');
     }
 
     /**

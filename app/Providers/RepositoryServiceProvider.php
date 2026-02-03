@@ -46,6 +46,12 @@ use App\Repositories\Financial\DisbursementRepository;
 use App\Interfaces\Financial\LiquidationRepositoryInterface;
 use App\Repositories\Financial\LiquidationRepository;
 
+// Shared Module
+use App\Interfaces\Shared\DocumentRepositoryInterface;
+use App\Repositories\Shared\DocumentRepository;
+use App\Interfaces\Shared\AuditRepositoryInterface;
+use App\Repositories\Shared\AuditRepository;
+
 class RepositoryServiceProvider extends ServiceProvider
 {
     /**
@@ -77,6 +83,10 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(CashAdvanceRepositoryInterface::class, CashAdvanceRepository::class);
         $this->app->bind(DisbursementRepositoryInterface::class, DisbursementRepository::class);
         $this->app->bind(LiquidationRepositoryInterface::class, LiquidationRepository::class);
+
+        // Shared Module Repository Bindings
+        $this->app->bind(DocumentRepositoryInterface::class, DocumentRepository::class);
+        $this->app->bind(AuditRepositoryInterface::class, AuditRepository::class);
     }
 
     /**

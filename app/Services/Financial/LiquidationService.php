@@ -99,6 +99,15 @@ class LiquidationService
                 throw new \Exception('Only verified liquidations can be approved.');
             }
 
+            // Validate mandatory documents (Official Receipt)
+            $hasOR = $liquidation->documents()
+                ->where('document_type', 'official_receipt')
+                ->exists();
+
+            if (!$hasOR) {
+                throw new \Exception('Official Receipt photo is required before approval.');
+            }
+
             // Approve liquidation
             $liquidation = $this->liquidationRepository->approveLiquidation($id, $approvedBy);
 

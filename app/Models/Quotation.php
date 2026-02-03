@@ -5,10 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 class Quotation extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, SoftDeletes, LogsActivity;
 
     protected $fillable = [
         'purchase_request_id',
@@ -97,5 +99,18 @@ class Quotation extends Model
         $this->purchaseRequest->quotations()
             ->where('id', '!=', $this->id)
             ->update(['is_selected' => false]);
+    }
+
+    /**
+     * Get the activity log options
+     */
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logOnly(['quotation_number', 'supplier_id', 'total_amount', 'status'])
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs()
+            ->setDescriptionForEvent(fn(string $eventName) => "Quotation {$eventName}")
+            ->useLogName('procurement');
     }
 }

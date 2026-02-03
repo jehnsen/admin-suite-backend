@@ -2056,12 +2056,98 @@
 								"1",
 								"accept"
 							]
-						}
+						},
+						"description": "Accept a delivery after successful inspection. Automatically creates InventoryItems and StockCard entries. For equipment items, property numbers can be assigned later via the tag-assets endpoint."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Pending Assets for Tagging",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/deliveries/1/pending-assets",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"deliveries",
+								"1",
+								"pending-assets"
+							]
+						},
+						"description": "Get list of equipment items from an accepted delivery that still need asset tagging (serial number and property number assignment)."
+					},
+					"response": []
+				},
+				{
+					"name": "Tag Delivery Assets",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"asset_details\": [\n        {\n            \"inventory_item_id\": 101,\n            \"serial_number\": \"HP-LAPTOP-2026-001\",\n            \"property_number\": \"PROP-2026-0001\"\n        },\n        {\n            \"inventory_item_id\": 102,\n            \"serial_number\": \"HP-LAPTOP-2026-002\"\n        }\n    ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/deliveries/1/tag-assets",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"deliveries",
+								"1",
+								"tag-assets"
+							]
+						},
+						"description": "Tag equipment items with serial numbers and property numbers. Property numbers are auto-generated (PROP-YYYY-XXXX format) if not provided. Only works on accepted deliveries."
 					},
 					"response": []
 				}
 			],
-			"description": "Track and manage item deliveries and acceptance."
+			"description": "Track and manage item deliveries and acceptance. Includes automatic InventoryItem and StockCard creation upon acceptance, with asset tagging support for equipment."
 		},
 		{
 			"name": "Inventory - Items",
@@ -4245,6 +4331,470 @@
 				}
 			],
 			"description": "Utility endpoints"
+		},
+		{
+			"name": "Shared - Document Management",
+			"item": [
+				{
+					"name": "Upload Document",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": []
+								},
+								{
+									"key": "documentable_type",
+									"value": "Liquidation",
+									"type": "text"
+								},
+								{
+									"key": "documentable_id",
+									"value": "1",
+									"type": "text"
+								},
+								{
+									"key": "document_type",
+									"value": "official_receipt",
+									"type": "text"
+								},
+								{
+									"key": "description",
+									"value": "Official Receipt for liquidation",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/api/documents/upload",
+							"host": ["{{base_url}}"],
+							"path": ["api", "documents", "upload"]
+						},
+						"description": "Upload a document and link it to an entity (Liquidation, PurchaseRequest, or InventoryAdjustment)"
+					},
+					"response": []
+				},
+				{
+					"name": "List Documents",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/documents?documentable_type=Liquidation&documentable_id=1",
+							"host": ["{{base_url}}"],
+							"path": ["api", "documents"],
+							"query": [
+								{
+									"key": "documentable_type",
+									"value": "Liquidation"
+								},
+								{
+									"key": "documentable_id",
+									"value": "1"
+								}
+							]
+						},
+						"description": "Get all documents for a specific entity"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Document Details",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/documents/1",
+							"host": ["{{base_url}}"],
+							"path": ["api", "documents", "1"]
+						},
+						"description": "Get document metadata by ID"
+					},
+					"response": []
+				},
+				{
+					"name": "Download Document",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/documents/1/download",
+							"host": ["{{base_url}}"],
+							"path": ["api", "documents", "1", "download"]
+						},
+						"description": "Download document file (returns file stream)"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Document",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/documents/1",
+							"host": ["{{base_url}}"],
+							"path": ["api", "documents", "1"]
+						},
+						"description": "Soft delete a document"
+					},
+					"response": []
+				}
+			],
+			"description": "Document management system for uploading, storing, and managing documents linked to entities"
+		},
+		{
+			"name": "Shared - Audit Trail",
+			"item": [
+				{
+					"name": "Get Audit Logs",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/audit/logs?module=Financial&event=updated&date_from=2026-02-01&per_page=50",
+							"host": ["{{base_url}}"],
+							"path": ["api", "audit", "logs"],
+							"query": [
+								{
+									"key": "module",
+									"value": "Financial"
+								},
+								{
+									"key": "event",
+									"value": "updated"
+								},
+								{
+									"key": "date_from",
+									"value": "2026-02-01"
+								},
+								{
+									"key": "per_page",
+									"value": "50"
+								}
+							]
+						},
+						"description": "Get filtered audit logs with pagination. Query params: module (HR/Procurement/Financial/Inventory/System), event (created/updated/deleted), causer_id, date_from, date_to, per_page"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Entity History",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/audit/entity-history?type=Liquidation&id=1",
+							"host": ["{{base_url}}"],
+							"path": ["api", "audit", "entity-history"],
+							"query": [
+								{
+									"key": "type",
+									"value": "Liquidation"
+								},
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						},
+						"description": "Get complete audit history for a specific entity"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Audit Report",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/audit/report?date_from=2026-02-01&date_to=2026-02-28",
+							"host": ["{{base_url}}"],
+							"path": ["api", "audit", "report"],
+							"query": [
+								{
+									"key": "date_from",
+									"value": "2026-02-01"
+								},
+								{
+									"key": "date_to",
+									"value": "2026-02-28"
+								}
+							]
+						},
+						"description": "Generate audit report with statistics (by event, module, top users, trends)"
+					},
+					"response": []
+				},
+				{
+					"name": "Get My Activity",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/audit/my-activity?per_page=50",
+							"host": ["{{base_url}}"],
+							"path": ["api", "audit", "my-activity"],
+							"query": [
+								{
+									"key": "per_page",
+									"value": "50"
+								}
+							]
+						},
+						"description": "Get current user's activity log"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Module Activity",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/audit/module/Financial?per_page=50",
+							"host": ["{{base_url}}"],
+							"path": ["api", "audit", "module", "Financial"],
+							"query": [
+								{
+									"key": "per_page",
+									"value": "50"
+								}
+							]
+						},
+						"description": "Get audit logs for a specific module"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Audit Log Details",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/audit/1",
+							"host": ["{{base_url}}"],
+							"path": ["api", "audit", "1"]
+						},
+						"description": "Get single audit log by ID"
+					},
+					"response": []
+				},
+				{
+					"name": "Export for COA Compliance",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/audit/export?date_from=2026-02-01&date_to=2026-02-28&module=Financial",
+							"host": ["{{base_url}}"],
+							"path": ["api", "audit", "export"],
+							"query": [
+								{
+									"key": "date_from",
+									"value": "2026-02-01"
+								},
+								{
+									"key": "date_to",
+									"value": "2026-02-28"
+								},
+								{
+									"key": "module",
+									"value": "Financial"
+								}
+							]
+						},
+						"description": "Export audit logs for COA compliance reporting"
+					},
+					"response": []
+				}
+			],
+			"description": "Comprehensive audit trail system for tracking all changes and activities in the system"
 		}
 	],
 	"variable": [

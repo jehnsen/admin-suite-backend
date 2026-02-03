@@ -3,6 +3,9 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
+use App\Models\Activity;
+use App\Observers\ActivityObserver;
+use App\Services\Inventory\AssetTaggingService;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -11,7 +14,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        // Register AssetTaggingService as singleton for efficient property number generation
+        $this->app->singleton(AssetTaggingService::class);
     }
 
     /**
@@ -19,6 +23,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        // Register Activity Observer for audit trail metadata injection
+        Activity::observe(ActivityObserver::class);
     }
 }

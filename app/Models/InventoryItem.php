@@ -6,10 +6,12 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 class InventoryItem extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, SoftDeletes, LogsActivity;
 
     /**
      * The attributes that are mass assignable.
@@ -17,6 +19,7 @@ class InventoryItem extends Model
      * @var array<int, string>
      */
     protected $fillable = [
+        'delivery_item_id',
         'item_code',
         'item_name',
         'description',
@@ -90,6 +93,14 @@ class InventoryItem extends Model
     public function activeIssuances(): HasMany
     {
         return $this->hasMany(Issuance::class)->where('status', 'Active');
+    }
+
+    /**
+     * Get the delivery item that created this inventory item.
+     */
+    public function deliveryItem()
+    {
+        return $this->belongsTo(DeliveryItem::class);
     }
 
     /**
@@ -172,5 +183,18 @@ class InventoryItem extends Model
     public function scopeByFundSource($query, string $fundSource)
     {
         return $query->where('fund_source', $fundSource);
+    }
+
+    /**
+     * Get the activity log options
+     */
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logOnly(['item_code', 'item_name', 'category', 'unit_of_measure'])
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs()
+            ->setDescriptionForEvent(fn(string $eventName) => "Inventory Item {$eventName}")
+            ->useLogName('inventory');
     }
 }

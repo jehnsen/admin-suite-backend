@@ -5,10 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\Activitylog\LogOptions;
 
 class InventoryAdjustment extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, SoftDeletes, LogsActivity;
 
     protected $fillable = [
         'adjustment_number',
@@ -54,6 +56,27 @@ class InventoryAdjustment extends Model
     public function approvedBy()
     {
         return $this->belongsTo(User::class, 'approved_by');
+    }
+
+    /**
+     * Get all documents for this inventory adjustment
+     */
+    public function documents()
+    {
+        return $this->morphMany(Document::class, 'documentable');
+    }
+
+    /**
+     * Get activity log options
+     */
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logOnly(['adjustment_number', 'inventory_item_id', 'adjustment_type', 'quantity_adjusted', 'status', 'approved_by'])
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs()
+            ->setDescriptionForEvent(fn(string $eventName) => "Inventory Adjustment {$eventName}")
+            ->useLogName('inventory');
     }
 
     /**

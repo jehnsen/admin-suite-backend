@@ -13,6 +13,7 @@ use App\Http\Controllers\Api\Procurement\PurchaseRequestController;
 use App\Http\Controllers\Api\Procurement\QuotationController;
 use App\Http\Controllers\Api\Procurement\PurchaseOrderController;
 use App\Http\Controllers\Api\Procurement\DeliveryController;
+use App\Http\Controllers\Api\Procurement\DeliveryAssetTaggingController;
 use App\Http\Controllers\Api\Inventory\InventoryItemController;
 use App\Http\Controllers\Api\Inventory\StockCardController;
 use App\Http\Controllers\Api\Inventory\InventoryAdjustmentController;
@@ -23,6 +24,8 @@ use App\Http\Controllers\Api\Financial\DisbursementController;
 use App\Http\Controllers\Api\Financial\LiquidationController;
 use App\Http\Controllers\Api\Financial\TransactionController;
 use App\Http\Controllers\Api\User\ProfileController;
+use App\Http\Controllers\Api\Shared\DocumentController;
+use App\Http\Controllers\Api\Shared\AuditController;
 
 /*
 |--------------------------------------------------------------------------
@@ -179,6 +182,8 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::put('/{id}/inspect', [DeliveryController::class, 'inspect']);
         Route::put('/{id}/accept', [DeliveryController::class, 'accept']);
         Route::put('/{id}/reject', [DeliveryController::class, 'reject']);
+        Route::get('/{id}/pending-assets', [DeliveryAssetTaggingController::class, 'getPendingAssets']);
+        Route::post('/{id}/tag-assets', [DeliveryAssetTaggingController::class, 'tagAssets']);
     });
 
     // Inventory Management - Inventory Items
@@ -312,6 +317,26 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::put('/{id}', [TransactionController::class, 'update']);
         Route::delete('/{id}', [TransactionController::class, 'destroy']);
         Route::put('/{id}/verify', [TransactionController::class, 'verify']);
+    });
+
+    // Shared Module - Document Management
+    Route::prefix('documents')->group(function () {
+        Route::post('/upload', [DocumentController::class, 'upload']);
+        Route::get('/', [DocumentController::class, 'index']);
+        Route::get('/{id}', [DocumentController::class, 'show']);
+        Route::get('/{id}/download', [DocumentController::class, 'download']);
+        Route::delete('/{id}', [DocumentController::class, 'destroy']);
+    });
+
+    // Shared Module - Audit Trail
+    Route::prefix('audit')->group(function () {
+        Route::get('/logs', [AuditController::class, 'index']);
+        Route::get('/entity-history', [AuditController::class, 'entityHistory']);
+        Route::get('/report', [AuditController::class, 'report']);
+        Route::get('/my-activity', [AuditController::class, 'myActivity']);
+        Route::get('/module/{module}', [AuditController::class, 'byModule']);
+        Route::get('/export', [AuditController::class, 'export']);
+        Route::get('/{id}', [AuditController::class, 'show']);
     });
 });
 

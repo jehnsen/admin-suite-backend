@@ -1,0 +1,21 @@
+{
+  "workspace": {
+    "id": ""
+  },
+  "entities": {
+    "environments": [
+      "..\\AdminSuite_Environment.postman_environment.json"
+    ],
+    "flows": [],
+    "globals": [],
+    "mocks": [],
+    "specs": [
+      "..\\vendor\\knuckleswtf\\scribe\\tests\\Fixtures\\openapi.yaml"
+    ],
+    "collections": [
+      "..\\AdminSuite_API.postman_collection.json",
+      "..\\AdminSuite_API.postman_collection_backup.json",
+      "..\\vendor\\knuckleswtf\\scribe\\tests\\Fixtures\\collection.json"
+    ]
+  }
+}

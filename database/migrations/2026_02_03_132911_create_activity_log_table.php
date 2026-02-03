@@ -1,0 +1,35 @@
+<?php
+
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Migrations\Migration;
+
+class CreateActivityLogTable extends Migration
+{
+    public function up()
+    {
+        Schema::connection(config('activitylog.database_connection'))->create(config('activitylog.table_name'), function (Blueprint $table) {
+            $table->bigIncrements('id');
+            $table->string('log_name')->nullable();
+            $table->text('description');
+            $table->nullableMorphs('subject', 'subject');
+            $table->nullableMorphs('causer', 'causer');
+            $table->json('properties')->nullable();
+
+            // COA Compliance Fields
+            $table->string('ip_address', 45)->nullable();
+            $table->text('user_agent')->nullable();
+            $table->string('module', 50)->nullable();
+
+            $table->timestamps();
+            $table->index('log_name');
+            $table->index('module');
+            $table->index('created_at');
+        });
+    }
+
+    public function down()
+    {
+        Schema::connection(config('activitylog.database_connection'))->dropIfExists(config('activitylog.table_name'));
+    }
+}

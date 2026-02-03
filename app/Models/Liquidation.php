@@ -5,10 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\Activitylog\LogOptions;
 
 class Liquidation extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, SoftDeletes, LogsActivity;
 
     protected $fillable = [
         'liquidation_number',
@@ -75,6 +77,35 @@ class Liquidation extends Model
     public function approvedBy()
     {
         return $this->belongsTo(User::class, 'approved_by');
+    }
+
+    /**
+     * Get all documents for this liquidation
+     */
+    public function documents()
+    {
+        return $this->morphMany(Document::class, 'documentable');
+    }
+
+    /**
+     * Get official receipt documents only
+     */
+    public function officialReceipts()
+    {
+        return $this->documents()->where('document_type', 'official_receipt');
+    }
+
+    /**
+     * Get activity log options
+     */
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logOnly(['liquidation_number', 'cash_advance_id', 'total_expenses', 'status', 'verified_by', 'approved_by'])
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs()
+            ->setDescriptionForEvent(fn(string $eventName) => "Liquidation {$eventName}")
+            ->useLogName('financial');
     }
 
     /**
