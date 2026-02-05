@@ -18,9 +18,17 @@ class LeaveRequestService
 
     /**
      * Get all leave requests with filtering.
+     * Applies ownership filtering for Teacher/Staff users.
      */
     public function getAllLeaveRequests(array $filters = [], int $perPage = 15): LengthAwarePaginator
     {
+        $user = auth()->user();
+
+        // Teachers/Staff can only see their own leave requests
+        if ($user && $user->hasRole('Teacher/Staff') && $user->employee) {
+            $filters['employee_id'] = $user->employee->id;
+        }
+
         return $this->leaveRequestRepository->getAllLeaveRequests($filters, $perPage);
     }
 

@@ -25,7 +25,34 @@ class UploadDocumentRequest extends FormRequest
                 'required',
                 'file',
                 'mimes:pdf,jpg,jpeg,png',
+                'mimetypes:application/pdf,image/jpeg,image/jpg,image/png', // Strict MIME type validation
                 'max:10240', // 10MB max
+                function ($attribute, $value, $fail) {
+                    // Additional security validations for filename
+                    if ($value) {
+                        $filename = $value->getClientOriginalName();
+
+                        // Validate filename length
+                        if (strlen($filename) > 255) {
+                            $fail('The filename is too long. Maximum 255 characters allowed.');
+                        }
+
+                        // Validate filename doesn't contain path traversal
+                        if (preg_match('/\.\.[\/\\\\]/', $filename)) {
+                            $fail('The filename contains invalid path traversal characters.');
+                        }
+
+                        // Validate against null bytes
+                        if (strpos($filename, chr(0)) !== false) {
+                            $fail('The filename contains invalid null byte characters.');
+                        }
+
+                        // Validate against control characters
+                        if (preg_match('/[\x00-\x1F\x7F]/', $filename)) {
+                            $fail('The filename contains invalid control characters.');
+                        }
+                    }
+                },
             ],
             'documentable_type' => [
                 'required',
@@ -65,6 +92,7 @@ class UploadDocumentRequest extends FormRequest
         return [
             'file.required' => 'Please select a file to upload.',
             'file.mimes' => 'Only PDF, JPG, JPEG, and PNG files are allowed.',
+            'file.mimetypes' => 'File type validation failed. Only PDF and image files (JPG, PNG) are allowed.',
             'file.max' => 'File size must not exceed 10MB.',
             'documentable_type.required' => 'Entity type is required.',
             'documentable_type.in' => 'Invalid entity type selected.',

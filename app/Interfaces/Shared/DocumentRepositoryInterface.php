@@ -38,4 +38,14 @@ interface DocumentRepositoryInterface
      * Get documents by type
      */
     public function getDocumentsByType(string $type, int $entityId, string $documentType): Collection;
+
+    /**
+     * Generate temporary signed URL for document download
+     */
+    public function generateTemporaryUrl(int $documentId, int $expiresInMinutes = 30): string;
+
+    /**
+     * Get document with temporary download URL
+     */
+    public function getDocumentWithUrl(int $id): array;
 }

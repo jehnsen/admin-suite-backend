@@ -18,6 +18,14 @@ class RoleAndPermissionSeeder extends Seeder
 
         // Create Permissions
         $permissions = [
+            // User Account Management
+            'view_users',
+            'create_users',
+            'edit_users',
+            'delete_users',
+            'reset_user_password',
+            'manage_user_roles',
+
             // Employee Management
             'view_employees',
             'create_employees',
@@ -76,6 +84,7 @@ class RoleAndPermissionSeeder extends Seeder
         // 2. School Head - Management level access
         $schoolHead = Role::create(['name' => 'School Head']);
         $schoolHead->givePermissionTo([
+            'view_users',
             'view_employees',
             'create_employees',
             'edit_employees',
@@ -96,6 +105,12 @@ class RoleAndPermissionSeeder extends Seeder
         // 3. Admin Officer - System Owner
         $adminOfficer = Role::create(['name' => 'Admin Officer']);
         $adminOfficer->givePermissionTo([
+            'view_users',
+            'create_users',
+            'edit_users',
+            'delete_users',
+            'reset_user_password',
+            'manage_user_roles',
             'view_employees',
             'create_employees',
             'edit_employees',

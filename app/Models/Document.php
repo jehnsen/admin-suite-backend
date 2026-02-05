@@ -23,11 +23,14 @@ class Document extends Model
         'uploaded_by',
         'uploaded_at',
         'is_mandatory',
+        'is_sensitive',
+        'storage_disk',
     ];
 
     protected $casts = [
         'uploaded_at' => 'datetime',
         'is_mandatory' => 'boolean',
+        'is_sensitive' => 'boolean',
         'file_size' => 'integer',
     ];
 
@@ -51,10 +54,24 @@ class Document extends Model
 
     /**
      * Get the full URL for the document
+     *
+     * For sensitive documents, returns a temporary signed URL
+     * For public documents, returns direct storage URL
      */
     public function getFileUrlAttribute(): string
     {
-        return Storage::url($this->file_path);
+        // For sensitive or private documents, use temporary signed route
+        if (($this->is_sensitive ?? false) || ($this->storage_disk ?? 'public') === 'private') {
+            return \URL::temporarySignedRoute(
+                'documents.download',
+                now()->addMinutes(30),
+                ['id' => $this->id]
+            );
+        }
+
+        // For public documents, return direct URL
+        $disk = $this->storage_disk ?? 'public';
+        return Storage::disk($disk)->url($this->file_path);
     }
 
     /**
@@ -81,8 +98,11 @@ class Document extends Model
 
         static::deleting(function ($document) {
             // Delete physical file when document is deleted (not soft deleted)
-            if ($document->isForceDeleting() && Storage::exists($document->file_path)) {
-                Storage::delete($document->file_path);
+            if ($document->isForceDeleting()) {
+                $disk = $document->storage_disk ?? 'public';
+                if (Storage::disk($disk)->exists($document->file_path)) {
+                    Storage::disk($disk)->delete($document->file_path);
+                }
             }
         });
     }

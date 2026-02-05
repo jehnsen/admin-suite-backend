@@ -38,6 +38,9 @@ class LeaveRequestController extends Controller
      */
     public function index(Request $request): AnonymousResourceCollection
     {
+        // Authorization check
+        $this->authorize('viewAny', \App\Models\LeaveRequest::class);
+
         $filters = $request->only(['status', 'leave_type', 'employee_id', 'start_date', 'end_date']);
         $perPage = $request->input('per_page', 15);
 
@@ -98,6 +101,9 @@ class LeaveRequestController extends Controller
             return response()->json(['message' => 'Leave request not found.'], 404);
         }
 
+        // Authorization check
+        $this->authorize('view', $leaveRequest);
+
         return response()->json([
             'data' => new LeaveRequestResource($leaveRequest),
         ]);
@@ -123,6 +129,15 @@ class LeaveRequestController extends Controller
             'recommended_by' => 'required|integer|exists:employees,id',
             'remarks' => 'nullable|string|max:500',
         ]);
+
+        $leaveRequest = $this->leaveRequestService->findLeaveRequestById($id);
+
+        if (!$leaveRequest) {
+            return response()->json(['message' => 'Leave request not found.'], 404);
+        }
+
+        // Authorization check
+        $this->authorize('recommend', $leaveRequest);
 
         $leaveRequest = $this->leaveRequestService->recommendLeaveRequest(
             $id,
@@ -159,6 +174,15 @@ class LeaveRequestController extends Controller
             'approved_by' => 'required|integer|exists:employees,id',
             'remarks' => 'nullable|string|max:500',
         ]);
+
+        $leaveRequest = $this->leaveRequestService->findLeaveRequestById($id);
+
+        if (!$leaveRequest) {
+            return response()->json(['message' => 'Leave request not found.'], 404);
+        }
+
+        // Authorization check
+        $this->authorize('approve', $leaveRequest);
 
         try {
             $leaveRequest = $this->leaveRequestService->approveLeaveRequest(
@@ -199,6 +223,15 @@ class LeaveRequestController extends Controller
             'reason' => 'required|string|max:500',
         ]);
 
+        $leaveRequest = $this->leaveRequestService->findLeaveRequestById($id);
+
+        if (!$leaveRequest) {
+            return response()->json(['message' => 'Leave request not found.'], 404);
+        }
+
+        // Authorization check
+        $this->authorize('disapprove', $leaveRequest);
+
         $leaveRequest = $this->leaveRequestService->disapproveLeaveRequest(
             $id,
             $validated['disapproved_by'],
@@ -225,6 +258,15 @@ class LeaveRequestController extends Controller
      */
     public function cancel(int $id): JsonResponse
     {
+        $leaveRequest = $this->leaveRequestService->findLeaveRequestById($id);
+
+        if (!$leaveRequest) {
+            return response()->json(['message' => 'Leave request not found.'], 404);
+        }
+
+        // Authorization check
+        $this->authorize('cancel', $leaveRequest);
+
         try {
             $leaveRequest = $this->leaveRequestService->cancelLeaveRequest($id);
 

@@ -26,6 +26,7 @@ use App\Http\Controllers\Api\Financial\TransactionController;
 use App\Http\Controllers\Api\User\ProfileController;
 use App\Http\Controllers\Api\Shared\DocumentController;
 use App\Http\Controllers\Api\Shared\AuditController;
+use App\Http\Controllers\Api\Admin\UserManagementController;
 
 /*
 |--------------------------------------------------------------------------
@@ -40,7 +41,10 @@ use App\Http\Controllers\Api\Shared\AuditController;
 
 // Public routes
 Route::prefix('auth')->group(function () {
-    Route::post('/register', [RegisterController::class, 'register']);
+    // DISABLED: Public registration not allowed in production
+    // Admin Officer creates user accounts via /users endpoint
+    // Route::post('/register', [RegisterController::class, 'register']);
+
     Route::post('/login', [LoginController::class, 'login']);
 });
 
@@ -67,38 +71,54 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/activities', [ProfileController::class, 'activities']);
     });
 
+    // Admin - User Management (Admin Officer only)
+    Route::prefix('users')->middleware('permission:view_users')->group(function () {
+        Route::get('/', [UserManagementController::class, 'index']);
+        Route::get('/statistics', [UserManagementController::class, 'statistics']);
+        Route::get('/{id}', [UserManagementController::class, 'show']);
+
+        Route::post('/', [UserManagementController::class, 'store'])->middleware('permission:create_users');
+        Route::put('/{id}', [UserManagementController::class, 'update'])->middleware('permission:edit_users');
+        Route::delete('/{id}', [UserManagementController::class, 'destroy'])->middleware('permission:delete_users');
+        Route::post('/{id}/reset-password', [UserManagementController::class, 'resetPassword'])->middleware('permission:reset_user_password');
+        Route::post('/{id}/assign-role', [UserManagementController::class, 'assignRole'])->middleware('permission:manage_user_roles');
+    });
+
     // HR Management - Employees
-    Route::prefix('employees')->group(function () {
+    Route::prefix('employees')->middleware('permission:view_employees')->group(function () {
         Route::get('/', [EmployeeController::class, 'index']);
-        Route::post('/', [EmployeeController::class, 'store']);
         Route::get('/search', [EmployeeController::class, 'search']);
         Route::get('/statistics', [EmployeeController::class, 'statistics']);
         Route::get('/{id}', [EmployeeController::class, 'show']);
-        Route::put('/{id}', [EmployeeController::class, 'update']);
-        Route::delete('/{id}', [EmployeeController::class, 'destroy']);
-        Route::post('/{id}/promote', [EmployeeController::class, 'promote']);
+
+        Route::post('/', [EmployeeController::class, 'store'])->middleware('permission:create_employees');
+        Route::put('/{id}', [EmployeeController::class, 'update'])->middleware('permission:edit_employees');
+        Route::delete('/{id}', [EmployeeController::class, 'destroy'])->middleware('permission:delete_employees');
+        Route::post('/{id}/promote', [EmployeeController::class, 'promote'])->middleware('permission:promote_employees');
     });
 
     // HR Management - Leave Requests
-    Route::prefix('leave-requests')->group(function () {
+    Route::prefix('leave-requests')->middleware('permission:view_leave_requests')->group(function () {
         Route::get('/', [LeaveRequestController::class, 'index']);
-        Route::post('/', [LeaveRequestController::class, 'store']);
         Route::get('/pending', [LeaveRequestController::class, 'pending']);
         Route::get('/statistics', [LeaveRequestController::class, 'statistics']);
         Route::get('/{id}', [LeaveRequestController::class, 'show']);
-        Route::put('/{id}/recommend', [LeaveRequestController::class, 'recommend']);
-        Route::put('/{id}/approve', [LeaveRequestController::class, 'approve']);
-        Route::put('/{id}/disapprove', [LeaveRequestController::class, 'disapprove']);
-        Route::put('/{id}/cancel', [LeaveRequestController::class, 'cancel']);
+
+        Route::post('/', [LeaveRequestController::class, 'store'])->middleware('permission:create_leave_request');
+        Route::put('/{id}/recommend', [LeaveRequestController::class, 'recommend'])->middleware('permission:recommend_leave');
+        Route::put('/{id}/approve', [LeaveRequestController::class, 'approve'])->middleware('permission:approve_leave');
+        Route::put('/{id}/disapprove', [LeaveRequestController::class, 'disapprove'])->middleware('permission:reject_leave');
+        Route::put('/{id}/cancel', [LeaveRequestController::class, 'cancel']); // No extra permission - policy handles this
     });
 
     // HR Management - Service Records
-    Route::prefix('service-records')->group(function () {
+    Route::prefix('service-records')->middleware('permission:view_service_records')->group(function () {
         Route::get('/employee/{employeeId}', [ServiceRecordController::class, 'byEmployee']);
-        Route::post('/', [ServiceRecordController::class, 'store']);
         Route::get('/{id}', [ServiceRecordController::class, 'show']);
-        Route::put('/{id}', [ServiceRecordController::class, 'update']);
-        Route::delete('/{id}', [ServiceRecordController::class, 'destroy']);
+
+        Route::post('/', [ServiceRecordController::class, 'store'])->middleware('permission:create_service_records');
+        Route::put('/{id}', [ServiceRecordController::class, 'update'])->middleware('permission:edit_service_records');
+        Route::delete('/{id}', [ServiceRecordController::class, 'destroy'])->middleware('permission:delete_service_records');
     });
 
     // HR Management - Trainings
@@ -187,56 +207,59 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
     // Inventory Management - Inventory Items
-    Route::prefix('inventory-items')->group(function () {
+    Route::prefix('inventory-items')->middleware('permission:view_inventory')->group(function () {
         Route::get('/', [InventoryItemController::class, 'index']);
-        Route::post('/', [InventoryItemController::class, 'store']);
         Route::get('/search', [InventoryItemController::class, 'search']);
         Route::get('/with-balances', [InventoryItemController::class, 'withBalances']);
         Route::get('/low-stock', [InventoryItemController::class, 'lowStock']);
         Route::get('/statistics', [InventoryItemController::class, 'statistics']);
         Route::get('/{id}', [InventoryItemController::class, 'show']);
         Route::get('/{id}/with-balance', [InventoryItemController::class, 'showWithBalance']);
-        Route::put('/{id}', [InventoryItemController::class, 'update']);
-        Route::delete('/{id}', [InventoryItemController::class, 'destroy']);
+
+        Route::post('/', [InventoryItemController::class, 'store'])->middleware('permission:create_inventory');
+        Route::put('/{id}', [InventoryItemController::class, 'update'])->middleware('permission:edit_inventory');
+        Route::delete('/{id}', [InventoryItemController::class, 'destroy'])->middleware('permission:delete_inventory');
     });
 
     // Inventory Management - Stock Cards
-    Route::prefix('stock-cards')->group(function () {
+    Route::prefix('stock-cards')->middleware('permission:view_inventory')->group(function () {
         Route::get('/', [StockCardController::class, 'index']);
         Route::get('/{id}', [StockCardController::class, 'show']);
-        Route::post('/stock-in', [StockCardController::class, 'stockIn']);
-        Route::post('/stock-out', [StockCardController::class, 'stockOut']);
-        Route::post('/donation', [StockCardController::class, 'recordDonation']);
         Route::get('/item/{itemId}', [StockCardController::class, 'byInventoryItem']);
         Route::get('/item/{itemId}/balance', [StockCardController::class, 'currentBalance']);
+
+        Route::post('/stock-in', [StockCardController::class, 'stockIn'])->middleware('permission:create_inventory');
+        Route::post('/stock-out', [StockCardController::class, 'stockOut'])->middleware('permission:issue_inventory');
+        Route::post('/donation', [StockCardController::class, 'recordDonation'])->middleware('permission:create_inventory');
     });
 
     // Inventory Management - Inventory Adjustments
-    Route::prefix('inventory-adjustments')->group(function () {
+    Route::prefix('inventory-adjustments')->middleware('permission:view_inventory')->group(function () {
         Route::get('/', [InventoryAdjustmentController::class, 'index']);
-        Route::post('/', [InventoryAdjustmentController::class, 'store']);
         Route::get('/pending', [InventoryAdjustmentController::class, 'pending']);
         Route::get('/{id}', [InventoryAdjustmentController::class, 'show']);
-        Route::put('/{id}', [InventoryAdjustmentController::class, 'update']);
-        Route::delete('/{id}', [InventoryAdjustmentController::class, 'destroy']);
-        Route::put('/{id}/approve', [InventoryAdjustmentController::class, 'approve']);
-        Route::put('/{id}/reject', [InventoryAdjustmentController::class, 'reject']);
+
+        Route::post('/', [InventoryAdjustmentController::class, 'store'])->middleware('permission:create_inventory');
+        Route::put('/{id}', [InventoryAdjustmentController::class, 'update'])->middleware('permission:edit_inventory');
+        Route::delete('/{id}', [InventoryAdjustmentController::class, 'destroy'])->middleware('permission:delete_inventory');
+        Route::put('/{id}/approve', [InventoryAdjustmentController::class, 'approve'])->middleware('permission:edit_inventory');
+        Route::put('/{id}/reject', [InventoryAdjustmentController::class, 'reject'])->middleware('permission:edit_inventory');
     });
 
     // Inventory Management - Physical Counts
-    Route::prefix('physical-counts')->group(function () {
+    Route::prefix('physical-counts')->middleware('permission:view_inventory')->group(function () {
         Route::get('/', [PhysicalCountController::class, 'index']);
-        Route::post('/', [PhysicalCountController::class, 'store']);
         Route::get('/with-variances', [PhysicalCountController::class, 'withVariances']);
         Route::get('/{id}', [PhysicalCountController::class, 'show']);
-        Route::put('/{id}', [PhysicalCountController::class, 'update']);
-        Route::delete('/{id}', [PhysicalCountController::class, 'destroy']);
+
+        Route::post('/', [PhysicalCountController::class, 'store'])->middleware('permission:create_inventory');
+        Route::put('/{id}', [PhysicalCountController::class, 'update'])->middleware('permission:edit_inventory');
+        Route::delete('/{id}', [PhysicalCountController::class, 'destroy'])->middleware('permission:delete_inventory');
     });
 
     // Financial Management - Budgets
-    Route::prefix('budgets')->group(function () {
+    Route::prefix('budgets')->middleware('permission:view_budget')->group(function () {
         Route::get('/', [BudgetController::class, 'index']);
-        Route::post('/', [BudgetController::class, 'store']);
         Route::get('/active', [BudgetController::class, 'active']);
         Route::get('/utilization', [BudgetController::class, 'utilization']);
         Route::get('/nearly-depleted', [BudgetController::class, 'nearlyDepleted']);
@@ -244,79 +267,86 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/fiscal-year/{year}', [BudgetController::class, 'byFiscalYear']);
         Route::get('/fund-source/{fundSource}', [BudgetController::class, 'byFundSource']);
         Route::get('/{id}', [BudgetController::class, 'show']);
-        Route::put('/{id}', [BudgetController::class, 'update']);
-        Route::delete('/{id}', [BudgetController::class, 'destroy']);
-        Route::put('/{id}/approve', [BudgetController::class, 'approve']);
-        Route::put('/{id}/activate', [BudgetController::class, 'activate']);
-        Route::put('/{id}/close', [BudgetController::class, 'close']);
-        Route::put('/{id}/update-utilization', [BudgetController::class, 'updateUtilization']);
+
+        Route::post('/', [BudgetController::class, 'store'])->middleware('permission:create_budget');
+        Route::put('/{id}', [BudgetController::class, 'update'])->middleware('permission:edit_budget');
+        Route::delete('/{id}', [BudgetController::class, 'destroy'])->middleware('permission:edit_budget');
+        Route::put('/{id}/approve', [BudgetController::class, 'approve'])->middleware('permission:approve_budget');
+        Route::put('/{id}/activate', [BudgetController::class, 'activate'])->middleware('permission:approve_budget');
+        Route::put('/{id}/close', [BudgetController::class, 'close'])->middleware('permission:approve_budget');
+        Route::put('/{id}/update-utilization', [BudgetController::class, 'updateUtilization'])->middleware('permission:edit_budget');
     });
 
     // Budget Allocations (Alias for Budgets - for frontend compatibility)
-    Route::prefix('budget-allocations')->group(function () {
+    Route::prefix('budget-allocations')->middleware('permission:view_budget')->group(function () {
         Route::get('/', [BudgetController::class, 'index']);
-        Route::post('/', [BudgetController::class, 'store']);
         Route::get('/active', [BudgetController::class, 'active']);
         Route::get('/utilization', [BudgetController::class, 'utilization']);
         Route::get('/statistics', [BudgetController::class, 'statistics']);
         Route::get('/{id}', [BudgetController::class, 'show']);
-        Route::put('/{id}', [BudgetController::class, 'update']);
-        Route::delete('/{id}', [BudgetController::class, 'destroy']);
+
+        Route::post('/', [BudgetController::class, 'store'])->middleware('permission:create_budget');
+        Route::put('/{id}', [BudgetController::class, 'update'])->middleware('permission:edit_budget');
+        Route::delete('/{id}', [BudgetController::class, 'destroy'])->middleware('permission:edit_budget');
     });
 
     // Financial Management - Cash Advances
-    Route::prefix('cash-advances')->group(function () {
+    Route::prefix('cash-advances')->middleware('permission:view_expenses')->group(function () {
         Route::get('/', [CashAdvanceController::class, 'index']);
-        Route::post('/', [CashAdvanceController::class, 'store']);
         Route::get('/pending', [CashAdvanceController::class, 'pending']);
         Route::get('/overdue', [CashAdvanceController::class, 'overdue']);
         Route::get('/statistics', [CashAdvanceController::class, 'statistics']);
         Route::get('/employee/{employeeId}', [CashAdvanceController::class, 'byEmployee']);
         Route::get('/{id}', [CashAdvanceController::class, 'show']);
-        Route::put('/{id}', [CashAdvanceController::class, 'update']);
-        Route::delete('/{id}', [CashAdvanceController::class, 'destroy']);
-        Route::put('/{id}/approve', [CashAdvanceController::class, 'approve']);
-        Route::put('/{id}/release', [CashAdvanceController::class, 'release']);
+
+        Route::post('/', [CashAdvanceController::class, 'store'])->middleware('permission:create_expense');
+        Route::put('/{id}', [CashAdvanceController::class, 'update'])->middleware('permission:create_expense');
+        Route::delete('/{id}', [CashAdvanceController::class, 'destroy'])->middleware('permission:create_expense');
+        Route::put('/{id}/approve', [CashAdvanceController::class, 'approve'])->middleware('permission:approve_expense');
+        Route::put('/{id}/release', [CashAdvanceController::class, 'release'])->middleware('permission:approve_expense');
     });
 
     // Financial Management - Disbursements
-    Route::prefix('disbursements')->group(function () {
+    Route::prefix('disbursements')->middleware('permission:view_expenses')->group(function () {
         Route::get('/', [DisbursementController::class, 'index']);
-        Route::post('/', [DisbursementController::class, 'store']);
         Route::get('/pending', [DisbursementController::class, 'pending']);
         Route::get('/statistics', [DisbursementController::class, 'statistics']);
         Route::get('/{id}', [DisbursementController::class, 'show']);
-        Route::put('/{id}', [DisbursementController::class, 'update']);
-        Route::delete('/{id}', [DisbursementController::class, 'destroy']);
-        Route::put('/{id}/certify', [DisbursementController::class, 'certify']);
-        Route::put('/{id}/approve', [DisbursementController::class, 'approve']);
-        Route::put('/{id}/mark-paid', [DisbursementController::class, 'markPaid']);
+
+        Route::post('/', [DisbursementController::class, 'store'])->middleware('permission:create_expense');
+        Route::put('/{id}', [DisbursementController::class, 'update'])->middleware('permission:create_expense');
+        Route::delete('/{id}', [DisbursementController::class, 'destroy'])->middleware('permission:create_expense');
+        Route::put('/{id}/certify', [DisbursementController::class, 'certify'])->middleware('permission:approve_expense');
+        Route::put('/{id}/approve', [DisbursementController::class, 'approve'])->middleware('permission:approve_expense');
+        Route::put('/{id}/mark-paid', [DisbursementController::class, 'markPaid'])->middleware('permission:approve_expense');
     });
 
     // Financial Management - Liquidations
-    Route::prefix('liquidations')->group(function () {
+    Route::prefix('liquidations')->middleware('permission:view_expenses')->group(function () {
         Route::get('/', [LiquidationController::class, 'index']);
-        Route::post('/', [LiquidationController::class, 'store']);
         Route::get('/pending', [LiquidationController::class, 'pending']);
         Route::get('/cash-advance/{caId}', [LiquidationController::class, 'byCashAdvance']);
         Route::get('/{id}', [LiquidationController::class, 'show']);
-        Route::put('/{id}', [LiquidationController::class, 'update']);
-        Route::delete('/{id}', [LiquidationController::class, 'destroy']);
-        Route::post('/{id}/items', [LiquidationController::class, 'addItem']);
-        Route::put('/{id}/approve', [LiquidationController::class, 'approve']);
-        Route::put('/{id}/reject', [LiquidationController::class, 'reject']);
+
+        Route::post('/', [LiquidationController::class, 'store'])->middleware('permission:create_expense');
+        Route::put('/{id}', [LiquidationController::class, 'update'])->middleware('permission:create_expense');
+        Route::delete('/{id}', [LiquidationController::class, 'destroy'])->middleware('permission:create_expense');
+        Route::post('/{id}/items', [LiquidationController::class, 'addItem'])->middleware('permission:create_expense');
+        Route::put('/{id}/approve', [LiquidationController::class, 'approve'])->middleware('permission:approve_expense');
+        Route::put('/{id}/reject', [LiquidationController::class, 'reject'])->middleware('permission:approve_expense');
     });
 
     // Financial Management - Transactions
-    Route::prefix('transactions')->group(function () {
+    Route::prefix('transactions')->middleware('permission:view_expenses')->group(function () {
         Route::get('/', [TransactionController::class, 'index']);
-        Route::post('/', [TransactionController::class, 'store']);
         Route::get('/recent', [TransactionController::class, 'recent']);
         Route::get('/statistics', [TransactionController::class, 'statistics']);
         Route::get('/{id}', [TransactionController::class, 'show']);
-        Route::put('/{id}', [TransactionController::class, 'update']);
-        Route::delete('/{id}', [TransactionController::class, 'destroy']);
-        Route::put('/{id}/verify', [TransactionController::class, 'verify']);
+
+        Route::post('/', [TransactionController::class, 'store'])->middleware('permission:create_expense');
+        Route::put('/{id}', [TransactionController::class, 'update'])->middleware('permission:create_expense');
+        Route::delete('/{id}', [TransactionController::class, 'destroy'])->middleware('permission:create_expense');
+        Route::put('/{id}/verify', [TransactionController::class, 'verify'])->middleware('permission:approve_expense');
     });
 
     // Shared Module - Document Management
@@ -324,7 +354,9 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/upload', [DocumentController::class, 'upload']);
         Route::get('/', [DocumentController::class, 'index']);
         Route::get('/{id}', [DocumentController::class, 'show']);
-        Route::get('/{id}/download', [DocumentController::class, 'download']);
+        Route::get('/{id}/download', [DocumentController::class, 'download'])
+            ->middleware('signed')  // Require signed URL for download (security for sensitive docs)
+            ->name('documents.download');
         Route::delete('/{id}', [DocumentController::class, 'destroy']);
     });
 

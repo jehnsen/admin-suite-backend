@@ -49,6 +49,9 @@ class EmployeeController extends Controller
      */
     public function index(Request $request): AnonymousResourceCollection
     {
+        // Authorization check
+        $this->authorize('viewAny', \App\Models\Employee::class);
+
         $filters = $request->only(['status', 'position', 'employment_status', 'search']);
         $perPage = $request->input('per_page', 15);
 
@@ -82,6 +85,9 @@ class EmployeeController extends Controller
      */
     public function store(StoreEmployeeRequest $request): JsonResponse
     {
+        // Authorization check
+        $this->authorize('create', \App\Models\Employee::class);
+
         $employee = $this->employeeService->createEmployee(
             $request->validated(),
             $request->input('service_record', [])
@@ -122,6 +128,9 @@ class EmployeeController extends Controller
             return response()->json(['message' => 'Employee not found.'], 404);
         }
 
+        // Authorization check
+        $this->authorize('view', $employee);
+
         return response()->json([
             'data' => new EmployeeResource($employee),
         ]);
@@ -141,6 +150,15 @@ class EmployeeController extends Controller
      */
     public function update(UpdateEmployeeRequest $request, int $id): JsonResponse
     {
+        $employee = $this->employeeService->findEmployeeById($id);
+
+        if (!$employee) {
+            return response()->json(['message' => 'Employee not found.'], 404);
+        }
+
+        // Authorization check
+        $this->authorize('update', $employee);
+
         $employee = $this->employeeService->updateEmployee($id, $request->validated());
 
         return response()->json([
@@ -162,6 +180,15 @@ class EmployeeController extends Controller
      */
     public function destroy(int $id): JsonResponse
     {
+        $employee = $this->employeeService->findEmployeeById($id);
+
+        if (!$employee) {
+            return response()->json(['message' => 'Employee not found.'], 404);
+        }
+
+        // Authorization check
+        $this->authorize('delete', $employee);
+
         $this->employeeService->deleteEmployee($id);
 
         return response()->json([
@@ -187,6 +214,15 @@ class EmployeeController extends Controller
      */
     public function promote(Request $request, int $id): JsonResponse
     {
+        $employee = $this->employeeService->findEmployeeById($id);
+
+        if (!$employee) {
+            return response()->json(['message' => 'Employee not found.'], 404);
+        }
+
+        // Authorization check
+        $this->authorize('promote', $employee);
+
         $validated = $request->validate([
             'new_position' => 'required|string|max:255',
             'new_salary_grade' => 'required|integer|min:1|max:33',

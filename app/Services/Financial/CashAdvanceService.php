@@ -17,6 +17,13 @@ class CashAdvanceService
 
     public function getAllCashAdvances(array $filters = [], int $perPage = 15): LengthAwarePaginator
     {
+        $user = auth()->user();
+
+        // Teachers/Staff can only see their own cash advances
+        if ($user && $user->hasRole('Teacher/Staff') && $user->employee) {
+            $filters['employee_id'] = $user->employee->id;
+        }
+
         return $this->caRepository->getAllCashAdvances($filters, $perPage);
     }
 

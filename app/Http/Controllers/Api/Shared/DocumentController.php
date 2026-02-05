@@ -79,6 +79,9 @@ class DocumentController extends Controller
             ], 404);
         }
 
+        // Authorization check
+        $this->authorize('view', $document);
+
         return response()->json([
             'data' => $document,
         ]);
@@ -90,6 +93,17 @@ class DocumentController extends Controller
     public function download(int $id)
     {
         try {
+            $document = $this->documentService->getDocumentById($id);
+
+            if (!$document) {
+                return response()->json([
+                    'message' => 'Document not found.',
+                ], 404);
+            }
+
+            // Authorization check
+            $this->authorize('view', $document);
+
             return $this->documentService->downloadDocument($id);
         } catch (\Exception $e) {
             return response()->json([
@@ -111,6 +125,9 @@ class DocumentController extends Controller
                 'message' => 'Document not found.',
             ], 404);
         }
+
+        // Authorization check
+        $this->authorize('delete', $document);
 
         $deleted = $this->documentService->deleteDocument($id);
 
