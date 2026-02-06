@@ -67,4 +67,15 @@ class EmployeePolicy
             ? Response::allow()
             : Response::deny('You do not have permission to promote employees.');
     }
+
+    /**
+     * Determine if user can update monthly leave credits for all employees.
+     * This is typically restricted to Admin Officer and Super Admin only.
+     */
+    public function updateMonthlyLeaveCredits(User $user): Response
+    {
+        return $user->hasPermissionTo('manage_leave_credits')
+            ? Response::allow()
+            : Response::deny('You do not have permission to update monthly leave credits.');
+    }
 }

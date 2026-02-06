@@ -95,6 +95,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::put('/{id}', [EmployeeController::class, 'update'])->middleware('permission:edit_employees');
         Route::delete('/{id}', [EmployeeController::class, 'destroy'])->middleware('permission:delete_employees');
         Route::post('/{id}/promote', [EmployeeController::class, 'promote'])->middleware('permission:promote_employees');
+        Route::post('/update-monthly-leave-credits', [EmployeeController::class, 'updateMonthlyLeaveCredits'])->middleware('permission:manage_leave_credits');
     });
 
     // HR Management - Leave Requests

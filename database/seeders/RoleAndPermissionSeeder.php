@@ -43,6 +43,7 @@ class RoleAndPermissionSeeder extends Seeder
             'recommend_leave',
             'approve_leave',
             'reject_leave',
+            'manage_leave_credits',
 
             // Service Records
             'view_service_records',
@@ -72,18 +73,18 @@ class RoleAndPermissionSeeder extends Seeder
         ];
 
         foreach ($permissions as $permission) {
-            Permission::create(['name' => $permission]);
+            Permission::firstOrCreate(['name' => $permission]);
         }
 
         // Create Roles and Assign Permissions
 
         // 1. Super Admin - Full access
-        $superAdmin = Role::create(['name' => 'Super Admin']);
-        $superAdmin->givePermissionTo(Permission::all());
+        $superAdmin = Role::firstOrCreate(['name' => 'Super Admin']);
+        $superAdmin->syncPermissions(Permission::all());
 
         // 2. School Head - Management level access
-        $schoolHead = Role::create(['name' => 'School Head']);
-        $schoolHead->givePermissionTo([
+        $schoolHead = Role::firstOrCreate(['name' => 'School Head']);
+        $schoolHead->syncPermissions([
             'view_users',
             'view_employees',
             'create_employees',
@@ -103,8 +104,8 @@ class RoleAndPermissionSeeder extends Seeder
         ]);
 
         // 3. Admin Officer - System Owner
-        $adminOfficer = Role::create(['name' => 'Admin Officer']);
-        $adminOfficer->givePermissionTo([
+        $adminOfficer = Role::firstOrCreate(['name' => 'Admin Officer']);
+        $adminOfficer->syncPermissions([
             'view_users',
             'create_users',
             'edit_users',
@@ -118,6 +119,7 @@ class RoleAndPermissionSeeder extends Seeder
             'edit_201_file',
             'view_leave_requests',
             'recommend_leave',
+            'manage_leave_credits',
             'view_service_records',
             'create_service_records',
             'edit_service_records',
@@ -135,8 +137,8 @@ class RoleAndPermissionSeeder extends Seeder
         ]);
 
         // 4. Teacher/Staff - Limited access
-        $teacherStaff = Role::create(['name' => 'Teacher/Staff']);
-        $teacherStaff->givePermissionTo([
+        $teacherStaff = Role::firstOrCreate(['name' => 'Teacher/Staff']);
+        $teacherStaff->syncPermissions([
             'view_employees', // Can view colleagues
             'create_leave_request',
             'view_leave_requests', // Own only

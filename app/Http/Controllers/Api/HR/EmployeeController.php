@@ -245,6 +245,34 @@ class EmployeeController extends Controller
     }
 
     /**
+     * Update monthly leave credits
+     *
+     * Bulk update leave credits for all active permanent employees.
+     * Increments vacation_leave_credits and sick_leave_credits by 1.25 days each.
+     * This is typically executed at the end of each month.
+     *
+     * @response 200 {
+     *   "message": "Successfully updated leave credits for 45 permanent employees",
+     *   "data": {
+     *     "updated_count": 45,
+     *     "message": "Successfully updated leave credits for 45 permanent employees"
+     *   }
+     * }
+     */
+    public function updateMonthlyLeaveCredits(): JsonResponse
+    {
+        // Authorization check - only Admin Officer and Super Admin can do this
+        $this->authorize('updateMonthlyLeaveCredits', \App\Models\Employee::class);
+
+        $result = $this->employeeService->updateMonthlyLeaveCredits();
+
+        return response()->json([
+            'message' => $result['message'],
+            'data' => $result,
+        ]);
+    }
+
+    /**
      * Get employee statistics
      *
      * Retrieve overall employee statistics including counts by status and position.
