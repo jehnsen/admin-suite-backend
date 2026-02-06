@@ -51,6 +51,10 @@ class Employee extends Model
         'sss_number',
         'vacation_leave_credits',
         'sick_leave_credits',
+        'service_credit_balance',
+        'standard_time_in',
+        'standard_time_out',
+        'daily_rate',
         'status',
     ];
 
@@ -66,6 +70,8 @@ class Employee extends Model
         'monthly_salary' => 'decimal:2',
         'vacation_leave_credits' => 'decimal:2',
         'sick_leave_credits' => 'decimal:2',
+        'service_credit_balance' => 'decimal:2',
+        'daily_rate' => 'decimal:2',
     ];
 
     /**
@@ -125,6 +131,22 @@ class Employee extends Model
     }
 
     /**
+     * Get all attendance records for the employee.
+     */
+    public function attendanceRecords(): HasMany
+    {
+        return $this->hasMany(AttendanceRecord::class);
+    }
+
+    /**
+     * Get all service credits for the employee.
+     */
+    public function serviceCredits(): HasMany
+    {
+        return $this->hasMany(ServiceCredit::class);
+    }
+
+    /**
      * Get the employee's full name.
      */
     public function getFullNameAttribute(): string
@@ -179,12 +201,55 @@ class Employee extends Model
     }
 
     /**
+     * Calculate daily rate from monthly salary.
+     */
+    public function calculateDailyRate(): float
+    {
+        return $this->monthly_salary ? round($this->monthly_salary / 22, 2) : 0.00;
+    }
+
+    /**
+     * Check if employee is eligible for service credits.
+     * Only Permanent and Active employees can earn service credits.
+     */
+    public function isEligibleForServiceCredits(): bool
+    {
+        return $this->employment_status === 'Permanent' && $this->isActive();
+    }
+
+    /**
+     * Get attendance summary for current month.
+     */
+    public function getCurrentMonthAttendanceSummary(): array
+    {
+        $currentYear = now()->year;
+        $currentMonth = now()->month;
+
+        $records = $this->attendanceRecords()
+            ->whereYear('attendance_date', $currentYear)
+            ->whereMonth('attendance_date', $currentMonth)
+            ->get();
+
+        return [
+            'total_days' => $records->count(),
+            'present' => $records->where('status', 'Present')->count(),
+            'absent' => $records->where('status', 'Absent')->count(),
+            'late_count' => $records->where('late_minutes', '>', 0)->count(),
+            'total_undertime_hours' => $records->sum('undertime_hours'),
+            'total_overtime_hours' => $records->sum('overtime_hours'),
+        ];
+    }
+
+    /**
      * Get the activity log options
      */
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
-            ->logOnly(['employee_number', 'first_name', 'last_name', 'position', 'employment_status'])
+            ->logOnly([
+                'employee_number', 'first_name', 'last_name', 'position',
+                'employment_status', 'service_credit_balance'
+            ])
             ->logOnlyDirty()
             ->dontSubmitEmptyLogs()
             ->setDescriptionForEvent(fn(string $eventName) => "Employee {$eventName}")

@@ -4,8 +4,10 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\Auth\LoginController;
 use App\Http\Controllers\Api\Auth\RegisterController;
 use App\Http\Controllers\Api\Auth\LogoutController;
+use App\Http\Controllers\Api\HR\AttendanceRecordController;
 use App\Http\Controllers\Api\HR\EmployeeController;
 use App\Http\Controllers\Api\HR\LeaveRequestController;
+use App\Http\Controllers\Api\HR\ServiceCreditController;
 use App\Http\Controllers\Api\HR\ServiceRecordController;
 use App\Http\Controllers\Api\HR\TrainingController;
 use App\Http\Controllers\Api\Procurement\SupplierController;
@@ -27,6 +29,7 @@ use App\Http\Controllers\Api\User\ProfileController;
 use App\Http\Controllers\Api\Shared\DocumentController;
 use App\Http\Controllers\Api\Shared\AuditController;
 use App\Http\Controllers\Api\Admin\UserManagementController;
+use App\Http\Controllers\Api\DashboardController;
 
 /*
 |--------------------------------------------------------------------------
@@ -52,6 +55,14 @@ Route::prefix('auth')->group(function () {
 Route::middleware('auth:sanctum')->group(function () {
     // Authentication
     Route::post('/auth/logout', [LogoutController::class, 'logout']);
+
+    // Dashboard - Administrative Officer Command Center
+    Route::prefix('dashboard')->group(function () {
+        Route::get('/metrics', [DashboardController::class, 'metrics']);
+        Route::get('/expiring-budgets', [DashboardController::class, 'expiringBudgets']);
+        Route::get('/critical-stock', [DashboardController::class, 'criticalStock']);
+        Route::get('/step-increments-due', [DashboardController::class, 'stepIncrementsDue']);
+    });
 
     // User Profile / My Account
     Route::prefix('profile')->group(function () {
@@ -134,6 +145,42 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/{id}', [TrainingController::class, 'show']);
         Route::put('/{id}', [TrainingController::class, 'update']);
         Route::delete('/{id}', [TrainingController::class, 'destroy']);
+    });
+
+    // HR Management - Attendance Records
+    Route::prefix('attendance-records')->middleware('permission:view_attendance')->group(function () {
+        Route::get('/', [AttendanceRecordController::class, 'index']);
+        Route::get('/statistics', [AttendanceRecordController::class, 'statistics']);
+        Route::get('/employee/{employeeId}', [AttendanceRecordController::class, 'byEmployee']);
+        Route::get('/employee/{employeeId}/summary', [AttendanceRecordController::class, 'summary']);
+        Route::get('/{id}', [AttendanceRecordController::class, 'show']);
+
+        Route::post('/', [AttendanceRecordController::class, 'store'])->middleware('permission:create_attendance');
+        Route::post('/import-csv', [AttendanceRecordController::class, 'importCSV'])->middleware('permission:upload_attendance_csv');
+
+        Route::put('/{id}', [AttendanceRecordController::class, 'update'])->middleware('permission:edit_attendance');
+        Route::put('/{id}/approve', [AttendanceRecordController::class, 'approve'])->middleware('permission:approve_attendance');
+
+        Route::delete('/{id}', [AttendanceRecordController::class, 'destroy'])->middleware('permission:edit_attendance');
+    });
+
+    // HR Management - Service Credits
+    Route::prefix('service-credits')->middleware('permission:view_service_credits')->group(function () {
+        Route::get('/', [ServiceCreditController::class, 'index']);
+        Route::get('/pending', [ServiceCreditController::class, 'pending'])->middleware('permission:approve_service_credits');
+        Route::get('/employee/{employeeId}', [ServiceCreditController::class, 'byEmployee']);
+        Route::get('/employee/{employeeId}/summary', [ServiceCreditController::class, 'summary']);
+        Route::get('/{id}', [ServiceCreditController::class, 'show']);
+
+        Route::post('/', [ServiceCreditController::class, 'store'])->middleware('permission:create_service_credits');
+        Route::post('/apply-offset', [ServiceCreditController::class, 'applyOffset'])->middleware('permission:apply_service_credit_offset');
+
+        Route::put('/{id}', [ServiceCreditController::class, 'update'])->middleware('permission:create_service_credits');
+        Route::put('/{id}/approve', [ServiceCreditController::class, 'approve'])->middleware('permission:approve_service_credits');
+        Route::put('/{id}/reject', [ServiceCreditController::class, 'reject'])->middleware('permission:approve_service_credits');
+        Route::put('/offsets/{offsetId}/revert', [ServiceCreditController::class, 'revertOffset'])->middleware('permission:apply_service_credit_offset');
+
+        Route::delete('/{id}', [ServiceCreditController::class, 'destroy'])->middleware('permission:create_service_credits');
     });
 
     // Procurement - Suppliers

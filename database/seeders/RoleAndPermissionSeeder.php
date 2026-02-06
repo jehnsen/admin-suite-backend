@@ -51,6 +51,22 @@ class RoleAndPermissionSeeder extends Seeder
             'edit_service_records',
             'delete_service_records',
 
+            // Attendance/DTR Management
+            'view_attendance',
+            'create_attendance',
+            'edit_attendance',
+            'approve_attendance',
+            'manage_attendance_settings',
+            'export_attendance',
+            'upload_attendance_csv',
+
+            // Service Credits Management
+            'view_service_credits',
+            'create_service_credits',
+            'approve_service_credits',
+            'apply_service_credit_offset',
+            'manage_service_credit_rules',
+
             // Inventory Management
             'view_inventory',
             'create_inventory',
@@ -94,6 +110,11 @@ class RoleAndPermissionSeeder extends Seeder
             'approve_leave',
             'reject_leave',
             'view_service_records',
+            'view_attendance',
+            'approve_attendance',
+            'export_attendance',
+            'view_service_credits',
+            'approve_service_credits',
             'view_inventory',
             'issue_inventory',
             'view_budget',
@@ -123,6 +144,18 @@ class RoleAndPermissionSeeder extends Seeder
             'view_service_records',
             'create_service_records',
             'edit_service_records',
+            'view_attendance',
+            'create_attendance',
+            'edit_attendance',
+            'approve_attendance',
+            'manage_attendance_settings',
+            'export_attendance',
+            'upload_attendance_csv',
+            'view_service_credits',
+            'create_service_credits',
+            'approve_service_credits',
+            'apply_service_credit_offset',
+            'manage_service_credit_rules',
             'view_inventory',
             'create_inventory',
             'edit_inventory',
@@ -142,6 +175,7 @@ class RoleAndPermissionSeeder extends Seeder
             'view_employees', // Can view colleagues
             'create_leave_request',
             'view_leave_requests', // Own only
+            'view_attendance', // Own records only
         ]);
 
         $this->command->info('Roles and permissions created successfully!');

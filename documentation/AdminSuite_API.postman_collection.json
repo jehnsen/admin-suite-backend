@@ -44,8 +44,14 @@
 						},
 						"url": {
 							"raw": "{{base_url}}/api/auth/register",
-							"host": ["{{base_url}}"],
-							"path": ["api", "auth", "register"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"register"
+							]
 						},
 						"description": "Register a new user account. Default role: Teacher/Staff"
 					},
@@ -87,8 +93,14 @@
 						},
 						"url": {
 							"raw": "{{base_url}}/api/auth/login",
-							"host": ["{{base_url}}"],
-							"path": ["api", "auth", "login"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"login"
+							]
 						},
 						"description": "Login and receive Bearer token"
 					},
@@ -116,8 +128,14 @@
 						],
 						"url": {
 							"raw": "{{base_url}}/api/auth/logout",
-							"host": ["{{base_url}}"],
-							"path": ["api", "auth", "logout"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"logout"
+							]
 						},
 						"description": "Logout and revoke current token"
 					},
@@ -125,6 +143,210 @@
 				}
 			],
 			"description": "Authentication endpoints using Laravel Sanctum"
+		},
+		{
+			"name": "Dashboard - Command Center",
+			"item": [
+				{
+					"name": "Get All Dashboard Metrics",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/dashboard/metrics?budget_days=60&stock_prediction_days=14&stock_usage_window=30&step_increment_days=60&step_increment_months=36",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"dashboard",
+								"metrics"
+							],
+							"query": [
+								{
+									"key": "budget_days",
+									"value": "60",
+									"description": "Days to check for expiring budgets"
+								},
+								{
+									"key": "stock_prediction_days",
+									"value": "14",
+									"description": "Days to predict stockout"
+								},
+								{
+									"key": "stock_usage_window",
+									"value": "30",
+									"description": "Days to analyze for usage patterns"
+								},
+								{
+									"key": "step_increment_days",
+									"value": "60",
+									"description": "Days to check for due step increments"
+								},
+								{
+									"key": "step_increment_months",
+									"value": "36",
+									"description": "Months required for step increment eligibility (DepEd rule: 3 years)"
+								}
+							]
+						},
+						"description": "Get comprehensive dashboard metrics including expiring budgets, critical stock levels, and employees due for step increment. Returns all three alerts with summary counts and high-priority items."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Expiring Budgets",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/dashboard/expiring-budgets?within_days=60",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"dashboard",
+								"expiring-budgets"
+							],
+							"query": [
+								{
+									"key": "within_days",
+									"value": "60",
+									"description": "Number of days to check for expiring budgets (default: 60)"
+								}
+							]
+						},
+						"description": "Get only expiring budget alerts. Returns active budgets approaching their end_date with remaining balances. Example: MOOE - Training Fund expires in 45 days. You have 15000.00 remaining."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Critical Stock Items (AI/Usage-Based)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/dashboard/critical-stock?prediction_days=14&usage_window=30",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"dashboard",
+								"critical-stock"
+							],
+							"query": [
+								{
+									"key": "prediction_days",
+									"value": "14",
+									"description": "Days to predict stockout (default: 14)"
+								},
+								{
+									"key": "usage_window",
+									"value": "30",
+									"description": "Days to analyze for usage patterns (default: 30)"
+								}
+							]
+						},
+						"description": "Get stock items predicted to run out based on consumption patterns. Uses AI logic to calculate average daily consumption and predict stockout dates."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Employees Due for Step Increment",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/dashboard/step-increments-due?within_days=60&eligibility_months=36",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"dashboard",
+								"step-increments-due"
+							],
+							"query": [
+								{
+									"key": "within_days",
+									"value": "60",
+									"description": "Days to check for due step increments (default: 60)"
+								},
+								{
+									"key": "eligibility_months",
+									"value": "36",
+									"description": "Months required for eligibility per DepEd/CSC rule (default: 36)"
+								}
+							]
+						},
+						"description": "Get permanent employees due for step increment based on DepEd 3-year rule. Shows employees approaching 36-month eligibility with NOSA preparation reminder."
+					},
+					"response": []
+				}
+			],
+			"description": "Administrative Officer Command Center - Intelligent dashboard metrics with predictive alerts for budgets, inventory, and employee records"
 		},
 		{
 			"name": "HR - Employees",
@@ -151,8 +373,13 @@
 						],
 						"url": {
 							"raw": "{{base_url}}/api/employees?per_page=15&status=Active",
-							"host": ["{{base_url}}"],
-							"path": ["api", "employees"],
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"employees"
+							],
 							"query": [
 								{
 									"key": "per_page",
@@ -204,8 +431,14 @@
 						],
 						"url": {
 							"raw": "{{base_url}}/api/employees/1",
-							"host": ["{{base_url}}"],
-							"path": ["api", "employees", "1"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"employees",
+								"1"
+							]
 						},
 						"description": "Get detailed employee information"
 					},
@@ -255,8 +488,13 @@
 						},
 						"url": {
 							"raw": "{{base_url}}/api/employees",
-							"host": ["{{base_url}}"],
-							"path": ["api", "employees"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"employees"
+							]
 						},
 						"description": "Create a new employee record"
 					},
@@ -292,8 +530,14 @@
 						},
 						"url": {
 							"raw": "{{base_url}}/api/employees/3",
-							"host": ["{{base_url}}"],
-							"path": ["api", "employees", "3"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"employees",
+								"3"
+							]
 						},
 						"description": "Update employee information"
 					},
@@ -321,8 +565,14 @@
 						],
 						"url": {
 							"raw": "{{base_url}}/api/employees/99",
-							"host": ["{{base_url}}"],
-							"path": ["api", "employees", "99"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"employees",
+								"99"
+							]
 						},
 						"description": "Soft delete an employee"
 					},
@@ -358,8 +608,15 @@
 						},
 						"url": {
 							"raw": "{{base_url}}/api/employees/3/promote",
-							"host": ["{{base_url}}"],
-							"path": ["api", "employees", "3", "promote"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"employees",
+								"3",
+								"promote"
+							]
 						},
 						"description": "Promote employee to new position (auto-creates service record)"
 					},
@@ -387,8 +644,14 @@
 						],
 						"url": {
 							"raw": "{{base_url}}/api/employees/search?search=Juan",
-							"host": ["{{base_url}}"],
-							"path": ["api", "employees", "search"],
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"employees",
+								"search"
+							],
 							"query": [
 								{
 									"key": "search",
@@ -422,8 +685,14 @@
 						],
 						"url": {
 							"raw": "{{base_url}}/api/employees/statistics",
-							"host": ["{{base_url}}"],
-							"path": ["api", "employees", "statistics"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"employees",
+								"statistics"
+							]
 						},
 						"description": "Get employee statistics (counts by status, position)"
 					},
@@ -457,8 +726,13 @@
 						],
 						"url": {
 							"raw": "{{base_url}}/api/leave-requests?status=Pending&per_page=15",
-							"host": ["{{base_url}}"],
-							"path": ["api", "leave-requests"],
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"leave-requests"
+							],
 							"query": [
 								{
 									"key": "status",
@@ -507,8 +781,14 @@
 						],
 						"url": {
 							"raw": "{{base_url}}/api/leave-requests/1",
-							"host": ["{{base_url}}"],
-							"path": ["api", "leave-requests", "1"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"leave-requests",
+								"1"
+							]
 						},
 						"description": "Get detailed leave request information"
 					},
@@ -558,8 +838,13 @@
 						},
 						"url": {
 							"raw": "{{base_url}}/api/leave-requests",
-							"host": ["{{base_url}}"],
-							"path": ["api", "leave-requests"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"leave-requests"
+							]
 						},
 						"description": "Create leave request (auto-validates leave credits)"
 					},
@@ -595,8 +880,13 @@
 						},
 						"url": {
 							"raw": "{{base_url}}/api/leave-requests",
-							"host": ["{{base_url}}"],
-							"path": ["api", "leave-requests"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"leave-requests"
+							]
 						},
 						"description": "Create sick leave request with illness details"
 					},
@@ -632,8 +922,15 @@
 						},
 						"url": {
 							"raw": "{{base_url}}/api/leave-requests/1/recommend",
-							"host": ["{{base_url}}"],
-							"path": ["api", "leave-requests", "1", "recommend"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"leave-requests",
+								"1",
+								"recommend"
+							]
 						},
 						"description": "Immediate supervisor recommends leave approval"
 					},
@@ -669,8 +966,15 @@
 						},
 						"url": {
 							"raw": "{{base_url}}/api/leave-requests/1/approve",
-							"host": ["{{base_url}}"],
-							"path": ["api", "leave-requests", "1", "approve"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"leave-requests",
+								"1",
+								"approve"
+							]
 						},
 						"description": "Final approval (auto-deducts leave credits)"
 					},
@@ -706,8 +1010,15 @@
 						},
 						"url": {
 							"raw": "{{base_url}}/api/leave-requests/1/disapprove",
-							"host": ["{{base_url}}"],
-							"path": ["api", "leave-requests", "1", "disapprove"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"leave-requests",
+								"1",
+								"disapprove"
+							]
 						},
 						"description": "Disapprove leave request with reason"
 					},
@@ -735,8 +1046,15 @@
 						],
 						"url": {
 							"raw": "{{base_url}}/api/leave-requests/1/cancel",
-							"host": ["{{base_url}}"],
-							"path": ["api", "leave-requests", "1", "cancel"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"leave-requests",
+								"1",
+								"cancel"
+							]
 						},
 						"description": "Cancel leave request (auto-restores credits if already approved)"
 					},
@@ -764,8 +1082,14 @@
 						],
 						"url": {
 							"raw": "{{base_url}}/api/leave-requests/pending",
-							"host": ["{{base_url}}"],
-							"path": ["api", "leave-requests", "pending"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"leave-requests",
+								"pending"
+							]
 						},
 						"description": "Get all pending leave requests requiring action"
 					},
@@ -793,8 +1117,14 @@
 						],
 						"url": {
 							"raw": "{{base_url}}/api/leave-requests/statistics?employee_id=3",
-							"host": ["{{base_url}}"],
-							"path": ["api", "leave-requests", "statistics"],
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"leave-requests",
+								"statistics"
+							],
 							"query": [
 								{
 									"key": "employee_id",
@@ -834,8 +1164,15 @@
 						],
 						"url": {
 							"raw": "{{base_url}}/api/service-records/employee/3",
-							"host": ["{{base_url}}"],
-							"path": ["api", "service-records", "employee", "3"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"service-records",
+								"employee",
+								"3"
+							]
 						},
 						"description": "Get all service records (201 file) for specific employee"
 					},
@@ -863,8 +1200,14 @@
 						],
 						"url": {
 							"raw": "{{base_url}}/api/service-records/1",
-							"host": ["{{base_url}}"],
-							"path": ["api", "service-records", "1"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"service-records",
+								"1"
+							]
 						},
 						"description": "Get specific service record details"
 					},
@@ -900,8 +1243,13 @@
 						},
 						"url": {
 							"raw": "{{base_url}}/api/service-records",
-							"host": ["{{base_url}}"],
-							"path": ["api", "service-records"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"service-records"
+							]
 						},
 						"description": "Create new service record entry"
 					},
@@ -937,8 +1285,14 @@
 						},
 						"url": {
 							"raw": "{{base_url}}/api/service-records/1",
-							"host": ["{{base_url}}"],
-							"path": ["api", "service-records", "1"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"service-records",
+								"1"
+							]
 						},
 						"description": "Update service record"
 					},
@@ -966,8 +1320,14 @@
 						],
 						"url": {
 							"raw": "{{base_url}}/api/service-records/99",
-							"host": ["{{base_url}}"],
-							"path": ["api", "service-records", "99"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"service-records",
+								"99"
+							]
 						},
 						"description": "Delete service record"
 					},
@@ -1001,8 +1361,13 @@
 						],
 						"url": {
 							"raw": "{{base_url}}/api/trainings?per_page=15",
-							"host": ["{{base_url}}"],
-							"path": ["api", "trainings"],
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"trainings"
+							],
 							"query": [
 								{
 									"key": "per_page",
@@ -1061,8 +1426,14 @@
 						],
 						"url": {
 							"raw": "{{base_url}}/api/trainings/1",
-							"host": ["{{base_url}}"],
-							"path": ["api", "trainings", "1"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"trainings",
+								"1"
+							]
 						},
 						"description": "Get specific training details by ID"
 					},
@@ -1090,8 +1461,15 @@
 						],
 						"url": {
 							"raw": "{{base_url}}/api/trainings/employee/1?per_page=15",
-							"host": ["{{base_url}}"],
-							"path": ["api", "trainings", "employee", "1"],
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"trainings",
+								"employee",
+								"1"
+							],
 							"query": [
 								{
 									"key": "per_page",
@@ -1125,8 +1503,16 @@
 						],
 						"url": {
 							"raw": "{{base_url}}/api/trainings/employee/1/completed",
-							"host": ["{{base_url}}"],
-							"path": ["api", "trainings", "employee", "1", "completed"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"trainings",
+								"employee",
+								"1",
+								"completed"
+							]
 						},
 						"description": "Get only completed training records for a specific employee"
 					},
@@ -1154,8 +1540,15 @@
 						],
 						"url": {
 							"raw": "{{base_url}}/api/trainings/type/Seminar?per_page=15",
-							"host": ["{{base_url}}"],
-							"path": ["api", "trainings", "type", "Seminar"],
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"trainings",
+								"type",
+								"Seminar"
+							],
 							"query": [
 								{
 									"key": "per_page",
@@ -1189,8 +1582,15 @@
 						],
 						"url": {
 							"raw": "{{base_url}}/api/trainings/year/2024?per_page=15",
-							"host": ["{{base_url}}"],
-							"path": ["api", "trainings", "year", "2024"],
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"trainings",
+								"year",
+								"2024"
+							],
 							"query": [
 								{
 									"key": "per_page",
@@ -1224,8 +1624,14 @@
 						],
 						"url": {
 							"raw": "{{base_url}}/api/trainings/statistics",
-							"host": ["{{base_url}}"],
-							"path": ["api", "trainings", "statistics"],
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"trainings",
+								"statistics"
+							],
 							"query": [
 								{
 									"key": "employee_id",
@@ -1269,8 +1675,13 @@
 						},
 						"url": {
 							"raw": "{{base_url}}/api/trainings",
-							"host": ["{{base_url}}"],
-							"path": ["api", "trainings"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"trainings"
+							]
 						},
 						"description": "Create a new training record"
 					},
@@ -1306,8 +1717,14 @@
 						},
 						"url": {
 							"raw": "{{base_url}}/api/trainings/1",
-							"host": ["{{base_url}}"],
-							"path": ["api", "trainings", "1"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"trainings",
+								"1"
+							]
 						},
 						"description": "Update training record details"
 					},
@@ -1335,8 +1752,14 @@
 						],
 						"url": {
 							"raw": "{{base_url}}/api/trainings/99",
-							"host": ["{{base_url}}"],
-							"path": ["api", "trainings", "99"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"trainings",
+								"99"
+							]
 						},
 						"description": "Soft delete a training record"
 					},
@@ -2174,8 +2597,13 @@
 						],
 						"url": {
 							"raw": "{{base_url}}/api/inventory-items?per_page=15",
-							"host": ["{{base_url}}"],
-							"path": ["api", "inventory-items"],
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"inventory-items"
+							],
 							"query": [
 								{
 									"key": "per_page",
@@ -2224,8 +2652,14 @@
 						],
 						"url": {
 							"raw": "{{base_url}}/api/inventory-items/with-balances",
-							"host": ["{{base_url}}"],
-							"path": ["api", "inventory-items", "with-balances"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"inventory-items",
+								"with-balances"
+							]
 						},
 						"description": "Get all inventory items with their current stock balances from stock cards"
 					},
@@ -2253,8 +2687,14 @@
 						],
 						"url": {
 							"raw": "{{base_url}}/api/inventory-items/low-stock?threshold=10",
-							"host": ["{{base_url}}"],
-							"path": ["api", "inventory-items", "low-stock"],
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"inventory-items",
+								"low-stock"
+							],
 							"query": [
 								{
 									"key": "threshold",
@@ -2288,8 +2728,14 @@
 						],
 						"url": {
 							"raw": "{{base_url}}/api/inventory-items/statistics",
-							"host": ["{{base_url}}"],
-							"path": ["api", "inventory-items", "statistics"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"inventory-items",
+								"statistics"
+							]
 						},
 						"description": "Get inventory statistics including total items, values, and category breakdown"
 					},
@@ -2317,8 +2763,14 @@
 						],
 						"url": {
 							"raw": "{{base_url}}/api/inventory-items/search?q=laptop&per_page=15",
-							"host": ["{{base_url}}"],
-							"path": ["api", "inventory-items", "search"],
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"inventory-items",
+								"search"
+							],
 							"query": [
 								{
 									"key": "q",
@@ -2356,8 +2808,14 @@
 						],
 						"url": {
 							"raw": "{{base_url}}/api/inventory-items/1",
-							"host": ["{{base_url}}"],
-							"path": ["api", "inventory-items", "1"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"inventory-items",
+								"1"
+							]
 						},
 						"description": "Get specific inventory item details by ID"
 					},
@@ -2385,8 +2843,15 @@
 						],
 						"url": {
 							"raw": "{{base_url}}/api/inventory-items/1/with-balance",
-							"host": ["{{base_url}}"],
-							"path": ["api", "inventory-items", "1", "with-balance"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"inventory-items",
+								"1",
+								"with-balance"
+							]
 						},
 						"description": "Get specific inventory item with its current stock balance"
 					},
@@ -2422,8 +2887,13 @@
 						},
 						"url": {
 							"raw": "{{base_url}}/api/inventory-items",
-							"host": ["{{base_url}}"],
-							"path": ["api", "inventory-items"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"inventory-items"
+							]
 						},
 						"description": "Create a new inventory item"
 					},
@@ -2459,8 +2929,14 @@
 						},
 						"url": {
 							"raw": "{{base_url}}/api/inventory-items/1",
-							"host": ["{{base_url}}"],
-							"path": ["api", "inventory-items", "1"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"inventory-items",
+								"1"
+							]
 						},
 						"description": "Update inventory item details"
 					},
@@ -2488,8 +2964,14 @@
 						],
 						"url": {
 							"raw": "{{base_url}}/api/inventory-items/1",
-							"host": ["{{base_url}}"],
-							"path": ["api", "inventory-items", "1"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"inventory-items",
+								"1"
+							]
 						},
 						"description": "Soft delete an inventory item"
 					},
@@ -2523,8 +3005,13 @@
 						],
 						"url": {
 							"raw": "{{base_url}}/api/stock-cards?per_page=15",
-							"host": ["{{base_url}}"],
-							"path": ["api", "stock-cards"],
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"stock-cards"
+							],
 							"query": [
 								{
 									"key": "per_page",
@@ -2568,8 +3055,14 @@
 						],
 						"url": {
 							"raw": "{{base_url}}/api/stock-cards/1",
-							"host": ["{{base_url}}"],
-							"path": ["api", "stock-cards", "1"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"stock-cards",
+								"1"
+							]
 						},
 						"description": "Get specific stock card entry details"
 					},
@@ -2605,8 +3098,14 @@
 						},
 						"url": {
 							"raw": "{{base_url}}/api/stock-cards/stock-in",
-							"host": ["{{base_url}}"],
-							"path": ["api", "stock-cards", "stock-in"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"stock-cards",
+								"stock-in"
+							]
 						},
 						"description": "Record inventory stock in transaction"
 					},
@@ -2642,8 +3141,14 @@
 						},
 						"url": {
 							"raw": "{{base_url}}/api/stock-cards/stock-out",
-							"host": ["{{base_url}}"],
-							"path": ["api", "stock-cards", "stock-out"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"stock-cards",
+								"stock-out"
+							]
 						},
 						"description": "Record inventory stock out transaction (validates sufficient balance)"
 					},
@@ -2679,8 +3184,14 @@
 						},
 						"url": {
 							"raw": "{{base_url}}/api/stock-cards/donation",
-							"host": ["{{base_url}}"],
-							"path": ["api", "stock-cards", "donation"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"stock-cards",
+								"donation"
+							]
 						},
 						"description": "Record donated equipment/supplies"
 					},
@@ -2708,8 +3219,15 @@
 						],
 						"url": {
 							"raw": "{{base_url}}/api/stock-cards/item/1",
-							"host": ["{{base_url}}"],
-							"path": ["api", "stock-cards", "item", "1"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"stock-cards",
+								"item",
+								"1"
+							]
 						},
 						"description": "Get all stock card entries for specific inventory item"
 					},
@@ -2737,8 +3255,16 @@
 						],
 						"url": {
 							"raw": "{{base_url}}/api/stock-cards/item/1/balance",
-							"host": ["{{base_url}}"],
-							"path": ["api", "stock-cards", "item", "1", "balance"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"stock-cards",
+								"item",
+								"1",
+								"balance"
+							]
 						},
 						"description": "Get current inventory balance for specific item"
 					},
@@ -2772,8 +3298,13 @@
 						],
 						"url": {
 							"raw": "{{base_url}}/api/inventory-adjustments?status=Pending",
-							"host": ["{{base_url}}"],
-							"path": ["api", "inventory-adjustments"],
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"inventory-adjustments"
+							],
 							"query": [
 								{
 									"key": "status",
@@ -2812,8 +3343,14 @@
 						],
 						"url": {
 							"raw": "{{base_url}}/api/inventory-adjustments/1",
-							"host": ["{{base_url}}"],
-							"path": ["api", "inventory-adjustments", "1"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"inventory-adjustments",
+								"1"
+							]
 						},
 						"description": "Get specific adjustment details"
 					},
@@ -2849,8 +3386,13 @@
 						},
 						"url": {
 							"raw": "{{base_url}}/api/inventory-adjustments",
-							"host": ["{{base_url}}"],
-							"path": ["api", "inventory-adjustments"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"inventory-adjustments"
+							]
 						},
 						"description": "Create new inventory adjustment (requires approval)"
 					},
@@ -2886,8 +3428,14 @@
 						},
 						"url": {
 							"raw": "{{base_url}}/api/inventory-adjustments/1",
-							"host": ["{{base_url}}"],
-							"path": ["api", "inventory-adjustments", "1"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"inventory-adjustments",
+								"1"
+							]
 						},
 						"description": "Update pending adjustment"
 					},
@@ -2915,8 +3463,14 @@
 						],
 						"url": {
 							"raw": "{{base_url}}/api/inventory-adjustments/1",
-							"host": ["{{base_url}}"],
-							"path": ["api", "inventory-adjustments", "1"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"inventory-adjustments",
+								"1"
+							]
 						},
 						"description": "Delete adjustment"
 					},
@@ -2952,8 +3506,15 @@
 						},
 						"url": {
 							"raw": "{{base_url}}/api/inventory-adjustments/1/approve",
-							"host": ["{{base_url}}"],
-							"path": ["api", "inventory-adjustments", "1", "approve"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"inventory-adjustments",
+								"1",
+								"approve"
+							]
 						},
 						"description": "Approve adjustment (auto-creates stock card entry)"
 					},
@@ -2989,8 +3550,15 @@
 						},
 						"url": {
 							"raw": "{{base_url}}/api/inventory-adjustments/1/reject",
-							"host": ["{{base_url}}"],
-							"path": ["api", "inventory-adjustments", "1", "reject"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"inventory-adjustments",
+								"1",
+								"reject"
+							]
 						},
 						"description": "Reject adjustment with reason"
 					},
@@ -3018,8 +3586,14 @@
 						],
 						"url": {
 							"raw": "{{base_url}}/api/inventory-adjustments/pending",
-							"host": ["{{base_url}}"],
-							"path": ["api", "inventory-adjustments", "pending"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"inventory-adjustments",
+								"pending"
+							]
 						},
 						"description": "Get all pending adjustments requiring approval"
 					},
@@ -3053,8 +3627,13 @@
 						],
 						"url": {
 							"raw": "{{base_url}}/api/physical-counts",
-							"host": ["{{base_url}}"],
-							"path": ["api", "physical-counts"],
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"physical-counts"
+							],
 							"query": [
 								{
 									"key": "variance_type",
@@ -3089,8 +3668,14 @@
 						],
 						"url": {
 							"raw": "{{base_url}}/api/physical-counts/1",
-							"host": ["{{base_url}}"],
-							"path": ["api", "physical-counts", "1"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"physical-counts",
+								"1"
+							]
 						},
 						"description": "Get specific physical count details"
 					},
@@ -3126,8 +3711,13 @@
 						},
 						"url": {
 							"raw": "{{base_url}}/api/physical-counts",
-							"host": ["{{base_url}}"],
-							"path": ["api", "physical-counts"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"physical-counts"
+							]
 						},
 						"description": "Record physical count (auto-calculates variance)"
 					},
@@ -3163,8 +3753,14 @@
 						},
 						"url": {
 							"raw": "{{base_url}}/api/physical-counts/1",
-							"host": ["{{base_url}}"],
-							"path": ["api", "physical-counts", "1"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"physical-counts",
+								"1"
+							]
 						},
 						"description": "Update physical count record"
 					},
@@ -3192,8 +3788,14 @@
 						],
 						"url": {
 							"raw": "{{base_url}}/api/physical-counts/1",
-							"host": ["{{base_url}}"],
-							"path": ["api", "physical-counts", "1"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"physical-counts",
+								"1"
+							]
 						},
 						"description": "Delete physical count record"
 					},
@@ -3221,8 +3823,14 @@
 						],
 						"url": {
 							"raw": "{{base_url}}/api/physical-counts/with-variances",
-							"host": ["{{base_url}}"],
-							"path": ["api", "physical-counts", "with-variances"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"physical-counts",
+								"with-variances"
+							]
 						},
 						"description": "Get all items with inventory variances (shortage/overage)"
 					},
@@ -3256,8 +3864,13 @@
 						],
 						"url": {
 							"raw": "{{base_url}}/api/cash-advances?status=Pending",
-							"host": ["{{base_url}}"],
-							"path": ["api", "cash-advances"],
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"cash-advances"
+							],
 							"query": [
 								{
 									"key": "status",
@@ -3296,8 +3909,14 @@
 						],
 						"url": {
 							"raw": "{{base_url}}/api/cash-advances/1",
-							"host": ["{{base_url}}"],
-							"path": ["api", "cash-advances", "1"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"cash-advances",
+								"1"
+							]
 						},
 						"description": "Get specific cash advance details"
 					},
@@ -3333,8 +3952,13 @@
 						},
 						"url": {
 							"raw": "{{base_url}}/api/cash-advances",
-							"host": ["{{base_url}}"],
-							"path": ["api", "cash-advances"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"cash-advances"
+							]
 						},
 						"description": "Create new cash advance request"
 					},
@@ -3370,8 +3994,14 @@
 						},
 						"url": {
 							"raw": "{{base_url}}/api/cash-advances/1",
-							"host": ["{{base_url}}"],
-							"path": ["api", "cash-advances", "1"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"cash-advances",
+								"1"
+							]
 						},
 						"description": "Update cash advance details"
 					},
@@ -3399,8 +4029,14 @@
 						],
 						"url": {
 							"raw": "{{base_url}}/api/cash-advances/1",
-							"host": ["{{base_url}}"],
-							"path": ["api", "cash-advances", "1"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"cash-advances",
+								"1"
+							]
 						},
 						"description": "Delete cash advance"
 					},
@@ -3436,8 +4072,15 @@
 						},
 						"url": {
 							"raw": "{{base_url}}/api/cash-advances/1/approve",
-							"host": ["{{base_url}}"],
-							"path": ["api", "cash-advances", "1", "approve"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"cash-advances",
+								"1",
+								"approve"
+							]
 						},
 						"description": "Approve cash advance request"
 					},
@@ -3473,8 +4116,15 @@
 						},
 						"url": {
 							"raw": "{{base_url}}/api/cash-advances/1/release",
-							"host": ["{{base_url}}"],
-							"path": ["api", "cash-advances", "1", "release"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"cash-advances",
+								"1",
+								"release"
+							]
 						},
 						"description": "Release approved cash advance"
 					},
@@ -3502,8 +4152,14 @@
 						],
 						"url": {
 							"raw": "{{base_url}}/api/cash-advances/pending",
-							"host": ["{{base_url}}"],
-							"path": ["api", "cash-advances", "pending"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"cash-advances",
+								"pending"
+							]
 						},
 						"description": "Get all pending cash advances"
 					},
@@ -3531,8 +4187,14 @@
 						],
 						"url": {
 							"raw": "{{base_url}}/api/cash-advances/overdue",
-							"host": ["{{base_url}}"],
-							"path": ["api", "cash-advances", "overdue"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"cash-advances",
+								"overdue"
+							]
 						},
 						"description": "Get all overdue cash advances requiring liquidation"
 					},
@@ -3560,8 +4222,15 @@
 						],
 						"url": {
 							"raw": "{{base_url}}/api/cash-advances/employee/3",
-							"host": ["{{base_url}}"],
-							"path": ["api", "cash-advances", "employee", "3"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"cash-advances",
+								"employee",
+								"3"
+							]
 						},
 						"description": "Get all cash advances for specific employee"
 					},
@@ -3589,8 +4258,14 @@
 						],
 						"url": {
 							"raw": "{{base_url}}/api/cash-advances/statistics",
-							"host": ["{{base_url}}"],
-							"path": ["api", "cash-advances", "statistics"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"cash-advances",
+								"statistics"
+							]
 						},
 						"description": "Get cash advance statistics (counts, amounts by status)"
 					},
@@ -3624,8 +4299,13 @@
 						],
 						"url": {
 							"raw": "{{base_url}}/api/disbursements?fund_source=MOOE",
-							"host": ["{{base_url}}"],
-							"path": ["api", "disbursements"],
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"disbursements"
+							],
 							"query": [
 								{
 									"key": "fund_source",
@@ -3664,8 +4344,14 @@
 						],
 						"url": {
 							"raw": "{{base_url}}/api/disbursements/1",
-							"host": ["{{base_url}}"],
-							"path": ["api", "disbursements", "1"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"disbursements",
+								"1"
+							]
 						},
 						"description": "Get specific disbursement voucher details"
 					},
@@ -3701,8 +4387,13 @@
 						},
 						"url": {
 							"raw": "{{base_url}}/api/disbursements",
-							"host": ["{{base_url}}"],
-							"path": ["api", "disbursements"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"disbursements"
+							]
 						},
 						"description": "Create new disbursement voucher"
 					},
@@ -3738,8 +4429,14 @@
 						},
 						"url": {
 							"raw": "{{base_url}}/api/disbursements/1",
-							"host": ["{{base_url}}"],
-							"path": ["api", "disbursements", "1"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"disbursements",
+								"1"
+							]
 						},
 						"description": "Update disbursement voucher"
 					},
@@ -3767,8 +4464,14 @@
 						],
 						"url": {
 							"raw": "{{base_url}}/api/disbursements/1",
-							"host": ["{{base_url}}"],
-							"path": ["api", "disbursements", "1"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"disbursements",
+								"1"
+							]
 						},
 						"description": "Delete disbursement voucher"
 					},
@@ -3804,8 +4507,15 @@
 						},
 						"url": {
 							"raw": "{{base_url}}/api/disbursements/1/certify",
-							"host": ["{{base_url}}"],
-							"path": ["api", "disbursements", "1", "certify"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"disbursements",
+								"1",
+								"certify"
+							]
 						},
 						"description": "Certify disbursement voucher (Budget Officer)"
 					},
@@ -3841,8 +4551,15 @@
 						},
 						"url": {
 							"raw": "{{base_url}}/api/disbursements/1/approve",
-							"host": ["{{base_url}}"],
-							"path": ["api", "disbursements", "1", "approve"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"disbursements",
+								"1",
+								"approve"
+							]
 						},
 						"description": "Approve disbursement voucher (School Head)"
 					},
@@ -3878,8 +4595,15 @@
 						},
 						"url": {
 							"raw": "{{base_url}}/api/disbursements/1/mark-paid",
-							"host": ["{{base_url}}"],
-							"path": ["api", "disbursements", "1", "mark-paid"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"disbursements",
+								"1",
+								"mark-paid"
+							]
 						},
 						"description": "Mark disbursement as paid"
 					},
@@ -3907,8 +4631,14 @@
 						],
 						"url": {
 							"raw": "{{base_url}}/api/disbursements/pending",
-							"host": ["{{base_url}}"],
-							"path": ["api", "disbursements", "pending"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"disbursements",
+								"pending"
+							]
 						},
 						"description": "Get all pending disbursements"
 					},
@@ -3936,8 +4666,14 @@
 						],
 						"url": {
 							"raw": "{{base_url}}/api/disbursements/statistics",
-							"host": ["{{base_url}}"],
-							"path": ["api", "disbursements", "statistics"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"disbursements",
+								"statistics"
+							]
 						},
 						"description": "Get disbursement statistics (counts, amounts by status and fund source)"
 					},
@@ -3971,8 +4707,13 @@
 						],
 						"url": {
 							"raw": "{{base_url}}/api/liquidations?status=Pending",
-							"host": ["{{base_url}}"],
-							"path": ["api", "liquidations"],
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"liquidations"
+							],
 							"query": [
 								{
 									"key": "status",
@@ -4006,8 +4747,14 @@
 						],
 						"url": {
 							"raw": "{{base_url}}/api/liquidations/1",
-							"host": ["{{base_url}}"],
-							"path": ["api", "liquidations", "1"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"liquidations",
+								"1"
+							]
 						},
 						"description": "Get specific liquidation details with items"
 					},
@@ -4043,8 +4790,13 @@
 						},
 						"url": {
 							"raw": "{{base_url}}/api/liquidations",
-							"host": ["{{base_url}}"],
-							"path": ["api", "liquidations"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"liquidations"
+							]
 						},
 						"description": "Create liquidation (auto-calculates refund/additional payment needed)"
 					},
@@ -4080,8 +4832,14 @@
 						},
 						"url": {
 							"raw": "{{base_url}}/api/liquidations/1",
-							"host": ["{{base_url}}"],
-							"path": ["api", "liquidations", "1"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"liquidations",
+								"1"
+							]
 						},
 						"description": "Update liquidation details"
 					},
@@ -4109,8 +4867,14 @@
 						],
 						"url": {
 							"raw": "{{base_url}}/api/liquidations/1",
-							"host": ["{{base_url}}"],
-							"path": ["api", "liquidations", "1"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"liquidations",
+								"1"
+							]
 						},
 						"description": "Delete liquidation"
 					},
@@ -4146,8 +4910,15 @@
 						},
 						"url": {
 							"raw": "{{base_url}}/api/liquidations/1/items",
-							"host": ["{{base_url}}"],
-							"path": ["api", "liquidations", "1", "items"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"liquidations",
+								"1",
+								"items"
+							]
 						},
 						"description": "Add expense item to liquidation (auto-recalculates totals)"
 					},
@@ -4183,8 +4954,15 @@
 						},
 						"url": {
 							"raw": "{{base_url}}/api/liquidations/1/approve",
-							"host": ["{{base_url}}"],
-							"path": ["api", "liquidations", "1", "approve"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"liquidations",
+								"1",
+								"approve"
+							]
 						},
 						"description": "Approve liquidation (auto-updates cash advance status)"
 					},
@@ -4220,8 +4998,15 @@
 						},
 						"url": {
 							"raw": "{{base_url}}/api/liquidations/1/reject",
-							"host": ["{{base_url}}"],
-							"path": ["api", "liquidations", "1", "reject"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"liquidations",
+								"1",
+								"reject"
+							]
 						},
 						"description": "Reject liquidation with reason"
 					},
@@ -4249,8 +5034,14 @@
 						],
 						"url": {
 							"raw": "{{base_url}}/api/liquidations/pending",
-							"host": ["{{base_url}}"],
-							"path": ["api", "liquidations", "pending"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"liquidations",
+								"pending"
+							]
 						},
 						"description": "Get all pending liquidations requiring approval"
 					},
@@ -4278,8 +5069,15 @@
 						],
 						"url": {
 							"raw": "{{base_url}}/api/liquidations/cash-advance/1",
-							"host": ["{{base_url}}"],
-							"path": ["api", "liquidations", "cash-advance", "1"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"liquidations",
+								"cash-advance",
+								"1"
+							]
 						},
 						"description": "Get all liquidations for specific cash advance"
 					},
@@ -4303,8 +5101,13 @@
 						],
 						"url": {
 							"raw": "{{base_url}}/api/health",
-							"host": ["{{base_url}}"],
-							"path": ["api", "health"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"health"
+							]
 						},
 						"description": "Check if API is running"
 					},
@@ -4322,8 +5125,12 @@
 						],
 						"url": {
 							"raw": "{{base_url}}/",
-							"host": ["{{base_url}}"],
-							"path": [""]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								""
+							]
 						},
 						"description": "API welcome message"
 					},
@@ -4387,8 +5194,14 @@
 						},
 						"url": {
 							"raw": "{{base_url}}/api/documents/upload",
-							"host": ["{{base_url}}"],
-							"path": ["api", "documents", "upload"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"documents",
+								"upload"
+							]
 						},
 						"description": "Upload a document and link it to an entity (Liquidation, PurchaseRequest, or InventoryAdjustment)"
 					},
@@ -4416,8 +5229,13 @@
 						],
 						"url": {
 							"raw": "{{base_url}}/api/documents?documentable_type=Liquidation&documentable_id=1",
-							"host": ["{{base_url}}"],
-							"path": ["api", "documents"],
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"documents"
+							],
 							"query": [
 								{
 									"key": "documentable_type",
@@ -4455,8 +5273,14 @@
 						],
 						"url": {
 							"raw": "{{base_url}}/api/documents/1",
-							"host": ["{{base_url}}"],
-							"path": ["api", "documents", "1"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"documents",
+								"1"
+							]
 						},
 						"description": "Get document metadata by ID"
 					},
@@ -4484,8 +5308,15 @@
 						],
 						"url": {
 							"raw": "{{base_url}}/api/documents/1/download",
-							"host": ["{{base_url}}"],
-							"path": ["api", "documents", "1", "download"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"documents",
+								"1",
+								"download"
+							]
 						},
 						"description": "Download document file (returns file stream)"
 					},
@@ -4513,8 +5344,14 @@
 						],
 						"url": {
 							"raw": "{{base_url}}/api/documents/1",
-							"host": ["{{base_url}}"],
-							"path": ["api", "documents", "1"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"documents",
+								"1"
+							]
 						},
 						"description": "Soft delete a document"
 					},
@@ -4548,8 +5385,14 @@
 						],
 						"url": {
 							"raw": "{{base_url}}/api/audit/logs?module=Financial&event=updated&date_from=2026-02-01&per_page=50",
-							"host": ["{{base_url}}"],
-							"path": ["api", "audit", "logs"],
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"audit",
+								"logs"
+							],
 							"query": [
 								{
 									"key": "module",
@@ -4595,8 +5438,14 @@
 						],
 						"url": {
 							"raw": "{{base_url}}/api/audit/entity-history?type=Liquidation&id=1",
-							"host": ["{{base_url}}"],
-							"path": ["api", "audit", "entity-history"],
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"audit",
+								"entity-history"
+							],
 							"query": [
 								{
 									"key": "type",
@@ -4634,8 +5483,14 @@
 						],
 						"url": {
 							"raw": "{{base_url}}/api/audit/report?date_from=2026-02-01&date_to=2026-02-28",
-							"host": ["{{base_url}}"],
-							"path": ["api", "audit", "report"],
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"audit",
+								"report"
+							],
 							"query": [
 								{
 									"key": "date_from",
@@ -4673,8 +5528,14 @@
 						],
 						"url": {
 							"raw": "{{base_url}}/api/audit/my-activity?per_page=50",
-							"host": ["{{base_url}}"],
-							"path": ["api", "audit", "my-activity"],
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"audit",
+								"my-activity"
+							],
 							"query": [
 								{
 									"key": "per_page",
@@ -4708,8 +5569,15 @@
 						],
 						"url": {
 							"raw": "{{base_url}}/api/audit/module/Financial?per_page=50",
-							"host": ["{{base_url}}"],
-							"path": ["api", "audit", "module", "Financial"],
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"audit",
+								"module",
+								"Financial"
+							],
 							"query": [
 								{
 									"key": "per_page",
@@ -4743,8 +5611,14 @@
 						],
 						"url": {
 							"raw": "{{base_url}}/api/audit/1",
-							"host": ["{{base_url}}"],
-							"path": ["api", "audit", "1"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"audit",
+								"1"
+							]
 						},
 						"description": "Get single audit log by ID"
 					},
@@ -4772,8 +5646,14 @@
 						],
 						"url": {
 							"raw": "{{base_url}}/api/audit/export?date_from=2026-02-01&date_to=2026-02-28&module=Financial",
-							"host": ["{{base_url}}"],
-							"path": ["api", "audit", "export"],
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"audit",
+								"export"
+							],
 							"query": [
 								{
 									"key": "date_from",

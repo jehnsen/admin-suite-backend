@@ -13,6 +13,12 @@ use App\Interfaces\HR\ServiceRecordRepositoryInterface;
 use App\Repositories\HR\ServiceRecordRepository;
 use App\Interfaces\HR\TrainingRepositoryInterface;
 use App\Repositories\HR\TrainingRepository;
+use App\Interfaces\HR\AttendanceRecordRepositoryInterface;
+use App\Repositories\HR\AttendanceRecordRepository;
+use App\Interfaces\HR\ServiceCreditRepositoryInterface;
+use App\Repositories\HR\ServiceCreditRepository;
+use App\Interfaces\HR\ServiceCreditOffsetRepositoryInterface;
+use App\Repositories\HR\ServiceCreditOffsetRepository;
 
 // Procurement Module
 use App\Interfaces\Procurement\SupplierRepositoryInterface;
@@ -52,6 +58,10 @@ use App\Repositories\Shared\DocumentRepository;
 use App\Interfaces\Shared\AuditRepositoryInterface;
 use App\Repositories\Shared\AuditRepository;
 
+// Dashboard Module
+use App\Interfaces\DashboardRepositoryInterface;
+use App\Repositories\DashboardRepository;
+
 class RepositoryServiceProvider extends ServiceProvider
 {
     /**
@@ -64,6 +74,9 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(LeaveRequestRepositoryInterface::class, LeaveRequestRepository::class);
         $this->app->bind(ServiceRecordRepositoryInterface::class, ServiceRecordRepository::class);
         $this->app->bind(TrainingRepositoryInterface::class, TrainingRepository::class);
+        $this->app->bind(AttendanceRecordRepositoryInterface::class, AttendanceRecordRepository::class);
+        $this->app->bind(ServiceCreditRepositoryInterface::class, ServiceCreditRepository::class);
+        $this->app->bind(ServiceCreditOffsetRepositoryInterface::class, ServiceCreditOffsetRepository::class);
 
         // Procurement Module Repository Bindings
         $this->app->bind(SupplierRepositoryInterface::class, SupplierRepository::class);
@@ -87,6 +100,9 @@ class RepositoryServiceProvider extends ServiceProvider
         // Shared Module Repository Bindings
         $this->app->bind(DocumentRepositoryInterface::class, DocumentRepository::class);
         $this->app->bind(AuditRepositoryInterface::class, AuditRepository::class);
+
+        // Dashboard Module Repository Binding
+        $this->app->bind(DashboardRepositoryInterface::class, DashboardRepository::class);
     }
 
     /**
