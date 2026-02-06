@@ -136,30 +136,15 @@ class EmployeeService
     /**
      * Calculate and update leave credits for all active employees.
      * Business Logic: Permanent employees earn 1.25 days per month for both VL and SL.
+     * Optimized: Uses bulk update to execute a single database query.
      */
     public function updateMonthlyLeaveCredits(): array
     {
-        $activeEmployees = $this->employeeRepository->getActiveEmployees();
-        $updated = [];
-
-        foreach ($activeEmployees as $employee) {
-            if ($employee->employment_status === 'Permanent') {
-                $newVacationCredits = $employee->vacation_leave_credits + 1.25;
-                $newSickCredits = $employee->sick_leave_credits + 1.25;
-
-                $this->employeeRepository->updateLeaveCredits(
-                    $employee->id,
-                    $newVacationCredits,
-                    $newSickCredits
-                );
-
-                $updated[] = $employee->id;
-            }
-        }
+        $updatedCount = $this->employeeRepository->bulkUpdateMonthlyLeaveCredits();
 
         return [
-            'updated_count' => count($updated),
-            'employee_ids' => $updated,
+            'updated_count' => $updatedCount,
+            'message' => "Successfully updated leave credits for {$updatedCount} permanent employees",
         ];
     }
 

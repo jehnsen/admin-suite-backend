@@ -183,3 +183,5 @@ See [ARCHITECTURE.md](ARCHITECTURE.md) for detailed architecture documentation.
 php artisan migrate --path=database/migrations/2025_12_12_000001_remove_supplier_details_from_purchase_orders_table.php
 
 php artisan migrate:fresh --seed
+
+Need to re-run migration & seeder

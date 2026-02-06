@@ -145,6 +145,22 @@ class EmployeeRepository implements EmployeeRepositoryInterface
     }
 
     /**
+     * Bulk update monthly leave credits for all active permanent employees.
+     * Uses a single query with DB::raw to increment credits.
+     *
+     * @return int Number of employees updated
+     */
+    public function bulkUpdateMonthlyLeaveCredits(): int
+    {
+        return Employee::where('status', 'Active')
+            ->where('employment_status', 'Permanent')
+            ->update([
+                'vacation_leave_credits' => \DB::raw('vacation_leave_credits + 1.25'),
+                'sick_leave_credits' => \DB::raw('sick_leave_credits + 1.25'),
+            ]);
+    }
+
+    /**
      * Search employees by name.
      */
     public function searchEmployeesByName(string $searchTerm): Collection

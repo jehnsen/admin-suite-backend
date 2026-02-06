@@ -64,6 +64,14 @@ interface EmployeeRepositoryInterface
     public function updateLeaveCredits(int $id, float $vacationCredits, float $sickCredits): Employee;
 
     /**
+     * Bulk update monthly leave credits for all active permanent employees.
+     * Increments vacation_leave_credits and sick_leave_credits by 1.25 days.
+     *
+     * @return int Number of employees updated
+     */
+    public function bulkUpdateMonthlyLeaveCredits(): int;
+
+    /**
      * Search employees by name.
      */
     public function searchEmployeesByName(string $searchTerm): Collection;
