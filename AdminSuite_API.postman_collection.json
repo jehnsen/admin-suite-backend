@@ -1,0 +1,787 @@
+{
+	"info": {
+		"_postman_id": "adminsuite-api-2025",
+		"name": "AdminSuite API - DTR & Service Credits",
+		"description": "Complete API collection for AdminSuite ERP - DTR (Daily Time Record) and Service Credits Management System for Philippine Public Schools",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "adminsuite"
+	},
+	"item": [
+		{
+			"name": "Authentication",
+			"item": [
+				{
+					"name": "Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var jsonData = pm.response.json();",
+									"    pm.environment.set(\"auth_token\", jsonData.token);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"admin@school.deped.gov.ph\",\n    \"password\": \"password123\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/auth/login",
+							"host": ["{{base_url}}"],
+							"path": ["api", "auth", "login"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Logout",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/auth/logout",
+							"host": ["{{base_url}}"],
+							"path": ["api", "auth", "logout"]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Attendance Records (DTR)",
+			"item": [
+				{
+					"name": "List Attendance Records",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/attendance-records?per_page=15&employee_id=&attendance_date_from=&attendance_date_to=&status=",
+							"host": ["{{base_url}}"],
+							"path": ["api", "attendance-records"],
+							"query": [
+								{
+									"key": "per_page",
+									"value": "15"
+								},
+								{
+									"key": "employee_id",
+									"value": ""
+								},
+								{
+									"key": "attendance_date_from",
+									"value": ""
+								},
+								{
+									"key": "attendance_date_to",
+									"value": ""
+								},
+								{
+									"key": "status",
+									"value": ""
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Attendance Statistics",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/attendance-records/statistics",
+							"host": ["{{base_url}}"],
+							"path": ["api", "attendance-records", "statistics"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Employee Attendance",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/attendance-records/employee/1?month=2&year=2025",
+							"host": ["{{base_url}}"],
+							"path": ["api", "attendance-records", "employee", "1"],
+							"query": [
+								{
+									"key": "month",
+									"value": "2"
+								},
+								{
+									"key": "year",
+									"value": "2025"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Employee Monthly Summary",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/attendance-records/employee/1/summary?month=2&year=2025",
+							"host": ["{{base_url}}"],
+							"path": ["api", "attendance-records", "employee", "1", "summary"],
+							"query": [
+								{
+									"key": "month",
+									"value": "2"
+								},
+								{
+									"key": "year",
+									"value": "2025"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Attendance Record",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/attendance-records/1",
+							"host": ["{{base_url}}"],
+							"path": ["api", "attendance-records", "1"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Attendance Record",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"employee_id\": 1,\n    \"attendance_date\": \"2025-02-06\",\n    \"time_in\": \"07:30:00\",\n    \"time_out\": \"16:30:00\",\n    \"lunch_out\": \"12:00:00\",\n    \"lunch_in\": \"13:00:00\",\n    \"status\": \"Present\",\n    \"remarks\": \"Regular day\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/attendance-records",
+							"host": ["{{base_url}}"],
+							"path": ["api", "attendance-records"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Attendance with Undertime",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"employee_id\": 1,\n    \"attendance_date\": \"2025-02-06\",\n    \"time_in\": \"07:30:00\",\n    \"time_out\": \"15:00:00\",\n    \"status\": \"Present\",\n    \"remarks\": \"Left early for appointment\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/attendance-records",
+							"host": ["{{base_url}}"],
+							"path": ["api", "attendance-records"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Attendance with Late",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"employee_id\": 1,\n    \"attendance_date\": \"2025-02-06\",\n    \"time_in\": \"08:00:00\",\n    \"time_out\": \"16:30:00\",\n    \"status\": \"Present\",\n    \"remarks\": \"Traffic\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/attendance-records",
+							"host": ["{{base_url}}"],
+							"path": ["api", "attendance-records"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Absence Record",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"employee_id\": 1,\n    \"attendance_date\": \"2025-02-06\",\n    \"status\": \"Absent\",\n    \"remarks\": \"Sick leave\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/attendance-records",
+							"host": ["{{base_url}}"],
+							"path": ["api", "attendance-records"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Import Attendance CSV",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": "/path/to/attendance.csv"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/api/attendance-records/import-csv",
+							"host": ["{{base_url}}"],
+							"path": ["api", "attendance-records", "import-csv"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Attendance Record",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"time_out\": \"17:00:00\",\n    \"remarks\": \"Extended for meeting\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/attendance-records/1",
+							"host": ["{{base_url}}"],
+							"path": ["api", "attendance-records", "1"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Approve Attendance Record",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/attendance-records/1/approve",
+							"host": ["{{base_url}}"],
+							"path": ["api", "attendance-records", "1", "approve"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Attendance Record",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/attendance-records/1",
+							"host": ["{{base_url}}"],
+							"path": ["api", "attendance-records", "1"]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Service Credits",
+			"item": [
+				{
+					"name": "List Service Credits",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/service-credits?per_page=15&employee_id=&credit_type=&status=",
+							"host": ["{{base_url}}"],
+							"path": ["api", "service-credits"],
+							"query": [
+								{
+									"key": "per_page",
+									"value": "15"
+								},
+								{
+									"key": "employee_id",
+									"value": ""
+								},
+								{
+									"key": "credit_type",
+									"value": "",
+									"description": "Summer Work, Holiday Work, Overtime, Special Duty, Weekend Work"
+								},
+								{
+									"key": "status",
+									"value": "",
+									"description": "Pending, Approved, Rejected, Expired"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Pending Approvals",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/service-credits/pending",
+							"host": ["{{base_url}}"],
+							"path": ["api", "service-credits", "pending"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Employee Service Credits",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/service-credits/employee/1",
+							"host": ["{{base_url}}"],
+							"path": ["api", "service-credits", "employee", "1"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Employee Credit Summary",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/service-credits/employee/1/summary",
+							"host": ["{{base_url}}"],
+							"path": ["api", "service-credits", "employee", "1", "summary"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Service Credit",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/service-credits/1",
+							"host": ["{{base_url}}"],
+							"path": ["api", "service-credits", "1"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Service Credit - Summer Work",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"employee_id\": 1,\n    \"credit_type\": \"Summer Work\",\n    \"work_date\": \"2024-04-15\",\n    \"hours_worked\": 8,\n    \"description\": \"Summer school tutoring program\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/service-credits",
+							"host": ["{{base_url}}"],
+							"path": ["api", "service-credits"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Service Credit - Holiday Work",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"employee_id\": 1,\n    \"credit_type\": \"Holiday Work\",\n    \"work_date\": \"2024-12-25\",\n    \"hours_worked\": 8,\n    \"description\": \"Christmas school event duty\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/service-credits",
+							"host": ["{{base_url}}"],
+							"path": ["api", "service-credits"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Service Credit - Overtime",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"employee_id\": 1,\n    \"credit_type\": \"Overtime\",\n    \"work_date\": \"2025-01-20\",\n    \"hours_worked\": 4,\n    \"description\": \"Evening parent-teacher conference\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/service-credits",
+							"host": ["{{base_url}}"],
+							"path": ["api", "service-credits"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Service Credit",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"hours_worked\": 12,\n    \"description\": \"Extended summer program - full day\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/service-credits/1",
+							"host": ["{{base_url}}"],
+							"path": ["api", "service-credits", "1"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Approve Service Credit",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"remarks\": \"Approved by School Head - verified summer program attendance\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/service-credits/1/approve",
+							"host": ["{{base_url}}"],
+							"path": ["api", "service-credits", "1", "approve"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Reject Service Credit",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"reason\": \"Insufficient documentation - need signed attendance sheet from coordinator\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/service-credits/1/reject",
+							"host": ["{{base_url}}"],
+							"path": ["api", "service-credits", "1", "reject"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Apply Service Credit Offset (FIFO)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"employee_id\": 1,\n    \"attendance_record_id\": 25,\n    \"credits_to_use\": 1.0,\n    \"reason\": \"Offsetting absence on Feb 5, 2025\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/service-credits/apply-offset",
+							"host": ["{{base_url}}"],
+							"path": ["api", "service-credits", "apply-offset"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Revert Service Credit Offset",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"reason\": \"Wrong attendance record selected - should be Feb 6 not Feb 5\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/service-credits/offsets/10/revert",
+							"host": ["{{base_url}}"],
+							"path": ["api", "service-credits", "offsets", "10", "revert"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Service Credit",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/service-credits/1",
+							"host": ["{{base_url}}"],
+							"path": ["api", "service-credits", "1"]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Health Check",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/api/health",
+					"host": ["{{base_url}}"],
+					"path": ["api", "health"]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:8000",
+			"type": "string"
+		},
+		{
+			"key": "auth_token",
+			"value": "",
+			"type": "string"
+		}
+	]
+}
