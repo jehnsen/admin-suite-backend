@@ -50,6 +50,10 @@ class ServiceCreditService
     public function createServiceCredit(array $data): ServiceCredit
     {
         return DB::transaction(function () use ($data) {
+            if (empty($data['created_by'])) {
+                $data['created_by'] = auth()->id();
+            }
+
             // Validate employee exists and is eligible
             $employee = $this->employeeRepository->findEmployeeById($data['employee_id']);
 

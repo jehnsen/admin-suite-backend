@@ -68,7 +68,8 @@ class BudgetService
     private function generateBudgetCode(string $fundSource, int $year): string
     {
         $prefix = strtoupper(substr($fundSource, 0, 4));
-        $lastBudget = Budget::where('budget_code', 'like', "{$prefix}-{$year}-%")
+        $lastBudget = Budget::withTrashed()
+            ->where('budget_code', 'like', "{$prefix}-{$year}-%")
             ->orderBy('budget_code', 'desc')
             ->first();
 

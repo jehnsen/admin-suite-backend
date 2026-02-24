@@ -105,7 +105,7 @@ class DisbursementController extends Controller
     public function certify(Request $request, int $id): JsonResponse
     {
         try {
-            $certifiedBy = $request->input('certified_by');
+            $certifiedBy = $request->input('certified_by', $request->user()->id);
             $disbursement = $this->disbursementService->certifyDisbursement($id, $certifiedBy);
 
             return response()->json([
@@ -123,7 +123,7 @@ class DisbursementController extends Controller
     public function approve(Request $request, int $id): JsonResponse
     {
         try {
-            $approvedBy = $request->input('approved_by');
+            $approvedBy = $request->input('approved_by', $request->user()->id);
             $disbursement = $this->disbursementService->approveDisbursement($id, $approvedBy);
 
             return response()->json([
@@ -141,7 +141,7 @@ class DisbursementController extends Controller
     public function markPaid(Request $request, int $id): JsonResponse
     {
         try {
-            $paidBy = $request->input('paid_by');
+            $paidBy = $request->input('paid_by', $request->user()->id);
             $paymentDate = $request->input('payment_date');
 
             $disbursement = $this->disbursementService->markAsPaid($id, $paidBy, $paymentDate);

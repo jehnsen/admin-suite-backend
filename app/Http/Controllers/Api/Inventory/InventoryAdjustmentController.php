@@ -105,7 +105,7 @@ class InventoryAdjustmentController extends Controller
     public function approve(Request $request, int $id): JsonResponse
     {
         try {
-            $approvedBy = $request->input('approved_by');
+            $approvedBy = $request->input('approved_by', $request->user()->id);
             $adjustment = $this->adjustmentService->approveAdjustment($id, $approvedBy);
 
             return response()->json([

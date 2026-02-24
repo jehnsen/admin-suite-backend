@@ -226,14 +226,8 @@ class AttendanceRecordController extends Controller
         $this->authorize('approve', $record);
 
         try {
-            $employee = auth()->user()->employee;
-            if (!$employee) {
-                return response()->json([
-                    'message' => 'User must be linked to an employee record.',
-                ], 403);
-            }
-
-            $record = $this->attendanceService->approveAttendance($id, $employee->id);
+            $employeeId = auth()->user()->employee?->id;
+            $record = $this->attendanceService->approveAttendance($id, $employeeId);
 
             return response()->json([
                 'message' => 'Attendance record approved successfully.',

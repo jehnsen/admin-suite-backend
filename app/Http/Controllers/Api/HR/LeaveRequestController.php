@@ -126,7 +126,7 @@ class LeaveRequestController extends Controller
     public function recommend(Request $request, int $id): JsonResponse
     {
         $validated = $request->validate([
-            'recommended_by' => 'required|integer|exists:employees,id',
+            'recommended_by' => 'nullable|integer|exists:employees,id',
             'remarks' => 'nullable|string|max:500',
         ]);
 
@@ -139,9 +139,12 @@ class LeaveRequestController extends Controller
         // Authorization check
         $this->authorize('recommend', $leaveRequest);
 
+        $recommendedBy = $validated['recommended_by']
+            ?? $request->user()->employee?->id;
+
         $leaveRequest = $this->leaveRequestService->recommendLeaveRequest(
             $id,
-            $validated['recommended_by'],
+            $recommendedBy,
             $validated['remarks'] ?? null
         );
 
@@ -171,7 +174,7 @@ class LeaveRequestController extends Controller
     public function approve(Request $request, int $id): JsonResponse
     {
         $validated = $request->validate([
-            'approved_by' => 'required|integer|exists:employees,id',
+            'approved_by' => 'nullable|integer|exists:employees,id',
             'remarks' => 'nullable|string|max:500',
         ]);
 
@@ -184,10 +187,13 @@ class LeaveRequestController extends Controller
         // Authorization check
         $this->authorize('approve', $leaveRequest);
 
+        $approvedBy = $validated['approved_by']
+            ?? $request->user()->employee?->id;
+
         try {
             $leaveRequest = $this->leaveRequestService->approveLeaveRequest(
                 $id,
-                $validated['approved_by'],
+                $approvedBy,
                 $validated['remarks'] ?? null
             );
 

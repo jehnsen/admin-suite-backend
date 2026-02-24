@@ -105,7 +105,8 @@ class SupplierService
     private function generateSupplierCode(): string
     {
         $year = date('Y');
-        $lastSupplier = Supplier::whereYear('created_at', $year)
+        $lastSupplier = Supplier::withTrashed()
+            ->whereYear('created_at', $year)
             ->orderBy('id', 'desc')
             ->first();
 

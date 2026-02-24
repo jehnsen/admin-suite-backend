@@ -167,7 +167,7 @@ class AttendanceRecordService
     /**
      * Approve attendance record.
      */
-    public function approveAttendance(int $id, int $approvedBy): AttendanceRecord
+    public function approveAttendance(int $id, ?int $approvedBy): AttendanceRecord
     {
         return DB::transaction(function () use ($id, $approvedBy) {
             $record = $this->attendanceRepository->findById($id);

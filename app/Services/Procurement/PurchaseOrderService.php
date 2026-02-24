@@ -195,7 +195,8 @@ class PurchaseOrderService
     private function generatePONumber(): string
     {
         $year = date('Y');
-        $lastPO = PurchaseOrder::whereYear('created_at', $year)
+        $lastPO = PurchaseOrder::withTrashed()
+            ->whereYear('created_at', $year)
             ->orderBy('id', 'desc')
             ->first();
 

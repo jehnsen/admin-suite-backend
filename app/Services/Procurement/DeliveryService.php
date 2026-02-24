@@ -166,7 +166,7 @@ class DeliveryService
                 $this->poRepository->updateStatus($po->id, 'Completed');
             }
 
-            return $delivery->fresh(['items.inventoryItems']);
+            return $delivery->fresh(['items']);
         });
     }
 
@@ -206,7 +206,8 @@ class DeliveryService
     private function generateDeliveryReceiptNumber(): string
     {
         $year = date('Y');
-        $lastDelivery = Delivery::whereYear('created_at', $year)
+        $lastDelivery = Delivery::withTrashed()
+            ->whereYear('created_at', $year)
             ->orderBy('id', 'desc')
             ->first();
 

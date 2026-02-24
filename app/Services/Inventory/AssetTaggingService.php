@@ -37,7 +37,8 @@ class AssetTaggingService
     {
         $year = date('Y');
 
-        $lastItem = InventoryItem::whereYear('created_at', $year)
+        $lastItem = InventoryItem::withTrashed()
+            ->whereYear('created_at', $year)
             ->whereNotNull('property_number')
             ->orderBy('id', 'desc')
             ->first();
@@ -69,7 +70,6 @@ class AssetTaggingService
         $itemCode = $this->generateItemCode($category);
 
         $inventoryData = [
-            'delivery_item_id' => $deliveryItem->id,
             'item_code' => $itemCode,
             'item_name' => $deliveryItem->item_description,
             'description' => $poItem->specifications ?? $deliveryItem->item_description,
@@ -85,7 +85,7 @@ class AssetTaggingService
             'date_acquired' => $delivery->delivery_date ?? now(),
             'po_number' => $delivery->purchaseOrder->po_number ?? null,
             'invoice_number' => $delivery->delivery_receipt_number,
-            'condition' => $deliveryItem->item_condition ?? 'Serviceable',
+            'condition' => $this->mapDeliveryCondition($deliveryItem->item_condition),
             'status' => 'In Stock',
             'location' => 'Warehouse',
             'remarks' => $deliveryItem->inspection_notes ?? "Received from delivery: {$delivery->delivery_receipt_number}",
@@ -220,6 +220,17 @@ class AssetTaggingService
         // Assume model is everything after the first word
         $parts = explode(' ', $brandModel, 2);
         return $parts[1] ?? null;
+    }
+
+    /**
+     * Map delivery item condition to inventory item condition ENUM
+     */
+    private function mapDeliveryCondition(?string $deliveryCondition): string
+    {
+        return match ($deliveryCondition) {
+            'Damaged', 'Defective', 'Incomplete' => 'Unserviceable',
+            default => 'Serviceable',
+        };
     }
 
     /**

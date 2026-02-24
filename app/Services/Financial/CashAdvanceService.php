@@ -128,7 +128,8 @@ class CashAdvanceService
     private function generateCANumber(): string
     {
         $year = date('Y');
-        $lastCA = CashAdvance::whereYear('created_at', $year)
+        $lastCA = CashAdvance::withTrashed()
+            ->whereYear('created_at', $year)
             ->orderBy('id', 'desc')
             ->first();
 

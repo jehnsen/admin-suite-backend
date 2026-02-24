@@ -108,7 +108,8 @@ class DisbursementService
     private function generateDVNumber(): string
     {
         $year = date('Y');
-        $lastDV = Disbursement::whereYear('created_at', $year)
+        $lastDV = Disbursement::withTrashed()
+            ->whereYear('created_at', $year)
             ->orderBy('id', 'desc')
             ->first();
 

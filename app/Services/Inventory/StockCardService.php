@@ -35,6 +35,14 @@ class StockCardService
     {
         $currentBalance = $this->stockCardRepository->getCurrentBalance($data['inventory_item_id']);
 
+        if (!isset($data['quantity_in'])) {
+            $data['quantity_in'] = $data['quantity'] ?? 0;
+        }
+
+        if (empty($data['processed_by'])) {
+            $data['processed_by'] = auth()->id();
+        }
+
         $data['transaction_type'] = 'Stock In';
         $data['quantity_out'] = 0;
         $data['balance'] = $currentBalance + $data['quantity_in'];

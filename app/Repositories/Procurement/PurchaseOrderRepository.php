@@ -75,6 +75,9 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
 
             // Create PO items
             foreach ($items as $index => $item) {
+                if (!isset($item['quantity_ordered'])) {
+                    $item['quantity_ordered'] = $item['quantity'] ?? 0;
+                }
                 $item['purchase_order_id'] = $po->id;
                 $item['item_number'] = $index + 1;
                 $item['quantity_remaining'] = $item['quantity_ordered'];

@@ -48,11 +48,4 @@ class DeliveryItem extends Model
         return $this->belongsTo(PurchaseOrderItem::class);
     }
 
-    /**
-     * Get the inventory items created from this delivery item
-     */
-    public function inventoryItems()
-    {
-        return $this->hasMany(InventoryItem::class);
-    }
 }

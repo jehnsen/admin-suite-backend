@@ -199,7 +199,8 @@ class PurchaseRequestService
     private function generatePRNumber(): string
     {
         $year = date('Y');
-        $lastPR = PurchaseRequest::whereYear('created_at', $year)
+        $lastPR = PurchaseRequest::withTrashed()
+            ->whereYear('created_at', $year)
             ->orderBy('id', 'desc')
             ->first();
 

@@ -53,7 +53,7 @@ class DashboardRepository implements DashboardRepositoryInterface
             ->select([
                 'ii.id',
                 'ii.item_name',
-                'ii.unit',
+                'ii.unit_of_measure as unit',
                 DB::raw('COALESCE(latest_balance.balance, 0) as current_balance'),
                 DB::raw('COALESCE(usage_stats.total_out, 0) as total_consumed'),
                 DB::raw('COALESCE(usage_stats.total_out / ' . $usageWindowDays . ', 0) as avg_daily_consumption'),

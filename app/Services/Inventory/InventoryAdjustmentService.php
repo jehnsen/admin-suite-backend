@@ -38,6 +38,15 @@ class InventoryAdjustmentService
             $data['adjustment_number'] = $this->generateAdjustmentNumber();
         }
 
+        if (!isset($data['quantity_adjusted']) && isset($data['quantity'])) {
+            $sign = ($data['adjustment_type'] === 'Decrease') ? -1 : 1;
+            $data['quantity_adjusted'] = $sign * $data['quantity'];
+        }
+
+        if (empty($data['prepared_by'])) {
+            $data['prepared_by'] = auth()->id();
+        }
+
         // Get current balance
         $currentBalance = $this->stockCardRepository->getCurrentBalance($data['inventory_item_id']);
         $data['quantity_before'] = $currentBalance;
@@ -127,7 +136,8 @@ class InventoryAdjustmentService
     private function generateAdjustmentNumber(): string
     {
         $year = date('Y');
-        $lastAdjustment = InventoryAdjustment::whereYear('created_at', $year)
+        $lastAdjustment = InventoryAdjustment::withTrashed()
+            ->whereYear('created_at', $year)
             ->orderBy('id', 'desc')
             ->first();
 

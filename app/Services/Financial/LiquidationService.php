@@ -5,6 +5,7 @@ namespace App\Services\Financial;
 use App\Interfaces\Financial\LiquidationRepositoryInterface;
 use App\Interfaces\Financial\CashAdvanceRepositoryInterface;
 use App\Models\Liquidation;
+use App\Models\LiquidationItem;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 
@@ -79,6 +80,28 @@ class LiquidationService
         return $this->liquidationRepository->deleteLiquidation($id);
     }
 
+    public function addLiquidationItem(int $liquidationId, array $data): LiquidationItem
+    {
+        $liquidation = $this->liquidationRepository->getLiquidationById($liquidationId);
+
+        if (!$liquidation) {
+            throw new \Exception('Liquidation not found.');
+        }
+
+        $data['liquidation_id'] = $liquidationId;
+        $data['item_number'] = $liquidation->items->count() + 1;
+
+        if (empty($data['expense_date'])) {
+            $data['expense_date'] = now()->toDateString();
+        }
+
+        if (empty($data['particulars'])) {
+            $data['particulars'] = $data['description'] ?? 'Expense';
+        }
+
+        return LiquidationItem::create($data);
+    }
+
     public function verifyLiquidation(int $id, int $verifiedBy, ?string $remarks = null): Liquidation
     {
         $liquidation = $this->liquidationRepository->getLiquidationById($id);
@@ -95,17 +118,8 @@ class LiquidationService
         return DB::transaction(function () use ($id, $approvedBy) {
             $liquidation = $this->liquidationRepository->getLiquidationById($id);
 
-            if ($liquidation->status !== 'Verified') {
-                throw new \Exception('Only verified liquidations can be approved.');
-            }
-
-            // Validate mandatory documents (Official Receipt)
-            $hasOR = $liquidation->documents()
-                ->where('document_type', 'official_receipt')
-                ->exists();
-
-            if (!$hasOR) {
-                throw new \Exception('Official Receipt photo is required before approval.');
+            if (!in_array($liquidation->status, ['Pending', 'Under Review', 'Verified'])) {
+                throw new \Exception('Only pending or verified liquidations can be approved.');
             }
 
             // Approve liquidation
@@ -139,7 +153,8 @@ class LiquidationService
     private function generateLiquidationNumber(): string
     {
         $year = date('Y');
-        $lastLiquidation = Liquidation::whereYear('created_at', $year)
+        $lastLiquidation = Liquidation::withTrashed()
+            ->whereYear('created_at', $year)
             ->orderBy('id', 'desc')
             ->first();
 

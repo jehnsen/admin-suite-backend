@@ -66,7 +66,8 @@ class PhysicalCountService
     private function generateCountNumber(): string
     {
         $year = date('Y');
-        $lastCount = PhysicalCount::whereYear('created_at', $year)
+        $lastCount = PhysicalCount::withTrashed()
+            ->whereYear('created_at', $year)
             ->orderBy('id', 'desc')
             ->first();
 

@@ -75,7 +75,7 @@ class LeaveRequestService
     /**
      * Recommend leave request.
      */
-    public function recommendLeaveRequest(int $id, int $recommendedBy, ?string $remarks = null): LeaveRequest
+    public function recommendLeaveRequest(int $id, ?int $recommendedBy, ?string $remarks = null): LeaveRequest
     {
         return $this->leaveRequestRepository->updateLeaveRequestStatus($id, 'Recommended', [
             'recommended_by' => $recommendedBy,
@@ -88,7 +88,7 @@ class LeaveRequestService
      * Approve leave request.
      * Business Logic: Deduct leave credits from employee.
      */
-    public function approveLeaveRequest(int $id, int $approvedBy, ?string $remarks = null): LeaveRequest
+    public function approveLeaveRequest(int $id, ?int $approvedBy, ?string $remarks = null): LeaveRequest
     {
         return DB::transaction(function () use ($id, $approvedBy, $remarks) {
             $leaveRequest = $this->leaveRequestRepository->findLeaveRequestById($id);

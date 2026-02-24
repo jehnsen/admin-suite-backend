@@ -233,7 +233,8 @@ class EmployeeService
     private function generateEmployeeNumber(): string
     {
         $year = Carbon::now()->year;
-        $lastEmployee = Employee::whereYear('created_at', $year)
+        $lastEmployee = Employee::withTrashed()
+                               ->whereYear('created_at', $year)
                                ->orderBy('employee_number', 'desc')
                                ->first();
 

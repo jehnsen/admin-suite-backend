@@ -5,6 +5,7 @@ namespace App\Repositories\Procurement;
 use App\Interfaces\Procurement\DeliveryRepositoryInterface;
 use App\Models\Delivery;
 use App\Models\DeliveryItem;
+use App\Models\PurchaseOrderItem;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 
@@ -70,6 +71,35 @@ class DeliveryRepository implements DeliveryRepositoryInterface
             foreach ($items as $index => $item) {
                 $item['delivery_id'] = $delivery->id;
                 $item['item_number'] = $index + 1;
+
+                // Auto-populate fields from PO item if not provided
+                if (!empty($item['purchase_order_item_id']) && (
+                    empty($item['item_description']) ||
+                    empty($item['unit_of_measure']) ||
+                    empty($item['unit_price']) ||
+                    !isset($item['quantity_ordered'])
+                )) {
+                    $poItem = PurchaseOrderItem::find($item['purchase_order_item_id']);
+                    if ($poItem) {
+                        if (empty($item['item_description'])) {
+                            $item['item_description'] = $poItem->item_description;
+                        }
+                        if (empty($item['unit_of_measure'])) {
+                            $item['unit_of_measure'] = $poItem->unit_of_measure ?? null;
+                        }
+                        if (empty($item['unit_price'])) {
+                            $item['unit_price'] = $poItem->unit_price ?? null;
+                        }
+                        if (!isset($item['quantity_ordered'])) {
+                            $item['quantity_ordered'] = $poItem->quantity_ordered ?? $item['quantity_delivered'] ?? 0;
+                        }
+                    }
+                }
+
+                if (!isset($item['quantity_ordered'])) {
+                    $item['quantity_ordered'] = $item['quantity_delivered'] ?? 0;
+                }
+
                 DeliveryItem::create($item);
             }
 
