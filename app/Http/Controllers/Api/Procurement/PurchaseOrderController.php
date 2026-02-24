@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Services\Procurement\PurchaseOrderService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use App\Http\Requests\Procurement\StorePurchaseOrderRequest;
+use App\Http\Requests\Procurement\UpdatePurchaseOrderRequest;
 
 class PurchaseOrderController extends Controller
 {
@@ -21,23 +23,12 @@ class PurchaseOrderController extends Controller
      */
     public function index(Request $request): JsonResponse
     {
-        try {
-            $filters = $request->only([
-                'status',
-                'supplier_id',
-                'fund_source',
-                'date_from',
-                'date_to',
-                'search'
-            ]);
-            $perPage = $request->input('per_page', 15);
+        $filters = $request->only(['status', 'supplier_id', 'fund_source', 'date_from', 'date_to', 'search']);
+        $perPage = $request->input('per_page', 15);
 
-            $purchaseOrders = $this->poService->getAllPurchaseOrders($filters, $perPage);
+        $purchaseOrders = $this->poService->getAllPurchaseOrders($filters, $perPage);
 
-            return response()->json($purchaseOrders);
-        } catch (\Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 500);
-        }
+        return response()->json($purchaseOrders);
     }
 
     /**
@@ -45,53 +36,52 @@ class PurchaseOrderController extends Controller
      */
     public function show(int $id): JsonResponse
     {
-        try {
-            $po = $this->poService->getPurchaseOrderById($id);
+        $po = $this->poService->getPurchaseOrderById($id);
 
-            if (!$po) {
-                return response()->json(['message' => 'Purchase order not found.'], 404);
-            }
-
-            return response()->json(['data' => $po]);
-        } catch (\Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 500);
+        if (!$po) {
+            return response()->json(['message' => 'Purchase order not found.'], 404);
         }
+
+        return response()->json(['data' => $po]);
     }
 
     /**
      * Create new purchase order
      */
-    public function store(Request $request): JsonResponse
+    public function store(StorePurchaseOrderRequest $request): JsonResponse
     {
         try {
-            $data = $request->all();
-            $data['prepared_by'] = $request->user()->id;
+            $data = array_merge($request->validated(), [
+                'prepared_by' => $request->user()->id,
+            ]);
 
             $po = $this->poService->createPurchaseOrder($data);
 
             return response()->json([
                 'message' => 'Purchase order created successfully.',
-                'data' => $po,
+                'data'    => $po,
             ], 201);
         } catch (\Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 500);
+            report($e);
+            return response()->json(['message' => $e->getMessage()], 422);
         }
     }
 
     /**
      * Update purchase order
      */
-    public function update(Request $request, int $id): JsonResponse
+    public function update(UpdatePurchaseOrderRequest $request, int $id): JsonResponse
     {
         try {
-            $po = $this->poService->updatePurchaseOrder($id, $request->all());
+            $po = $this->poService->updatePurchaseOrder($id, $request->validated());
 
             return response()->json([
                 'message' => 'Purchase order updated successfully.',
-                'data' => $po,
+                'data'    => $po,
             ]);
         } catch (\Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 500);
+            report($e);
+            return response()->json(['message' => $e->getMessage()], 422);
         }
     }
 
@@ -105,12 +95,14 @@ class PurchaseOrderController extends Controller
 
             return response()->json(['message' => 'Purchase order deleted successfully.']);
         } catch (\Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 500);
+            report($e);
+            return response()->json(['message' => $e->getMessage()], 422);
         }
     }
 
     /**
      * Approve purchase order
+     * The authenticated user is always recorded as the approver.
      */
     public function approve(Request $request, int $id): JsonResponse
     {
@@ -119,10 +111,11 @@ class PurchaseOrderController extends Controller
 
             return response()->json([
                 'message' => 'Purchase order approved successfully.',
-                'data' => $po,
+                'data'    => $po,
             ]);
         } catch (\Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 500);
+            report($e);
+            return response()->json(['message' => $e->getMessage()], 422);
         }
     }
 
@@ -136,10 +129,11 @@ class PurchaseOrderController extends Controller
 
             return response()->json([
                 'message' => 'Purchase order sent to supplier successfully.',
-                'data' => $po,
+                'data'    => $po,
             ]);
         } catch (\Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 500);
+            report($e);
+            return response()->json(['message' => $e->getMessage()], 422);
         }
     }
 
@@ -148,15 +142,20 @@ class PurchaseOrderController extends Controller
      */
     public function cancel(Request $request, int $id): JsonResponse
     {
+        $validated = $request->validate([
+            'reason' => 'required|string|max:500',
+        ]);
+
         try {
-            $po = $this->poService->cancelPurchaseOrder($id, $request->input('reason'));
+            $po = $this->poService->cancelPurchaseOrder($id, $validated['reason']);
 
             return response()->json([
                 'message' => 'Purchase order cancelled.',
-                'data' => $po,
+                'data'    => $po,
             ]);
         } catch (\Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 500);
+            report($e);
+            return response()->json(['message' => $e->getMessage()], 422);
         }
     }
 
@@ -165,14 +164,10 @@ class PurchaseOrderController extends Controller
      */
     public function pending(Request $request): JsonResponse
     {
-        try {
-            $perPage = $request->input('per_page', 15);
-            $pos = $this->poService->getPendingPurchaseOrders($perPage);
+        $perPage = $request->input('per_page', 15);
+        $pos = $this->poService->getPendingPurchaseOrders($perPage);
 
-            return response()->json($pos);
-        } catch (\Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 500);
-        }
+        return response()->json($pos);
     }
 
     /**
@@ -180,12 +175,8 @@ class PurchaseOrderController extends Controller
      */
     public function statistics(): JsonResponse
     {
-        try {
-            $statistics = $this->poService->getPurchaseOrderStatistics();
+        $statistics = $this->poService->getPurchaseOrderStatistics();
 
-            return response()->json(['data' => $statistics]);
-        } catch (\Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 500);
-        }
+        return response()->json(['data' => $statistics]);
     }
 }

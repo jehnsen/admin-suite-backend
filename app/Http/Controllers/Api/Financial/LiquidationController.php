@@ -3,6 +3,9 @@
 namespace App\Http\Controllers\Api\Financial;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Financial\AddLiquidationItemRequest;
+use App\Http\Requests\Financial\StoreLiquidationRequest;
+use App\Http\Requests\Financial\UpdateLiquidationRequest;
 use App\Services\Financial\LiquidationService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -21,16 +24,12 @@ class LiquidationController extends Controller
      */
     public function index(Request $request): JsonResponse
     {
-        try {
-            $filters = $request->only(['cash_advance_id', 'employee_id', 'status', 'date_from', 'date_to']);
-            $perPage = $request->input('per_page', 15);
+        $filters = $request->only(['cash_advance_id', 'employee_id', 'status', 'date_from', 'date_to']);
+        $perPage = $request->input('per_page', 15);
 
-            $liquidations = $this->liquidationService->getAllLiquidations($filters, $perPage);
+        $liquidations = $this->liquidationService->getAllLiquidations($filters, $perPage);
 
-            return response()->json($liquidations);
-        } catch (\Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 500);
-        }
+        return response()->json($liquidations);
     }
 
     /**
@@ -38,50 +37,48 @@ class LiquidationController extends Controller
      */
     public function show(int $id): JsonResponse
     {
-        try {
-            $liquidation = $this->liquidationService->getLiquidationById($id);
+        $liquidation = $this->liquidationService->getLiquidationById($id);
 
-            if (!$liquidation) {
-                return response()->json(['message' => 'Liquidation not found.'], 404);
-            }
-
-            return response()->json(['data' => $liquidation]);
-        } catch (\Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 500);
+        if (!$liquidation) {
+            return response()->json(['message' => 'Liquidation not found.'], 404);
         }
+
+        return response()->json(['data' => $liquidation]);
     }
 
     /**
      * Create new liquidation
      */
-    public function store(Request $request): JsonResponse
+    public function store(StoreLiquidationRequest $request): JsonResponse
     {
         try {
-            $liquidation = $this->liquidationService->createLiquidation($request->all());
+            $liquidation = $this->liquidationService->createLiquidation($request->validated());
 
             return response()->json([
                 'message' => 'Liquidation created successfully.',
-                'data' => $liquidation,
+                'data'    => $liquidation,
             ], 201);
         } catch (\Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 500);
+            report($e);
+            return response()->json(['message' => $e->getMessage()], 422);
         }
     }
 
     /**
      * Update liquidation
      */
-    public function update(Request $request, int $id): JsonResponse
+    public function update(UpdateLiquidationRequest $request, int $id): JsonResponse
     {
         try {
-            $liquidation = $this->liquidationService->updateLiquidation($id, $request->all());
+            $liquidation = $this->liquidationService->updateLiquidation($id, $request->validated());
 
             return response()->json([
                 'message' => 'Liquidation updated successfully.',
-                'data' => $liquidation,
+                'data'    => $liquidation,
             ]);
         } catch (\Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 500);
+            report($e);
+            return response()->json(['message' => $e->getMessage()], 422);
         }
     }
 
@@ -95,42 +92,45 @@ class LiquidationController extends Controller
 
             return response()->json(['message' => 'Liquidation deleted successfully.']);
         } catch (\Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 500);
+            report($e);
+            return response()->json(['message' => $e->getMessage()], 422);
         }
     }
 
     /**
      * Add item to liquidation
      */
-    public function addItem(Request $request, int $id): JsonResponse
+    public function addItem(AddLiquidationItemRequest $request, int $id): JsonResponse
     {
         try {
-            $item = $this->liquidationService->addLiquidationItem($id, $request->all());
+            $item = $this->liquidationService->addLiquidationItem($id, $request->validated());
 
             return response()->json([
                 'message' => 'Liquidation item added successfully.',
-                'data' => $item,
+                'data'    => $item,
             ], 201);
         } catch (\Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 500);
+            report($e);
+            return response()->json(['message' => $e->getMessage()], 422);
         }
     }
 
     /**
      * Approve liquidation
+     * The authenticated user is always recorded as the approver.
      */
     public function approve(Request $request, int $id): JsonResponse
     {
         try {
-            $approvedBy = $request->input('approved_by');
-            $liquidation = $this->liquidationService->approveLiquidation($id, $approvedBy);
+            $liquidation = $this->liquidationService->approveLiquidation($id, $request->user()->id);
 
             return response()->json([
                 'message' => 'Liquidation approved successfully. Cash advance status updated.',
-                'data' => $liquidation,
+                'data'    => $liquidation,
             ]);
         } catch (\Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 500);
+            report($e);
+            return response()->json(['message' => $e->getMessage()], 422);
         }
     }
 
@@ -139,18 +139,24 @@ class LiquidationController extends Controller
      */
     public function reject(Request $request, int $id): JsonResponse
     {
-        try {
-            $rejectedBy = $request->input('rejected_by');
-            $reason = $request->input('reason', '');
+        $validated = $request->validate([
+            'reason' => 'required|string|max:500',
+        ]);
 
-            $liquidation = $this->liquidationService->rejectLiquidation($id, $rejectedBy, $reason);
+        try {
+            $liquidation = $this->liquidationService->rejectLiquidation(
+                $id,
+                $request->user()->id,
+                $validated['reason']
+            );
 
             return response()->json([
                 'message' => 'Liquidation rejected.',
-                'data' => $liquidation,
+                'data'    => $liquidation,
             ]);
         } catch (\Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 500);
+            report($e);
+            return response()->json(['message' => $e->getMessage()], 422);
         }
     }
 
@@ -159,14 +165,10 @@ class LiquidationController extends Controller
      */
     public function pending(Request $request): JsonResponse
     {
-        try {
-            $perPage = $request->input('per_page', 15);
-            $liquidations = $this->liquidationService->getPendingLiquidations($perPage);
+        $perPage = $request->input('per_page', 15);
+        $liquidations = $this->liquidationService->getPendingLiquidations($perPage);
 
-            return response()->json($liquidations);
-        } catch (\Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 500);
-        }
+        return response()->json($liquidations);
     }
 
     /**
@@ -174,12 +176,8 @@ class LiquidationController extends Controller
      */
     public function byCashAdvance(int $caId): JsonResponse
     {
-        try {
-            $liquidations = $this->liquidationService->getLiquidationsByCashAdvance($caId);
+        $liquidations = $this->liquidationService->getLiquidationsByCashAdvance($caId);
 
-            return response()->json(['data' => $liquidations]);
-        } catch (\Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 500);
-        }
+        return response()->json(['data' => $liquidations]);
     }
 }

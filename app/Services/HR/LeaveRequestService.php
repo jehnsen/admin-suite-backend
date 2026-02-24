@@ -3,11 +3,15 @@
 namespace App\Services\HR;
 
 use App\Interfaces\HR\LeaveRequestRepositoryInterface;
+use App\Mail\LeaveRequestApproved;
+use App\Mail\LeaveRequestDisapproved;
 use App\Models\LeaveRequest;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
-use Carbon\Carbon;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 
 class LeaveRequestService
 {
@@ -86,11 +90,11 @@ class LeaveRequestService
 
     /**
      * Approve leave request.
-     * Business Logic: Deduct leave credits from employee.
+     * Business Logic: Deduct leave credits from employee, then send notification email.
      */
     public function approveLeaveRequest(int $id, ?int $approvedBy, ?string $remarks = null): LeaveRequest
     {
-        return DB::transaction(function () use ($id, $approvedBy, $remarks) {
+        $leaveRequest = DB::transaction(function () use ($id, $approvedBy, $remarks) {
             $leaveRequest = $this->leaveRequestRepository->findLeaveRequestById($id);
 
             if (!$leaveRequest) {
@@ -115,18 +119,75 @@ class LeaveRequestService
                 'approval_remarks' => $remarks,
             ]);
         });
+
+        // Send email notification (non-blocking — failure does not roll back the approval)
+        $this->sendLeaveApprovedEmail($leaveRequest->fresh(['employee', 'approver']));
+
+        return $leaveRequest;
     }
 
     /**
      * Disapprove leave request.
+     * Sends notification email to the employee after disapproval.
      */
     public function disapproveLeaveRequest(int $id, int $disapprovedBy, string $reason): LeaveRequest
     {
-        return $this->leaveRequestRepository->updateLeaveRequestStatus($id, 'Disapproved', [
+        $leaveRequest = $this->leaveRequestRepository->updateLeaveRequestStatus($id, 'Disapproved', [
             'disapproved_by' => $disapprovedBy,
             'disapproved_at' => now(),
             'disapproval_reason' => $reason,
         ]);
+
+        // Send email notification (non-blocking)
+        $this->sendLeaveDisapprovedEmail($leaveRequest->fresh(['employee', 'disapprover']));
+
+        return $leaveRequest;
+    }
+
+    /**
+     * Send leave approved email to the employee.
+     * Silently catches errors so mail issues never break the workflow.
+     */
+    private function sendLeaveApprovedEmail(LeaveRequest $leaveRequest): void
+    {
+        $employee = $leaveRequest->employee;
+
+        if (!$employee || empty($employee->email)) {
+            return;
+        }
+
+        try {
+            Mail::to($employee->email)->send(new LeaveRequestApproved($leaveRequest));
+        } catch (\Throwable $e) {
+            Log::error('Failed to send leave approved email', [
+                'leave_request_id' => $leaveRequest->id,
+                'employee_email'   => $employee->email,
+                'error'            => $e->getMessage(),
+            ]);
+        }
+    }
+
+    /**
+     * Send leave disapproved email to the employee.
+     * Silently catches errors so mail issues never break the workflow.
+     */
+    private function sendLeaveDisapprovedEmail(LeaveRequest $leaveRequest): void
+    {
+        $employee = $leaveRequest->employee;
+
+        if (!$employee || empty($employee->email)) {
+            return;
+        }
+
+        try {
+            Mail::to($employee->email)->send(new LeaveRequestDisapproved($leaveRequest));
+        } catch (\Throwable $e) {
+            Log::error('Failed to send leave disapproved email', [
+                'leave_request_id' => $leaveRequest->id,
+                'employee_email'   => $employee->email,
+                'error'            => $e->getMessage(),
+            ]);
+        }
     }
 
     /**

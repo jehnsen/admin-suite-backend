@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Services\HR\TrainingService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use App\Http\Requests\HR\StoreTrainingRequest;
+use App\Http\Requests\HR\UpdateTrainingRequest;
 
 class TrainingController extends Controller
 {
@@ -92,10 +94,10 @@ class TrainingController extends Controller
     /**
      * Create new training record
      */
-    public function store(Request $request): JsonResponse
+    public function store(StoreTrainingRequest $request): JsonResponse
     {
         try {
-            $training = $this->trainingService->createTraining($request->all());
+            $training = $this->trainingService->createTraining($request->validated());
 
             return response()->json([
                 'message' => 'Training record created successfully.',
@@ -109,10 +111,10 @@ class TrainingController extends Controller
     /**
      * Update training record
      */
-    public function update(Request $request, int $id): JsonResponse
+    public function update(UpdateTrainingRequest $request, int $id): JsonResponse
     {
         try {
-            $training = $this->trainingService->updateTraining($id, $request->all());
+            $training = $this->trainingService->updateTraining($id, $request->validated());
 
             return response()->json([
                 'message' => 'Training record updated successfully.',

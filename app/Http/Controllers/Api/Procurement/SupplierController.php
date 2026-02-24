@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Services\Procurement\SupplierService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use App\Http\Requests\Procurement\StoreSupplierRequest;
+use App\Http\Requests\Procurement\UpdateSupplierRequest;
 
 class SupplierController extends Controller
 {
@@ -54,10 +56,10 @@ class SupplierController extends Controller
     /**
      * Create new supplier
      */
-    public function store(Request $request): JsonResponse
+    public function store(StoreSupplierRequest $request): JsonResponse
     {
         try {
-            $supplier = $this->supplierService->createSupplier($request->all());
+            $supplier = $this->supplierService->createSupplier($request->validated());
 
             return response()->json([
                 'message' => 'Supplier created successfully.',
@@ -71,10 +73,10 @@ class SupplierController extends Controller
     /**
      * Update supplier
      */
-    public function update(Request $request, int $id): JsonResponse
+    public function update(UpdateSupplierRequest $request, int $id): JsonResponse
     {
         try {
-            $supplier = $this->supplierService->updateSupplier($id, $request->all());
+            $supplier = $this->supplierService->updateSupplier($id, $request->validated());
 
             return response()->json([
                 'message' => 'Supplier updated successfully.',

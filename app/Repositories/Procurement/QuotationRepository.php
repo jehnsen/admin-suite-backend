@@ -123,14 +123,14 @@ class QuotationRepository implements QuotationRepositoryInterface
 
     public function evaluateQuotations(int $prId, array $evaluationData): bool
     {
-        foreach ($evaluationData as $quotationId => $evaluation) {
-            Quotation::where('id', $quotationId)
+        foreach ($evaluationData as $evaluation) {
+            Quotation::where('id', $evaluation['quotation_id'])
                 ->where('purchase_request_id', $prId)
                 ->update([
-                    'ranking' => $evaluation['ranking'] ?? null,
-                    'evaluation_score' => $evaluation['score'] ?? null,
-                    'evaluation_remarks' => $evaluation['remarks'] ?? null,
-                    'status' => 'Evaluated',
+                    'ranking'           => $evaluation['ranking'] ?? null,
+                    'evaluation_score'  => $evaluation['evaluation_score'] ?? null,
+                    'evaluation_remarks'=> $evaluation['remarks'] ?? null,
+                    'status'            => 'Evaluated',
                 ]);
         }
 

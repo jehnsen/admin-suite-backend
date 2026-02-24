@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Services\Procurement\PurchaseRequestService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use App\Http\Requests\Procurement\StorePurchaseRequestRequest;
+use App\Http\Requests\Procurement\UpdatePurchaseRequestRequest;
 
 class PurchaseRequestController extends Controller
 {
@@ -21,24 +23,15 @@ class PurchaseRequestController extends Controller
      */
     public function index(Request $request): JsonResponse
     {
-        try {
-            $filters = $request->only([
-                'status',
-                'fund_source',
-                'procurement_mode',
-                'requested_by',
-                'date_from',
-                'date_to',
-                'search'
-            ]);
-            $perPage = $request->input('per_page', 15);
+        $filters = $request->only([
+            'status', 'fund_source', 'procurement_mode',
+            'requested_by', 'date_from', 'date_to', 'search',
+        ]);
+        $perPage = $request->input('per_page', 15);
 
-            $purchaseRequests = $this->prService->getAllPurchaseRequests($filters, $perPage);
+        $purchaseRequests = $this->prService->getAllPurchaseRequests($filters, $perPage);
 
-            return response()->json($purchaseRequests);
-        } catch (\Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 500);
-        }
+        return response()->json($purchaseRequests);
     }
 
     /**
@@ -46,50 +39,48 @@ class PurchaseRequestController extends Controller
      */
     public function show(int $id): JsonResponse
     {
-        try {
-            $pr = $this->prService->getPurchaseRequestById($id);
+        $pr = $this->prService->getPurchaseRequestById($id);
 
-            if (!$pr) {
-                return response()->json(['message' => 'Purchase request not found.'], 404);
-            }
-
-            return response()->json(['data' => $pr]);
-        } catch (\Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 500);
+        if (!$pr) {
+            return response()->json(['message' => 'Purchase request not found.'], 404);
         }
+
+        return response()->json(['data' => $pr]);
     }
 
     /**
      * Create new purchase request
      */
-    public function store(Request $request): JsonResponse
+    public function store(StorePurchaseRequestRequest $request): JsonResponse
     {
         try {
-            $pr = $this->prService->createPurchaseRequest($request->all());
+            $pr = $this->prService->createPurchaseRequest($request->validated());
 
             return response()->json([
                 'message' => 'Purchase request created successfully.',
-                'data' => $pr,
+                'data'    => $pr,
             ], 201);
         } catch (\Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 500);
+            report($e);
+            return response()->json(['message' => $e->getMessage()], 422);
         }
     }
 
     /**
      * Update purchase request
      */
-    public function update(Request $request, int $id): JsonResponse
+    public function update(UpdatePurchaseRequestRequest $request, int $id): JsonResponse
     {
         try {
-            $pr = $this->prService->updatePurchaseRequest($id, $request->all());
+            $pr = $this->prService->updatePurchaseRequest($id, $request->validated());
 
             return response()->json([
                 'message' => 'Purchase request updated successfully.',
-                'data' => $pr,
+                'data'    => $pr,
             ]);
         } catch (\Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 500);
+            report($e);
+            return response()->json(['message' => $e->getMessage()], 422);
         }
     }
 
@@ -103,7 +94,8 @@ class PurchaseRequestController extends Controller
 
             return response()->json(['message' => 'Purchase request deleted successfully.']);
         } catch (\Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 500);
+            report($e);
+            return response()->json(['message' => $e->getMessage()], 422);
         }
     }
 
@@ -117,10 +109,11 @@ class PurchaseRequestController extends Controller
 
             return response()->json([
                 'message' => 'Purchase request submitted successfully.',
-                'data' => $pr,
+                'data'    => $pr,
             ]);
         } catch (\Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 500);
+            report($e);
+            return response()->json(['message' => $e->getMessage()], 422);
         }
     }
 
@@ -129,19 +122,24 @@ class PurchaseRequestController extends Controller
      */
     public function recommend(Request $request, int $id): JsonResponse
     {
+        $validated = $request->validate([
+            'remarks' => 'nullable|string|max:500',
+        ]);
+
         try {
             $pr = $this->prService->recommendPurchaseRequest(
                 $id,
                 $request->user()->id,
-                $request->input('remarks')
+                $validated['remarks'] ?? null
             );
 
             return response()->json([
                 'message' => 'Purchase request recommended successfully.',
-                'data' => $pr,
+                'data'    => $pr,
             ]);
         } catch (\Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 500);
+            report($e);
+            return response()->json(['message' => $e->getMessage()], 422);
         }
     }
 
@@ -150,19 +148,24 @@ class PurchaseRequestController extends Controller
      */
     public function approve(Request $request, int $id): JsonResponse
     {
+        $validated = $request->validate([
+            'remarks' => 'nullable|string|max:500',
+        ]);
+
         try {
             $pr = $this->prService->approvePurchaseRequest(
                 $id,
                 $request->user()->id,
-                $request->input('remarks')
+                $validated['remarks'] ?? null
             );
 
             return response()->json([
                 'message' => 'Purchase request approved successfully.',
-                'data' => $pr,
+                'data'    => $pr,
             ]);
         } catch (\Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 500);
+            report($e);
+            return response()->json(['message' => $e->getMessage()], 422);
         }
     }
 
@@ -171,19 +174,24 @@ class PurchaseRequestController extends Controller
      */
     public function disapprove(Request $request, int $id): JsonResponse
     {
+        $validated = $request->validate([
+            'reason' => 'required|string|max:500',
+        ]);
+
         try {
             $pr = $this->prService->disapprovePurchaseRequest(
                 $id,
                 $request->user()->id,
-                $request->input('reason')
+                $validated['reason']
             );
 
             return response()->json([
                 'message' => 'Purchase request disapproved.',
-                'data' => $pr,
+                'data'    => $pr,
             ]);
         } catch (\Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 500);
+            report($e);
+            return response()->json(['message' => $e->getMessage()], 422);
         }
     }
 
@@ -192,15 +200,20 @@ class PurchaseRequestController extends Controller
      */
     public function cancel(Request $request, int $id): JsonResponse
     {
+        $validated = $request->validate([
+            'reason' => 'required|string|max:500',
+        ]);
+
         try {
-            $pr = $this->prService->cancelPurchaseRequest($id, $request->input('reason'));
+            $pr = $this->prService->cancelPurchaseRequest($id, $validated['reason']);
 
             return response()->json([
                 'message' => 'Purchase request cancelled.',
-                'data' => $pr,
+                'data'    => $pr,
             ]);
         } catch (\Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 500);
+            report($e);
+            return response()->json(['message' => $e->getMessage()], 422);
         }
     }
 
@@ -209,14 +222,10 @@ class PurchaseRequestController extends Controller
      */
     public function pending(Request $request): JsonResponse
     {
-        try {
-            $perPage = $request->input('per_page', 15);
-            $prs = $this->prService->getPendingPurchaseRequests($perPage);
+        $perPage = $request->input('per_page', 15);
+        $prs = $this->prService->getPendingPurchaseRequests($perPage);
 
-            return response()->json($prs);
-        } catch (\Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 500);
-        }
+        return response()->json($prs);
     }
 
     /**
@@ -224,12 +233,8 @@ class PurchaseRequestController extends Controller
      */
     public function statistics(): JsonResponse
     {
-        try {
-            $statistics = $this->prService->getPurchaseRequestStatistics();
+        $statistics = $this->prService->getPurchaseRequestStatistics();
 
-            return response()->json(['data' => $statistics]);
-        } catch (\Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 500);
-        }
+        return response()->json(['data' => $statistics]);
     }
 }

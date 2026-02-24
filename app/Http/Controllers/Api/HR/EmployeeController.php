@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\HR;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\HR\PromoteEmployeeRequest;
 use App\Http\Requests\HR\StoreEmployeeRequest;
 use App\Http\Requests\HR\UpdateEmployeeRequest;
 use App\Http\Resources\HR\EmployeeResource;
@@ -212,7 +213,7 @@ class EmployeeController extends Controller
      *   "data": {}
      * }
      */
-    public function promote(Request $request, int $id): JsonResponse
+    public function promote(PromoteEmployeeRequest $request, int $id): JsonResponse
     {
         $employee = $this->employeeService->findEmployeeById($id);
 
@@ -223,20 +224,7 @@ class EmployeeController extends Controller
         // Authorization check
         $this->authorize('promote', $employee);
 
-        $validated = $request->validate([
-            'new_position' => 'required|string|max:255',
-            'new_salary_grade' => 'required|integer|min:1|max:33',
-            'new_step_increment' => 'nullable|integer|min:1|max:8',
-            'new_monthly_salary' => 'required|numeric|min:0',
-            'effective_date' => 'required|date',
-            'station' => 'nullable|string',
-            'office_entity' => 'nullable|string',
-            'appointment_authority' => 'nullable|string',
-            'appointment_date' => 'nullable|date',
-            'remarks' => 'nullable|string',
-        ]);
-
-        $employee = $this->employeeService->promoteEmployee($id, $validated);
+        $employee = $this->employeeService->promoteEmployee($id, $request->validated());
 
         return response()->json([
             'message' => 'Employee promoted successfully.',

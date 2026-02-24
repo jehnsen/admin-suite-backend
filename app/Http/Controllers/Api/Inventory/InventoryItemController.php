@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Services\Inventory\InventoryItemService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use App\Http\Requests\Inventory\StoreInventoryItemRequest;
+use App\Http\Requests\Inventory\UpdateInventoryItemRequest;
 
 class InventoryItemController extends Controller
 {
@@ -72,10 +74,10 @@ class InventoryItemController extends Controller
     /**
      * Create new inventory item
      */
-    public function store(Request $request): JsonResponse
+    public function store(StoreInventoryItemRequest $request): JsonResponse
     {
         try {
-            $item = $this->inventoryItemService->createInventoryItem($request->all());
+            $item = $this->inventoryItemService->createInventoryItem($request->validated());
 
             return response()->json([
                 'message' => 'Inventory item created successfully.',
@@ -89,10 +91,10 @@ class InventoryItemController extends Controller
     /**
      * Update inventory item
      */
-    public function update(Request $request, int $id): JsonResponse
+    public function update(UpdateInventoryItemRequest $request, int $id): JsonResponse
     {
         try {
-            $item = $this->inventoryItemService->updateInventoryItem($id, $request->all());
+            $item = $this->inventoryItemService->updateInventoryItem($id, $request->validated());
 
             return response()->json([
                 'message' => 'Inventory item updated successfully.',

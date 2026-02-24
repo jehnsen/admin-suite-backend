@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Services\Inventory\PhysicalCountService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use App\Http\Requests\Inventory\StorePhysicalCountRequest;
+use App\Http\Requests\Inventory\UpdatePhysicalCountRequest;
 
 class PhysicalCountController extends Controller
 {
@@ -54,10 +56,10 @@ class PhysicalCountController extends Controller
     /**
      * Create new physical count
      */
-    public function store(Request $request): JsonResponse
+    public function store(StorePhysicalCountRequest $request): JsonResponse
     {
         try {
-            $physicalCount = $this->physicalCountService->createPhysicalCount($request->all());
+            $physicalCount = $this->physicalCountService->createPhysicalCount($request->validated());
 
             return response()->json([
                 'message' => 'Physical count recorded successfully.',
@@ -71,10 +73,10 @@ class PhysicalCountController extends Controller
     /**
      * Update physical count
      */
-    public function update(Request $request, int $id): JsonResponse
+    public function update(UpdatePhysicalCountRequest $request, int $id): JsonResponse
     {
         try {
-            $physicalCount = $this->physicalCountService->updatePhysicalCount($id, $request->all());
+            $physicalCount = $this->physicalCountService->updatePhysicalCount($id, $request->validated());
 
             return response()->json([
                 'message' => 'Physical count updated successfully.',

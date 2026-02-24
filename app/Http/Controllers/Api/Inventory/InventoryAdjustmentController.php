@@ -6,6 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Services\Inventory\InventoryAdjustmentService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use App\Http\Requests\Inventory\RejectInventoryAdjustmentRequest;
+use App\Http\Requests\Inventory\StoreInventoryAdjustmentRequest;
+use App\Http\Requests\Inventory\UpdateInventoryAdjustmentRequest;
 
 class InventoryAdjustmentController extends Controller
 {
@@ -21,16 +24,12 @@ class InventoryAdjustmentController extends Controller
      */
     public function index(Request $request): JsonResponse
     {
-        try {
-            $filters = $request->only(['inventory_item_id', 'adjustment_type', 'status']);
-            $perPage = $request->input('per_page', 15);
+        $filters = $request->only(['inventory_item_id', 'adjustment_type', 'status']);
+        $perPage = $request->input('per_page', 15);
 
-            $adjustments = $this->adjustmentService->getAllAdjustments($filters, $perPage);
+        $adjustments = $this->adjustmentService->getAllAdjustments($filters, $perPage);
 
-            return response()->json($adjustments);
-        } catch (\Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 500);
-        }
+        return response()->json($adjustments);
     }
 
     /**
@@ -38,50 +37,48 @@ class InventoryAdjustmentController extends Controller
      */
     public function show(int $id): JsonResponse
     {
-        try {
-            $adjustment = $this->adjustmentService->getAdjustmentById($id);
+        $adjustment = $this->adjustmentService->getAdjustmentById($id);
 
-            if (!$adjustment) {
-                return response()->json(['message' => 'Inventory adjustment not found.'], 404);
-            }
-
-            return response()->json(['data' => $adjustment]);
-        } catch (\Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 500);
+        if (!$adjustment) {
+            return response()->json(['message' => 'Inventory adjustment not found.'], 404);
         }
+
+        return response()->json(['data' => $adjustment]);
     }
 
     /**
      * Create new inventory adjustment
      */
-    public function store(Request $request): JsonResponse
+    public function store(StoreInventoryAdjustmentRequest $request): JsonResponse
     {
         try {
-            $adjustment = $this->adjustmentService->createAdjustment($request->all());
+            $adjustment = $this->adjustmentService->createAdjustment($request->validated());
 
             return response()->json([
                 'message' => 'Inventory adjustment created successfully.',
-                'data' => $adjustment,
+                'data'    => $adjustment,
             ], 201);
         } catch (\Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 500);
+            report($e);
+            return response()->json(['message' => $e->getMessage()], 422);
         }
     }
 
     /**
      * Update inventory adjustment
      */
-    public function update(Request $request, int $id): JsonResponse
+    public function update(UpdateInventoryAdjustmentRequest $request, int $id): JsonResponse
     {
         try {
-            $adjustment = $this->adjustmentService->updateAdjustment($id, $request->all());
+            $adjustment = $this->adjustmentService->updateAdjustment($id, $request->validated());
 
             return response()->json([
                 'message' => 'Inventory adjustment updated successfully.',
-                'data' => $adjustment,
+                'data'    => $adjustment,
             ]);
         } catch (\Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 500);
+            report($e);
+            return response()->json(['message' => $e->getMessage()], 422);
         }
     }
 
@@ -95,45 +92,49 @@ class InventoryAdjustmentController extends Controller
 
             return response()->json(['message' => 'Inventory adjustment deleted successfully.']);
         } catch (\Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 500);
+            report($e);
+            return response()->json(['message' => $e->getMessage()], 422);
         }
     }
 
     /**
      * Approve inventory adjustment
+     * The authenticated user is always recorded as the approver.
      */
     public function approve(Request $request, int $id): JsonResponse
     {
         try {
-            $approvedBy = $request->input('approved_by', $request->user()->id);
-            $adjustment = $this->adjustmentService->approveAdjustment($id, $approvedBy);
+            $adjustment = $this->adjustmentService->approveAdjustment($id, $request->user()->id);
 
             return response()->json([
                 'message' => 'Inventory adjustment approved successfully. Stock card entry created.',
-                'data' => $adjustment,
+                'data'    => $adjustment,
             ]);
         } catch (\Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 500);
+            report($e);
+            return response()->json(['message' => $e->getMessage()], 422);
         }
     }
 
     /**
      * Reject inventory adjustment
      */
-    public function reject(Request $request, int $id): JsonResponse
+    public function reject(RejectInventoryAdjustmentRequest $request, int $id): JsonResponse
     {
         try {
-            $rejectedBy = $request->input('rejected_by');
-            $reason = $request->input('reason', '');
-
-            $adjustment = $this->adjustmentService->rejectAdjustment($id, $rejectedBy, $reason);
+            $adjustment = $this->adjustmentService->rejectAdjustment(
+                $id,
+                $request->user()->id,
+                $request->input('reason')
+            );
 
             return response()->json([
                 'message' => 'Inventory adjustment rejected.',
-                'data' => $adjustment,
+                'data'    => $adjustment,
             ]);
         } catch (\Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 500);
+            report($e);
+            return response()->json(['message' => $e->getMessage()], 422);
         }
     }
 
@@ -142,13 +143,9 @@ class InventoryAdjustmentController extends Controller
      */
     public function pending(Request $request): JsonResponse
     {
-        try {
-            $perPage = $request->input('per_page', 15);
-            $adjustments = $this->adjustmentService->getPendingAdjustments($perPage);
+        $perPage = $request->input('per_page', 15);
+        $adjustments = $this->adjustmentService->getPendingAdjustments($perPage);
 
-            return response()->json($adjustments);
-        } catch (\Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 500);
-        }
+        return response()->json($adjustments);
     }
 }

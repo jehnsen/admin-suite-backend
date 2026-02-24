@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Services\Financial\BudgetService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use App\Http\Requests\Financial\StoreBudgetRequest;
+use App\Http\Requests\Financial\UpdateBudgetRequest;
 
 class BudgetController extends Controller
 {
@@ -61,10 +63,10 @@ class BudgetController extends Controller
     /**
      * Create new budget
      */
-    public function store(Request $request): JsonResponse
+    public function store(StoreBudgetRequest $request): JsonResponse
     {
         try {
-            $budget = $this->budgetService->createBudget($request->all());
+            $budget = $this->budgetService->createBudget($request->validated());
 
             return response()->json([
                 'message' => 'Budget created successfully.',
@@ -78,10 +80,10 @@ class BudgetController extends Controller
     /**
      * Update budget
      */
-    public function update(Request $request, int $id): JsonResponse
+    public function update(UpdateBudgetRequest $request, int $id): JsonResponse
     {
         try {
-            $budget = $this->budgetService->updateBudget($id, $request->all());
+            $budget = $this->budgetService->updateBudget($id, $request->validated());
 
             return response()->json([
                 'message' => 'Budget updated successfully.',

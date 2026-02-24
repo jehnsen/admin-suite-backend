@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\Transaction;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use App\Http\Requests\Financial\StoreTransactionRequest;
+use App\Http\Requests\Financial\UpdateTransactionRequest;
 use Illuminate\Support\Facades\DB;
 
 class TransactionController extends Controller
@@ -86,27 +88,13 @@ class TransactionController extends Controller
     /**
      * Create new transaction
      */
-    public function store(Request $request): JsonResponse
+    public function store(StoreTransactionRequest $request): JsonResponse
     {
         try {
-            $validated = $request->validate([
-                'transaction_date' => 'required|date',
-                'type' => 'required|in:Income,Expense,Transfer,Adjustment',
-                'category' => 'required|string',
-                'amount' => 'required|numeric|min:0',
-                'description' => 'required|string',
-                'fund_source' => 'nullable|string',
-                'payment_method' => 'nullable|string',
-                'reference_number' => 'nullable|string',
-                'payer' => 'nullable|string',
-                'payee' => 'nullable|string',
-                'budget_id' => 'nullable|exists:budgets,id',
-                'employee_id' => 'nullable|exists:employees,id',
+            $validated = array_merge($request->validated(), [
+                'transaction_number' => $this->generateTransactionNumber(),
+                'status'             => 'Completed',
             ]);
-
-            // Generate transaction number
-            $validated['transaction_number'] = $this->generateTransactionNumber();
-            $validated['status'] = $validated['status'] ?? 'Completed';
 
             $transaction = Transaction::create($validated);
 
@@ -122,11 +110,11 @@ class TransactionController extends Controller
     /**
      * Update transaction
      */
-    public function update(Request $request, int $id): JsonResponse
+    public function update(UpdateTransactionRequest $request, int $id): JsonResponse
     {
         try {
             $transaction = Transaction::findOrFail($id);
-            $transaction->update($request->all());
+            $transaction->update($request->validated());
 
             return response()->json([
                 'message' => 'Transaction updated successfully.',

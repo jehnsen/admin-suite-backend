@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Api\Financial;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Financial\StoreCashAdvanceRequest;
+use App\Http\Requests\Financial\UpdateCashAdvanceRequest;
 use App\Services\Financial\CashAdvanceService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -21,16 +23,12 @@ class CashAdvanceController extends Controller
      */
     public function index(Request $request): JsonResponse
     {
-        try {
-            $filters = $request->only(['employee_id', 'status', 'purpose', 'date_from', 'date_to']);
-            $perPage = $request->input('per_page', 15);
+        $filters = $request->only(['employee_id', 'status', 'purpose', 'date_from', 'date_to']);
+        $perPage = $request->input('per_page', 15);
 
-            $cashAdvances = $this->cashAdvanceService->getAllCashAdvances($filters, $perPage);
+        $cashAdvances = $this->cashAdvanceService->getAllCashAdvances($filters, $perPage);
 
-            return response()->json($cashAdvances);
-        } catch (\Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 500);
-        }
+        return response()->json($cashAdvances);
     }
 
     /**
@@ -38,50 +36,51 @@ class CashAdvanceController extends Controller
      */
     public function show(int $id): JsonResponse
     {
-        try {
-            $cashAdvance = $this->cashAdvanceService->getCashAdvanceById($id);
+        $cashAdvance = $this->cashAdvanceService->getCashAdvanceById($id);
 
-            if (!$cashAdvance) {
-                return response()->json(['message' => 'Cash advance not found.'], 404);
-            }
-
-            return response()->json(['data' => $cashAdvance]);
-        } catch (\Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 500);
+        if (!$cashAdvance) {
+            return response()->json(['message' => 'Cash advance not found.'], 404);
         }
+
+        return response()->json(['data' => $cashAdvance]);
     }
 
     /**
      * Create new cash advance
      */
-    public function store(Request $request): JsonResponse
+    public function store(StoreCashAdvanceRequest $request): JsonResponse
     {
         try {
-            $cashAdvance = $this->cashAdvanceService->createCashAdvance($request->all());
+            $data = $request->validated();
+            $data['user_id'] = $request->user()->id;
+
+            $cashAdvance = $this->cashAdvanceService->createCashAdvance($data);
 
             return response()->json([
                 'message' => 'Cash advance created successfully.',
-                'data' => $cashAdvance,
+                'data'    => $cashAdvance,
             ], 201);
         } catch (\Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 500);
+            report($e);
+            return response()->json(['message' => $e->getMessage()], 422);
         }
     }
 
     /**
      * Update cash advance
      */
-    public function update(Request $request, int $id): JsonResponse
+    public function update(UpdateCashAdvanceRequest $request, int $id): JsonResponse
     {
         try {
-            $cashAdvance = $this->cashAdvanceService->updateCashAdvance($id, $request->all());
+            $cashAdvance = $this->cashAdvanceService->updateCashAdvance($id, $request->validated());
 
             return response()->json([
                 'message' => 'Cash advance updated successfully.',
-                'data' => $cashAdvance,
+                'data'    => $cashAdvance,
             ]);
         } catch (\Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 500);
+            report($e);
+            return response()->json(['message' => $e->getMessage()], 422);
         }
     }
 
@@ -95,7 +94,8 @@ class CashAdvanceController extends Controller
 
             return response()->json(['message' => 'Cash advance deleted successfully.']);
         } catch (\Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 500);
+            report($e);
+            return response()->json(['message' => $e->getMessage()], 422);
         }
     }
 
@@ -105,15 +105,15 @@ class CashAdvanceController extends Controller
     public function approve(Request $request, int $id): JsonResponse
     {
         try {
-            $approvedBy = $request->input('approved_by');
-            $cashAdvance = $this->cashAdvanceService->approveCashAdvance($id, $approvedBy);
+            $cashAdvance = $this->cashAdvanceService->approveCashAdvance($id, $request->user()->id);
 
             return response()->json([
                 'message' => 'Cash advance approved successfully.',
-                'data' => $cashAdvance,
+                'data'    => $cashAdvance,
             ]);
         } catch (\Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 500);
+            report($e);
+            return response()->json(['message' => $e->getMessage()], 422);
         }
     }
 
@@ -123,15 +123,15 @@ class CashAdvanceController extends Controller
     public function release(Request $request, int $id): JsonResponse
     {
         try {
-            $releasedBy = $request->input('released_by');
-            $cashAdvance = $this->cashAdvanceService->releaseCashAdvance($id, $releasedBy);
+            $cashAdvance = $this->cashAdvanceService->releaseCashAdvance($id, $request->user()->id);
 
             return response()->json([
                 'message' => 'Cash advance released successfully.',
-                'data' => $cashAdvance,
+                'data'    => $cashAdvance,
             ]);
         } catch (\Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 500);
+            report($e);
+            return response()->json(['message' => $e->getMessage()], 422);
         }
     }
 
@@ -140,14 +140,10 @@ class CashAdvanceController extends Controller
      */
     public function pending(Request $request): JsonResponse
     {
-        try {
-            $perPage = $request->input('per_page', 15);
-            $cashAdvances = $this->cashAdvanceService->getPendingCashAdvances($perPage);
+        $perPage = $request->input('per_page', 15);
+        $cashAdvances = $this->cashAdvanceService->getPendingCashAdvances($perPage);
 
-            return response()->json($cashAdvances);
-        } catch (\Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 500);
-        }
+        return response()->json($cashAdvances);
     }
 
     /**
@@ -155,14 +151,10 @@ class CashAdvanceController extends Controller
      */
     public function overdue(Request $request): JsonResponse
     {
-        try {
-            $perPage = $request->input('per_page', 15);
-            $cashAdvances = $this->cashAdvanceService->getOverdueCashAdvances($perPage);
+        $perPage = $request->input('per_page', 15);
+        $cashAdvances = $this->cashAdvanceService->getOverdueCashAdvances($perPage);
 
-            return response()->json($cashAdvances);
-        } catch (\Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 500);
-        }
+        return response()->json($cashAdvances);
     }
 
     /**
@@ -170,13 +162,9 @@ class CashAdvanceController extends Controller
      */
     public function byEmployee(int $employeeId): JsonResponse
     {
-        try {
-            $cashAdvances = $this->cashAdvanceService->getCashAdvancesByEmployee($employeeId);
+        $cashAdvances = $this->cashAdvanceService->getCashAdvancesByEmployee($employeeId);
 
-            return response()->json(['data' => $cashAdvances]);
-        } catch (\Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 500);
-        }
+        return response()->json(['data' => $cashAdvances]);
     }
 
     /**
@@ -184,12 +172,8 @@ class CashAdvanceController extends Controller
      */
     public function statistics(): JsonResponse
     {
-        try {
-            $statistics = $this->cashAdvanceService->getCashAdvanceStatistics();
+        $statistics = $this->cashAdvanceService->getCashAdvanceStatistics();
 
-            return response()->json(['data' => $statistics]);
-        } catch (\Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 500);
-        }
+        return response()->json(['data' => $statistics]);
     }
 }

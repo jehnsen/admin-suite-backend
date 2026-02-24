@@ -320,7 +320,7 @@ class WorkflowTestCommand extends Command
         $this->step('Stock in (50 reams)', function () use ($itemId) {
             $this->post('/api/stock-cards/stock-in', [
                 'inventory_item_id' => $itemId,
-                'quantity'          => 50,
+                'quantity_in'       => 50,
                 'unit_cost'         => 250.00,
                 'transaction_date'  => now()->toDateString(),
                 'reference_number'  => "WFTEST-STOCKIN-{$this->ts}",
@@ -332,7 +332,7 @@ class WorkflowTestCommand extends Command
             $res = $this->post('/api/inventory-adjustments', [
                 'inventory_item_id' => $itemId,
                 'adjustment_type'   => 'Decrease',
-                'quantity'          => 2,
+                'quantity_adjusted' => 2,
                 'reason'            => '[WFTEST] Damaged items removed',
                 'adjustment_date'   => now()->toDateString(),
             ]);
@@ -372,6 +372,7 @@ class WorkflowTestCommand extends Command
                 $res = $this->post('/api/suppliers', [
                     'business_name'          => "[WFTEST] Supplier {$i} Corp {$suffix}",
                     'owner_name'             => "[WFTEST] Owner {$i}",
+                    'email'                  => "wftest.supplier{$i}.{$suffix}@example.com",
                     'phone_number'           => "0{$i}8{$suffix}",
                     'business_type'          => 'Corporation',
                     'address'                => "{$i} Test Business Road",
@@ -698,7 +699,9 @@ class WorkflowTestCommand extends Command
             });
 
             $this->step('Mark disbursement as paid', function () use ($dvId) {
-                $this->put("/api/disbursements/{$dvId}/mark-paid");
+                $this->put("/api/disbursements/{$dvId}/mark-paid", [
+                    'payment_date' => now()->toDateString(),
+                ]);
             });
         }
 
@@ -724,17 +727,15 @@ class WorkflowTestCommand extends Command
 
                 $this->step('Add liquidation item (receipt)', function () use ($liquidId) {
                     $this->post("/api/liquidations/{$liquidId}/items", [
-                        'expense_description' => '[WFTEST] Bond Paper A4 - 10 reams',
-                        'amount'              => 2500.00,
-                        'receipt_number'      => "WFTEST-OR-{$this->ts}",
-                        'payee'               => '[WFTEST] ABC Office Supplies',
+                        'expense_date'      => now()->toDateString(),
+                        'particulars'       => '[WFTEST] Bond Paper A4 - 10 reams',
+                        'amount'            => 2500.00,
+                        'or_invoice_number' => "WFTEST-OR-{$this->ts}",
                     ]);
                 });
 
                 $this->step('Approve liquidation', function () use ($liquidId) {
-                    $this->put("/api/liquidations/{$liquidId}/approve", [
-                        'approved_by' => $this->userId,
-                    ]);
+                    $this->put("/api/liquidations/{$liquidId}/approve");
                 });
             }
         }
