@@ -35,7 +35,7 @@ class ServiceCreditController extends Controller
             'expiring_soon'
         ]);
 
-        $perPage = $request->input('per_page', 15);
+        $perPage = $this->getPerPage($request);
 
         $serviceCredits = $this->serviceCreditService->getAllServiceCredits($filters, $perPage);
 

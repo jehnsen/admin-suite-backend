@@ -42,7 +42,7 @@ class LeaveRequestController extends Controller
         $this->authorize('viewAny', \App\Models\LeaveRequest::class);
 
         $filters = $request->only(['status', 'leave_type', 'employee_id', 'start_date', 'end_date']);
-        $perPage = $request->input('per_page', 15);
+        $perPage = $this->getPerPage($request);
 
         $leaveRequests = $this->leaveRequestService->getAllLeaveRequests($filters, $perPage);
 

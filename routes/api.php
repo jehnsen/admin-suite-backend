@@ -134,17 +134,18 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
     // HR Management - Trainings
-    Route::prefix('trainings')->group(function () {
+    Route::prefix('trainings')->middleware('permission:view_trainings')->group(function () {
         Route::get('/', [TrainingController::class, 'index']);
-        Route::post('/', [TrainingController::class, 'store']);
         Route::get('/statistics', [TrainingController::class, 'statistics']);
         Route::get('/type/{type}', [TrainingController::class, 'byType']);
         Route::get('/year/{year}', [TrainingController::class, 'byYear']);
         Route::get('/employee/{employeeId}', [TrainingController::class, 'byEmployee']);
         Route::get('/employee/{employeeId}/completed', [TrainingController::class, 'completedByEmployee']);
         Route::get('/{id}', [TrainingController::class, 'show']);
-        Route::put('/{id}', [TrainingController::class, 'update']);
-        Route::delete('/{id}', [TrainingController::class, 'destroy']);
+
+        Route::post('/', [TrainingController::class, 'store'])->middleware('permission:create_trainings');
+        Route::put('/{id}', [TrainingController::class, 'update'])->middleware('permission:edit_trainings');
+        Route::delete('/{id}', [TrainingController::class, 'destroy'])->middleware('permission:delete_trainings');
     });
 
     // HR Management - Attendance Records
@@ -184,15 +185,16 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
     // Procurement - Suppliers
-    Route::prefix('suppliers')->group(function () {
+    Route::prefix('suppliers')->middleware('permission:view_suppliers')->group(function () {
         Route::get('/', [SupplierController::class, 'index']);
-        Route::post('/', [SupplierController::class, 'store']);
         Route::get('/active', [SupplierController::class, 'active']);
         Route::get('/search', [SupplierController::class, 'search']);
         Route::get('/statistics', [SupplierController::class, 'statistics']);
         Route::get('/{id}', [SupplierController::class, 'show']);
-        Route::put('/{id}', [SupplierController::class, 'update']);
-        Route::delete('/{id}', [SupplierController::class, 'destroy']);
+
+        Route::post('/', [SupplierController::class, 'store'])->middleware('permission:create_suppliers');
+        Route::put('/{id}', [SupplierController::class, 'update'])->middleware('permission:edit_suppliers');
+        Route::delete('/{id}', [SupplierController::class, 'destroy'])->middleware('permission:delete_suppliers');
     });
 
     // Procurement - Purchase Requests

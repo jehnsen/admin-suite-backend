@@ -44,7 +44,7 @@ class AttendanceRecordController extends Controller
             'employee_id', 'date_from', 'date_to',
             'status', 'has_undertime'
         ]);
-        $perPage = $request->input('per_page', 15);
+        $perPage = $this->getPerPage($request);
 
         $records = $this->attendanceService->getAllAttendanceRecords($filters, $perPage);
 

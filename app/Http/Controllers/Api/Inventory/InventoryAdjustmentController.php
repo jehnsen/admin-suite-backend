@@ -25,7 +25,7 @@ class InventoryAdjustmentController extends Controller
     public function index(Request $request): JsonResponse
     {
         $filters = $request->only(['inventory_item_id', 'adjustment_type', 'status']);
-        $perPage = $request->input('per_page', 15);
+        $perPage = $this->getPerPage($request);
 
         $adjustments = $this->adjustmentService->getAllAdjustments($filters, $perPage);
 
@@ -143,7 +143,7 @@ class InventoryAdjustmentController extends Controller
      */
     public function pending(Request $request): JsonResponse
     {
-        $perPage = $request->input('per_page', 15);
+        $perPage = $this->getPerPage($request);
         $adjustments = $this->adjustmentService->getPendingAdjustments($perPage);
 
         return response()->json($adjustments);

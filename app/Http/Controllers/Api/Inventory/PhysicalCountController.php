@@ -25,7 +25,7 @@ class PhysicalCountController extends Controller
     {
         try {
             $filters = $request->only(['inventory_item_id', 'variance_type', 'date_from', 'date_to']);
-            $perPage = $request->input('per_page', 15);
+            $perPage = $this->getPerPage($request);
 
             $physicalCounts = $this->physicalCountService->getAllPhysicalCounts($filters, $perPage);
 
@@ -107,7 +107,7 @@ class PhysicalCountController extends Controller
     public function withVariances(Request $request): JsonResponse
     {
         try {
-            $perPage = $request->input('per_page', 15);
+            $perPage = $this->getPerPage($request);
             $physicalCounts = $this->physicalCountService->getItemsWithVariances($perPage);
 
             return response()->json($physicalCounts);

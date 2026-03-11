@@ -26,7 +26,7 @@ class StockCardController extends Controller
     {
         try {
             $filters = $request->only(['inventory_item_id', 'transaction_type', 'date_from', 'date_to']);
-            $perPage = $request->input('per_page', 15);
+            $perPage = $this->getPerPage($request);
 
             $stockCards = $this->stockCardService->getAllStockCards($filters, $perPage);
 

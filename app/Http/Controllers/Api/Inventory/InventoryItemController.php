@@ -25,7 +25,7 @@ class InventoryItemController extends Controller
     {
         try {
             $filters = $request->only(['category', 'status', 'condition', 'fund_source', 'location']);
-            $perPage = $request->input('per_page', 15);
+            $perPage = $this->getPerPage($request);
 
             $items = $this->inventoryItemService->getAllInventoryItems($filters, $perPage);
 
@@ -130,7 +130,7 @@ class InventoryItemController extends Controller
     {
         try {
             $searchTerm = $request->input('q', '');
-            $perPage = $request->input('per_page', 15);
+            $perPage = $this->getPerPage($request);
 
             if (empty($searchTerm)) {
                 return response()->json(['message' => 'Search term is required.'], 400);

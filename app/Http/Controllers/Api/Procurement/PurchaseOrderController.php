@@ -24,7 +24,7 @@ class PurchaseOrderController extends Controller
     public function index(Request $request): JsonResponse
     {
         $filters = $request->only(['status', 'supplier_id', 'fund_source', 'date_from', 'date_to', 'search']);
-        $perPage = $request->input('per_page', 15);
+        $perPage = $this->getPerPage($request);
 
         $purchaseOrders = $this->poService->getAllPurchaseOrders($filters, $perPage);
 
@@ -164,7 +164,7 @@ class PurchaseOrderController extends Controller
      */
     public function pending(Request $request): JsonResponse
     {
-        $perPage = $request->input('per_page', 15);
+        $perPage = $this->getPerPage($request);
         $pos = $this->poService->getPendingPurchaseOrders($perPage);
 
         return response()->json($pos);

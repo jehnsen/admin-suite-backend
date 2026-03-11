@@ -25,7 +25,7 @@ class SupplierController extends Controller
     {
         try {
             $filters = $request->only(['status', 'business_type', 'classification', 'search']);
-            $perPage = $request->input('per_page', 15);
+            $perPage = $this->getPerPage($request);
 
             $suppliers = $this->supplierService->getAllSuppliers($filters, $perPage);
 
@@ -107,7 +107,7 @@ class SupplierController extends Controller
     public function active(Request $request): JsonResponse
     {
         try {
-            $perPage = $request->input('per_page', 15);
+            $perPage = $this->getPerPage($request);
             $suppliers = $this->supplierService->getActiveSuppliers($perPage);
 
             return response()->json($suppliers);
@@ -123,7 +123,7 @@ class SupplierController extends Controller
     {
         try {
             $keyword = $request->input('keyword', '');
-            $perPage = $request->input('per_page', 15);
+            $perPage = $this->getPerPage($request);
 
             $suppliers = $this->supplierService->searchSuppliers($keyword, $perPage);
 

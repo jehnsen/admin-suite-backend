@@ -34,7 +34,7 @@ class TrainingController extends Controller
                 'venue_type',
                 'search'
             ]);
-            $perPage = $request->input('per_page', 15);
+            $perPage = $this->getPerPage($request);
 
             $trainings = $this->trainingService->getAllTrainings($filters, $perPage);
 
@@ -68,7 +68,7 @@ class TrainingController extends Controller
     public function byEmployee(int $employeeId, Request $request): JsonResponse
     {
         try {
-            $perPage = $request->input('per_page', 15);
+            $perPage = $this->getPerPage($request);
             $trainings = $this->trainingService->getTrainingsByEmployee($employeeId, $perPage);
 
             return response()->json($trainings);
@@ -149,7 +149,7 @@ class TrainingController extends Controller
     public function byType(string $type, Request $request): JsonResponse
     {
         try {
-            $perPage = $request->input('per_page', 15);
+            $perPage = $this->getPerPage($request);
             $trainings = $this->trainingService->getTrainingsByType($type, $perPage);
 
             return response()->json($trainings);
@@ -164,7 +164,7 @@ class TrainingController extends Controller
     public function byYear(int $year, Request $request): JsonResponse
     {
         try {
-            $perPage = $request->input('per_page', 15);
+            $perPage = $this->getPerPage($request);
             $trainings = $this->trainingService->getTrainingsByYear($year, $perPage);
 
             return response()->json($trainings);

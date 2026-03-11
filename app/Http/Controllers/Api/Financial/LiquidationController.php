@@ -25,7 +25,7 @@ class LiquidationController extends Controller
     public function index(Request $request): JsonResponse
     {
         $filters = $request->only(['cash_advance_id', 'employee_id', 'status', 'date_from', 'date_to']);
-        $perPage = $request->input('per_page', 15);
+        $perPage = $this->getPerPage($request);
 
         $liquidations = $this->liquidationService->getAllLiquidations($filters, $perPage);
 
@@ -165,7 +165,7 @@ class LiquidationController extends Controller
      */
     public function pending(Request $request): JsonResponse
     {
-        $perPage = $request->input('per_page', 15);
+        $perPage = $this->getPerPage($request);
         $liquidations = $this->liquidationService->getPendingLiquidations($perPage);
 
         return response()->json($liquidations);

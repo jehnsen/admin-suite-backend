@@ -54,7 +54,7 @@ class EmployeeController extends Controller
         $this->authorize('viewAny', \App\Models\Employee::class);
 
         $filters = $request->only(['status', 'position', 'employment_status', 'search']);
-        $perPage = $request->input('per_page', 15);
+        $perPage = $this->getPerPage($request);
 
         $employees = $this->employeeService->getAllEmployees($filters, $perPage);
 

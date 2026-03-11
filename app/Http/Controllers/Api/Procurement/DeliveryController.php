@@ -25,7 +25,7 @@ class DeliveryController extends Controller
     public function index(Request $request): JsonResponse
     {
         $filters = $request->only(['status', 'purchase_order_id', 'supplier_id', 'date_from', 'date_to']);
-        $perPage = $request->input('per_page', 15);
+        $perPage = $this->getPerPage($request);
 
         $deliveries = $this->deliveryService->getAllDeliveries($filters, $perPage);
 
@@ -51,7 +51,7 @@ class DeliveryController extends Controller
      */
     public function byPurchaseOrder(Request $request, int $poId): JsonResponse
     {
-        $perPage = $request->input('per_page', 15);
+        $perPage = $this->getPerPage($request);
         $deliveries = $this->deliveryService->getDeliveriesByPurchaseOrder($poId, $perPage);
 
         return response()->json($deliveries);
@@ -184,7 +184,7 @@ class DeliveryController extends Controller
      */
     public function pending(Request $request): JsonResponse
     {
-        $perPage = $request->input('per_page', 15);
+        $perPage = $this->getPerPage($request);
         $deliveries = $this->deliveryService->getPendingDeliveries($perPage);
 
         return response()->json($deliveries);

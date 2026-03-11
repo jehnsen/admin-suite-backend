@@ -62,7 +62,7 @@ class UserManagementController extends Controller
         }
 
         $users = $query->latest()
-            ->paginate($request->get('per_page', 15))
+            ->paginate($this->getPerPage($request))
             ->through(function ($user) {
                 return [
                     'id' => $user->id,
@@ -172,10 +172,11 @@ class UserManagementController extends Controller
             ],
         ];
 
-        // Include temporary password in response if it was generated
+        // Temporary password is never returned in the API response.
+        // When email is implemented, it will be sent to the user's DepEd email.
+        // Until then, use the reset-password endpoint to issue a new one.
         if ($generatedPassword) {
-            $response['temporary_password'] = $generatedPassword;
-            $response['message'] .= '. Please save the temporary password and share it securely with the user.';
+            $response['message'] .= '. A temporary password was generated. Use the reset-password endpoint to issue a new one or implement email delivery.';
         }
 
         return response()->json($response, 201);
@@ -361,9 +362,10 @@ class UserManagementController extends Controller
             'message' => 'Password reset successfully',
         ];
 
+        // Temporary password is never returned in the API response.
+        // Implement email delivery to send it to the user's DepEd email securely.
         if ($generatedPassword) {
-            $response['temporary_password'] = $generatedPassword;
-            $response['message'] .= '. Please save the temporary password and share it securely with the user.';
+            $response['message'] .= '. A temporary password was generated — deliver it to the user via a secure channel (e.g., email).';
         }
 
         return response()->json($response);

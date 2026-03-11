@@ -27,7 +27,7 @@ class PurchaseRequestController extends Controller
             'status', 'fund_source', 'procurement_mode',
             'requested_by', 'date_from', 'date_to', 'search',
         ]);
-        $perPage = $request->input('per_page', 15);
+        $perPage = $this->getPerPage($request);
 
         $purchaseRequests = $this->prService->getAllPurchaseRequests($filters, $perPage);
 
@@ -222,7 +222,7 @@ class PurchaseRequestController extends Controller
      */
     public function pending(Request $request): JsonResponse
     {
-        $perPage = $request->input('per_page', 15);
+        $perPage = $this->getPerPage($request);
         $prs = $this->prService->getPendingPurchaseRequests($perPage);
 
         return response()->json($prs);

@@ -25,7 +25,7 @@ class DisbursementController extends Controller
     public function index(Request $request): JsonResponse
     {
         $filters = $request->only(['payee', 'fund_source', 'status', 'date_from', 'date_to']);
-        $perPage = $request->input('per_page', 15);
+        $perPage = $this->getPerPage($request);
 
         $disbursements = $this->disbursementService->getAllDisbursements($filters, $perPage);
 
@@ -163,7 +163,7 @@ class DisbursementController extends Controller
      */
     public function pending(Request $request): JsonResponse
     {
-        $perPage = $request->input('per_page', 15);
+        $perPage = $this->getPerPage($request);
         $disbursements = $this->disbursementService->getPendingDisbursements($perPage);
 
         return response()->json($disbursements);

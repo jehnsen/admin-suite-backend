@@ -32,7 +32,7 @@ class BudgetController extends Controller
                 'quarter',
                 'search'
             ]);
-            $perPage = $request->input('per_page', 15);
+            $perPage = $this->getPerPage($request);
 
             $budgets = $this->budgetService->getAllBudgets($filters, $perPage);
 
@@ -165,7 +165,7 @@ class BudgetController extends Controller
     public function active(Request $request): JsonResponse
     {
         try {
-            $perPage = $request->input('per_page', 15);
+            $perPage = $this->getPerPage($request);
             $budgets = $this->budgetService->getActiveBudgets($perPage);
 
             return response()->json($budgets);
@@ -180,7 +180,7 @@ class BudgetController extends Controller
     public function byFiscalYear(Request $request, int $year): JsonResponse
     {
         try {
-            $perPage = $request->input('per_page', 15);
+            $perPage = $this->getPerPage($request);
             $budgets = $this->budgetService->getBudgetsByFiscalYear($year, $perPage);
 
             return response()->json($budgets);
@@ -195,7 +195,7 @@ class BudgetController extends Controller
     public function byFundSource(Request $request, string $fundSource): JsonResponse
     {
         try {
-            $perPage = $request->input('per_page', 15);
+            $perPage = $this->getPerPage($request);
             $budgets = $this->budgetService->getBudgetsByFundSource($fundSource, $perPage);
 
             return response()->json($budgets);

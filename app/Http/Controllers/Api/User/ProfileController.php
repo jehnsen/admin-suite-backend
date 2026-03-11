@@ -147,7 +147,7 @@ class ProfileController extends Controller
                 ]);
             }
 
-            $perPage = $request->input('per_page', 10);
+            $perPage = $this->getPerPage($request, 10);
 
             // Get recent leave requests
             $leaveRequests = $employee->leaveRequests()

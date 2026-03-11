@@ -83,6 +83,18 @@ class RoleAndPermissionSeeder extends Seeder
             'create_expense',
             'approve_expense',
 
+            // Supplier Management
+            'view_suppliers',
+            'create_suppliers',
+            'edit_suppliers',
+            'delete_suppliers',
+
+            // Training Management
+            'view_trainings',
+            'create_trainings',
+            'edit_trainings',
+            'delete_trainings',
+
             // Reports
             'view_reports',
             'export_reports',
@@ -120,6 +132,8 @@ class RoleAndPermissionSeeder extends Seeder
             'view_budget',
             'view_expenses',
             'approve_expense',
+            'view_suppliers',
+            'view_trainings',
             'view_reports',
             'export_reports',
         ]);
@@ -165,6 +179,14 @@ class RoleAndPermissionSeeder extends Seeder
             'edit_budget',
             'view_expenses',
             'create_expense',
+            'view_suppliers',
+            'create_suppliers',
+            'edit_suppliers',
+            'delete_suppliers',
+            'view_trainings',
+            'create_trainings',
+            'edit_trainings',
+            'delete_trainings',
             'view_reports',
             'export_reports',
         ]);
@@ -176,6 +198,7 @@ class RoleAndPermissionSeeder extends Seeder
             'create_leave_request',
             'view_leave_requests', // Own only
             'view_attendance', // Own records only
+            'view_trainings', // Can view own training records
         ]);
 
         $this->command->info('Roles and permissions created successfully!');

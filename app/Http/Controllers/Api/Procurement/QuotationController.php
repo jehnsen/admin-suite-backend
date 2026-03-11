@@ -25,7 +25,7 @@ class QuotationController extends Controller
     public function index(Request $request): JsonResponse
     {
         $filters = $request->only(['purchase_request_id', 'supplier_id', 'status', 'is_selected']);
-        $perPage = $request->input('per_page', 15);
+        $perPage = $this->getPerPage($request);
 
         $quotations = $this->quotationService->getAllQuotations($filters, $perPage);
 

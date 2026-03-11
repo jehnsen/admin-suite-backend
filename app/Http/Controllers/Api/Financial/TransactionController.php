@@ -54,7 +54,7 @@ class TransactionController extends Controller
                 });
             }
 
-            $perPage = $request->input('per_page', 15);
+            $perPage = $this->getPerPage($request);
             $transactions = $query->latest('transaction_date')->paginate($perPage);
 
             return response()->json($transactions);

@@ -24,7 +24,7 @@ class CashAdvanceController extends Controller
     public function index(Request $request): JsonResponse
     {
         $filters = $request->only(['employee_id', 'status', 'purpose', 'date_from', 'date_to']);
-        $perPage = $request->input('per_page', 15);
+        $perPage = $this->getPerPage($request);
 
         $cashAdvances = $this->cashAdvanceService->getAllCashAdvances($filters, $perPage);
 
@@ -140,7 +140,7 @@ class CashAdvanceController extends Controller
      */
     public function pending(Request $request): JsonResponse
     {
-        $perPage = $request->input('per_page', 15);
+        $perPage = $this->getPerPage($request);
         $cashAdvances = $this->cashAdvanceService->getPendingCashAdvances($perPage);
 
         return response()->json($cashAdvances);
@@ -151,7 +151,7 @@ class CashAdvanceController extends Controller
      */
     public function overdue(Request $request): JsonResponse
     {
-        $perPage = $request->input('per_page', 15);
+        $perPage = $this->getPerPage($request);
         $cashAdvances = $this->cashAdvanceService->getOverdueCashAdvances($perPage);
 
         return response()->json($cashAdvances);
