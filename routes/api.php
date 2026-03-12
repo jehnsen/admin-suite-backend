@@ -48,7 +48,7 @@ Route::prefix('auth')->group(function () {
     // Admin Officer creates user accounts via /users endpoint
     // Route::post('/register', [RegisterController::class, 'register']);
 
-    Route::post('/login', [LoginController::class, 'login']);
+    Route::post('/login', [LoginController::class, 'login'])->middleware('throttle:login');
 });
 
 // Protected routes (require authentication only)
@@ -198,62 +198,66 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
     // Procurement - Purchase Requests
-    Route::prefix('purchase-requests')->group(function () {
+    Route::prefix('purchase-requests')->middleware('permission:view_purchase_requests')->group(function () {
         Route::get('/', [PurchaseRequestController::class, 'index']);
-        Route::post('/', [PurchaseRequestController::class, 'store']);
         Route::get('/pending', [PurchaseRequestController::class, 'pending']);
         Route::get('/statistics', [PurchaseRequestController::class, 'statistics']);
         Route::get('/{id}', [PurchaseRequestController::class, 'show']);
-        Route::put('/{id}', [PurchaseRequestController::class, 'update']);
-        Route::delete('/{id}', [PurchaseRequestController::class, 'destroy']);
-        Route::put('/{id}/submit', [PurchaseRequestController::class, 'submit']);
-        Route::put('/{id}/recommend', [PurchaseRequestController::class, 'recommend']);
-        Route::put('/{id}/approve', [PurchaseRequestController::class, 'approve']);
-        Route::put('/{id}/disapprove', [PurchaseRequestController::class, 'disapprove']);
-        Route::put('/{id}/cancel', [PurchaseRequestController::class, 'cancel']);
+
+        Route::post('/', [PurchaseRequestController::class, 'store'])->middleware('permission:create_purchase_requests');
+        Route::put('/{id}', [PurchaseRequestController::class, 'update'])->middleware('permission:edit_purchase_requests');
+        Route::delete('/{id}', [PurchaseRequestController::class, 'destroy'])->middleware('permission:delete_purchase_requests');
+        Route::put('/{id}/submit', [PurchaseRequestController::class, 'submit'])->middleware('permission:submit_purchase_request');
+        Route::put('/{id}/recommend', [PurchaseRequestController::class, 'recommend'])->middleware('permission:recommend_purchase_request');
+        Route::put('/{id}/approve', [PurchaseRequestController::class, 'approve'])->middleware('permission:approve_purchase_request');
+        Route::put('/{id}/disapprove', [PurchaseRequestController::class, 'disapprove'])->middleware('permission:approve_purchase_request');
+        Route::put('/{id}/cancel', [PurchaseRequestController::class, 'cancel']); // No extra permission - policy handles this
     });
 
     // Procurement - Quotations
-    Route::prefix('quotations')->group(function () {
+    Route::prefix('quotations')->middleware('permission:view_quotations')->group(function () {
         Route::get('/', [QuotationController::class, 'index']);
-        Route::post('/', [QuotationController::class, 'store']);
         Route::get('/purchase-request/{prId}', [QuotationController::class, 'byPurchaseRequest']);
         Route::get('/{id}', [QuotationController::class, 'show']);
-        Route::put('/{id}', [QuotationController::class, 'update']);
-        Route::delete('/{id}', [QuotationController::class, 'destroy']);
-        Route::put('/{id}/select', [QuotationController::class, 'select']);
-        Route::put('/purchase-request/{prId}/evaluate', [QuotationController::class, 'evaluate']);
+
+        Route::post('/', [QuotationController::class, 'store'])->middleware('permission:create_quotations');
+        Route::put('/{id}', [QuotationController::class, 'update'])->middleware('permission:edit_quotations');
+        Route::delete('/{id}', [QuotationController::class, 'destroy'])->middleware('permission:delete_quotations');
+        Route::put('/{id}/select', [QuotationController::class, 'select'])->middleware('permission:evaluate_quotations');
+        Route::put('/purchase-request/{prId}/evaluate', [QuotationController::class, 'evaluate'])->middleware('permission:evaluate_quotations');
     });
 
     // Procurement - Purchase Orders
-    Route::prefix('purchase-orders')->group(function () {
+    Route::prefix('purchase-orders')->middleware('permission:view_purchase_orders')->group(function () {
         Route::get('/', [PurchaseOrderController::class, 'index']);
-        Route::post('/', [PurchaseOrderController::class, 'store']);
         Route::get('/pending', [PurchaseOrderController::class, 'pending']);
         Route::get('/statistics', [PurchaseOrderController::class, 'statistics']);
         Route::get('/{id}', [PurchaseOrderController::class, 'show']);
-        Route::put('/{id}', [PurchaseOrderController::class, 'update']);
-        Route::delete('/{id}', [PurchaseOrderController::class, 'destroy']);
-        Route::put('/{id}/approve', [PurchaseOrderController::class, 'approve']);
-        Route::put('/{id}/send-to-supplier', [PurchaseOrderController::class, 'sendToSupplier']);
-        Route::put('/{id}/cancel', [PurchaseOrderController::class, 'cancel']);
+
+        Route::post('/', [PurchaseOrderController::class, 'store'])->middleware('permission:create_purchase_orders');
+        Route::put('/{id}', [PurchaseOrderController::class, 'update'])->middleware('permission:edit_purchase_orders');
+        Route::delete('/{id}', [PurchaseOrderController::class, 'destroy'])->middleware('permission:delete_purchase_orders');
+        Route::put('/{id}/approve', [PurchaseOrderController::class, 'approve'])->middleware('permission:approve_purchase_orders');
+        Route::put('/{id}/send-to-supplier', [PurchaseOrderController::class, 'sendToSupplier'])->middleware('permission:approve_purchase_orders');
+        Route::put('/{id}/cancel', [PurchaseOrderController::class, 'cancel']); // No extra permission - policy handles this
     });
 
     // Procurement - Deliveries
-    Route::prefix('deliveries')->group(function () {
+    Route::prefix('deliveries')->middleware('permission:view_deliveries')->group(function () {
         Route::get('/', [DeliveryController::class, 'index']);
-        Route::post('/', [DeliveryController::class, 'store']);
         Route::get('/pending', [DeliveryController::class, 'pending']);
         Route::get('/statistics', [DeliveryController::class, 'statistics']);
         Route::get('/purchase-order/{poId}', [DeliveryController::class, 'byPurchaseOrder']);
         Route::get('/{id}', [DeliveryController::class, 'show']);
-        Route::put('/{id}', [DeliveryController::class, 'update']);
-        Route::delete('/{id}', [DeliveryController::class, 'destroy']);
-        Route::put('/{id}/inspect', [DeliveryController::class, 'inspect']);
-        Route::put('/{id}/accept', [DeliveryController::class, 'accept']);
-        Route::put('/{id}/reject', [DeliveryController::class, 'reject']);
         Route::get('/{id}/pending-assets', [DeliveryAssetTaggingController::class, 'getPendingAssets']);
-        Route::post('/{id}/tag-assets', [DeliveryAssetTaggingController::class, 'tagAssets']);
+
+        Route::post('/', [DeliveryController::class, 'store'])->middleware('permission:create_deliveries');
+        Route::put('/{id}', [DeliveryController::class, 'update'])->middleware('permission:edit_deliveries');
+        Route::delete('/{id}', [DeliveryController::class, 'destroy'])->middleware('permission:delete_deliveries');
+        Route::put('/{id}/inspect', [DeliveryController::class, 'inspect'])->middleware('permission:inspect_deliveries');
+        Route::put('/{id}/accept', [DeliveryController::class, 'accept'])->middleware('permission:accept_deliveries');
+        Route::put('/{id}/reject', [DeliveryController::class, 'reject'])->middleware('permission:accept_deliveries');
+        Route::post('/{id}/tag-assets', [DeliveryAssetTaggingController::class, 'tagAssets'])->middleware('permission:tag_delivery_assets');
     });
 
     // Inventory Management - Inventory Items
@@ -400,25 +404,27 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
     // Shared Module - Document Management
-    Route::prefix('documents')->group(function () {
-        Route::post('/upload', [DocumentController::class, 'upload']);
+    Route::prefix('documents')->middleware('permission:view_documents')->group(function () {
         Route::get('/', [DocumentController::class, 'index']);
         Route::get('/{id}', [DocumentController::class, 'show']);
         Route::get('/{id}/download', [DocumentController::class, 'download'])
             ->middleware('signed')  // Require signed URL for download (security for sensitive docs)
             ->name('documents.download');
-        Route::delete('/{id}', [DocumentController::class, 'destroy']);
+
+        Route::post('/upload', [DocumentController::class, 'upload'])->middleware('permission:upload_documents');
+        Route::delete('/{id}', [DocumentController::class, 'destroy'])->middleware('permission:delete_documents');
     });
 
     // Shared Module - Audit Trail
-    Route::prefix('audit')->group(function () {
+    Route::prefix('audit')->middleware('permission:view_audit_logs')->group(function () {
         Route::get('/logs', [AuditController::class, 'index']);
         Route::get('/entity-history', [AuditController::class, 'entityHistory']);
         Route::get('/report', [AuditController::class, 'report']);
         Route::get('/my-activity', [AuditController::class, 'myActivity']);
         Route::get('/module/{module}', [AuditController::class, 'byModule']);
-        Route::get('/export', [AuditController::class, 'export']);
         Route::get('/{id}', [AuditController::class, 'show']);
+
+        Route::get('/export', [AuditController::class, 'export'])->middleware('permission:export_audit_logs');
     });
 });
 
