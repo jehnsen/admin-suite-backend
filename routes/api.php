@@ -93,7 +93,15 @@ Route::middleware(['auth:sanctum', 'throttle:api'])->group(function () {
         Route::delete('/{id}', [UserManagementController::class, 'destroy'])->middleware('permission:delete_users');
         Route::post('/{id}/reset-password', [UserManagementController::class, 'resetPassword'])->middleware('permission:reset_user_password');
         Route::post('/{id}/assign-role', [UserManagementController::class, 'assignRole'])->middleware('permission:manage_user_roles');
+
+        // Direct permission management
+        Route::put('/{id}/permissions', [UserManagementController::class, 'syncPermissions'])->middleware('permission:manage_user_permissions');
+        Route::post('/{id}/permissions/give', [UserManagementController::class, 'givePermissions'])->middleware('permission:manage_user_permissions');
+        Route::post('/{id}/permissions/revoke', [UserManagementController::class, 'revokePermissions'])->middleware('permission:manage_user_permissions');
     });
+
+    // Admin - List all system permissions
+    Route::get('/permissions', [UserManagementController::class, 'listPermissions'])->middleware('permission:manage_user_permissions');
 
     // HR Management - Employees
     Route::prefix('employees')->middleware('permission:view_employees')->group(function () {

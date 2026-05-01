@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rules\Password;
+use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 
 /**
@@ -421,6 +422,160 @@ class UserManagementController extends Controller
                 'roles' => $user->getRoleNames(),
             ],
         ]);
+    }
+
+    /**
+     * List All Permissions
+     *
+     * Get all permissions defined in the system, grouped by module.
+     *
+     * @response 200 {
+     *   "data": ["view_employees", "create_leave_request", ...]
+     * }
+     */
+    public function listPermissions(): JsonResponse
+    {
+        $permissions = Permission::orderBy('name')->pluck('name');
+
+        return response()->json(['data' => $permissions]);
+    }
+
+    /**
+     * Sync User Permissions
+     *
+     * Replace all direct permissions for a user with the provided list.
+     * Role-based permissions are unaffected — this only manages the user's
+     * individual overrides on top of their role.
+     *
+     * @urlParam id integer required User ID. Example: 5
+     * @bodyParam permissions array required List of permission names to assign directly. Example: ["view_employees","create_leave_request"]
+     *
+     * @response 200 {
+     *   "message": "Permissions updated successfully.",
+     *   "direct_permissions": ["view_employees", "create_leave_request"],
+     *   "all_permissions": ["view_employees", "create_leave_request", "view_audit_logs"]
+     * }
+     */
+    public function syncPermissions(Request $request, int $id): JsonResponse
+    {
+        $user = User::findOrFail($id);
+
+        if ($user->hasRole('Super Admin') && !auth()->user()->hasRole('Super Admin')) {
+            return response()->json(['message' => 'You cannot modify Super Admin accounts.'], 403);
+        }
+
+        $validated = $request->validate([
+            'permissions'   => 'required|array',
+            'permissions.*' => 'string|exists:permissions,name',
+        ]);
+
+        $this->preventPrivilegeEscalation($validated['permissions']);
+
+        $user->syncPermissions($validated['permissions']);
+
+        return response()->json([
+            'message'          => 'Permissions updated successfully.',
+            'direct_permissions' => $user->getDirectPermissions()->pluck('name'),
+            'all_permissions'  => $user->getAllPermissions()->pluck('name'),
+        ]);
+    }
+
+    /**
+     * Give Permissions
+     *
+     * Add specific permissions to a user without affecting their existing direct permissions.
+     *
+     * @urlParam id integer required User ID. Example: 5
+     * @bodyParam permissions array required Permissions to add. Example: ["export_reports"]
+     *
+     * @response 200 {
+     *   "message": "Permissions granted successfully.",
+     *   "direct_permissions": ["create_leave_request", "export_reports"],
+     *   "all_permissions": ["view_employees", "create_leave_request", "export_reports"]
+     * }
+     */
+    public function givePermissions(Request $request, int $id): JsonResponse
+    {
+        $user = User::findOrFail($id);
+
+        if ($user->hasRole('Super Admin') && !auth()->user()->hasRole('Super Admin')) {
+            return response()->json(['message' => 'You cannot modify Super Admin accounts.'], 403);
+        }
+
+        $validated = $request->validate([
+            'permissions'   => 'required|array|min:1',
+            'permissions.*' => 'string|exists:permissions,name',
+        ]);
+
+        $this->preventPrivilegeEscalation($validated['permissions']);
+
+        $user->givePermissionTo($validated['permissions']);
+
+        return response()->json([
+            'message'          => 'Permissions granted successfully.',
+            'direct_permissions' => $user->getDirectPermissions()->pluck('name'),
+            'all_permissions'  => $user->getAllPermissions()->pluck('name'),
+        ]);
+    }
+
+    /**
+     * Revoke Permissions
+     *
+     * Remove specific direct permissions from a user.
+     * Only directly assigned permissions can be revoked; role-based permissions
+     * must be managed by changing the user's role.
+     *
+     * @urlParam id integer required User ID. Example: 5
+     * @bodyParam permissions array required Permissions to revoke. Example: ["export_reports"]
+     *
+     * @response 200 {
+     *   "message": "Permissions revoked successfully.",
+     *   "direct_permissions": ["create_leave_request"],
+     *   "all_permissions": ["view_employees", "create_leave_request"]
+     * }
+     */
+    public function revokePermissions(Request $request, int $id): JsonResponse
+    {
+        $user = User::findOrFail($id);
+
+        if ($user->hasRole('Super Admin') && !auth()->user()->hasRole('Super Admin')) {
+            return response()->json(['message' => 'You cannot modify Super Admin accounts.'], 403);
+        }
+
+        $validated = $request->validate([
+            'permissions'   => 'required|array|min:1',
+            'permissions.*' => 'string|exists:permissions,name',
+        ]);
+
+        foreach ($validated['permissions'] as $permission) {
+            $user->revokePermissionTo($permission);
+        }
+
+        return response()->json([
+            'message'          => 'Permissions revoked successfully.',
+            'direct_permissions' => $user->getDirectPermissions()->pluck('name'),
+            'all_permissions'  => $user->getAllPermissions()->pluck('name'),
+        ]);
+    }
+
+    /**
+     * Prevent a caller from granting permissions they do not themselves possess.
+     * Super Admins are exempt (they have all permissions).
+     */
+    private function preventPrivilegeEscalation(array $permissions): void
+    {
+        $caller = auth()->user();
+
+        if ($caller->hasRole('Super Admin')) {
+            return;
+        }
+
+        $callerPermissions = $caller->getAllPermissions()->pluck('name');
+        $disallowed = array_diff($permissions, $callerPermissions->toArray());
+
+        if (!empty($disallowed)) {
+            abort(403, 'You cannot grant permissions you do not have: ' . implode(', ', $disallowed));
+        }
     }
 
     /**
