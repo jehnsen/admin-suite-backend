@@ -10,7 +10,7 @@ use Illuminate\Http\Request;
 
 class DocumentController extends Controller
 {
-    protected $documentService;
+    protected DocumentService $documentService;
 
     public function __construct(DocumentService $documentService)
     {
@@ -33,9 +33,9 @@ class DocumentController extends Controller
                 'data' => $document->load('uploadedBy'),
             ], 201);
         } catch (\Exception $e) {
+            report($e);
             return response()->json([
                 'message' => 'Failed to upload document.',
-                'error' => $e->getMessage(),
             ], 500);
         }
     }
@@ -106,10 +106,10 @@ class DocumentController extends Controller
 
             return $this->documentService->downloadDocument($id);
         } catch (\Exception $e) {
+            report($e);
             return response()->json([
                 'message' => 'Failed to download document.',
-                'error' => $e->getMessage(),
-            ], 404);
+            ], 500);
         }
     }
 

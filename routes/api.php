@@ -51,8 +51,8 @@ Route::prefix('auth')->group(function () {
     Route::post('/login', [LoginController::class, 'login'])->middleware('throttle:login');
 });
 
-// Protected routes (require authentication only)
-Route::middleware('auth:sanctum')->group(function () {
+// Protected routes (require authentication + global rate limiting)
+Route::middleware(['auth:sanctum', 'throttle:api'])->group(function () {
     // Authentication
     Route::post('/auth/logout', [LogoutController::class, 'logout']);
 
@@ -162,7 +162,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::put('/{id}', [AttendanceRecordController::class, 'update'])->middleware('permission:edit_attendance');
         Route::put('/{id}/approve', [AttendanceRecordController::class, 'approve'])->middleware('permission:approve_attendance');
 
-        Route::delete('/{id}', [AttendanceRecordController::class, 'destroy'])->middleware('permission:edit_attendance');
+        Route::delete('/{id}', [AttendanceRecordController::class, 'destroy'])->middleware('permission:delete_attendance');
     });
 
     // HR Management - Service Credits
@@ -176,12 +176,12 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/', [ServiceCreditController::class, 'store'])->middleware('permission:create_service_credits');
         Route::post('/apply-offset', [ServiceCreditController::class, 'applyOffset'])->middleware('permission:apply_service_credit_offset');
 
-        Route::put('/{id}', [ServiceCreditController::class, 'update'])->middleware('permission:create_service_credits');
+        Route::put('/{id}', [ServiceCreditController::class, 'update'])->middleware('permission:edit_service_credits');
         Route::put('/{id}/approve', [ServiceCreditController::class, 'approve'])->middleware('permission:approve_service_credits');
         Route::put('/{id}/reject', [ServiceCreditController::class, 'reject'])->middleware('permission:approve_service_credits');
         Route::put('/offsets/{offsetId}/revert', [ServiceCreditController::class, 'revertOffset'])->middleware('permission:apply_service_credit_offset');
 
-        Route::delete('/{id}', [ServiceCreditController::class, 'destroy'])->middleware('permission:create_service_credits');
+        Route::delete('/{id}', [ServiceCreditController::class, 'destroy'])->middleware('permission:delete_service_credits');
     });
 
     // Procurement - Suppliers
@@ -296,8 +296,8 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/', [InventoryAdjustmentController::class, 'store'])->middleware('permission:create_inventory');
         Route::put('/{id}', [InventoryAdjustmentController::class, 'update'])->middleware('permission:edit_inventory');
         Route::delete('/{id}', [InventoryAdjustmentController::class, 'destroy'])->middleware('permission:delete_inventory');
-        Route::put('/{id}/approve', [InventoryAdjustmentController::class, 'approve'])->middleware('permission:edit_inventory');
-        Route::put('/{id}/reject', [InventoryAdjustmentController::class, 'reject'])->middleware('permission:edit_inventory');
+        Route::put('/{id}/approve', [InventoryAdjustmentController::class, 'approve'])->middleware('permission:approve_inventory_adjustments');
+        Route::put('/{id}/reject', [InventoryAdjustmentController::class, 'reject'])->middleware('permission:approve_inventory_adjustments');
     });
 
     // Inventory Management - Physical Counts
@@ -324,7 +324,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
         Route::post('/', [BudgetController::class, 'store'])->middleware('permission:create_budget');
         Route::put('/{id}', [BudgetController::class, 'update'])->middleware('permission:edit_budget');
-        Route::delete('/{id}', [BudgetController::class, 'destroy'])->middleware('permission:edit_budget');
+        Route::delete('/{id}', [BudgetController::class, 'destroy'])->middleware('permission:delete_budget');
         Route::put('/{id}/approve', [BudgetController::class, 'approve'])->middleware('permission:approve_budget');
         Route::put('/{id}/activate', [BudgetController::class, 'activate'])->middleware('permission:approve_budget');
         Route::put('/{id}/close', [BudgetController::class, 'close'])->middleware('permission:approve_budget');
@@ -341,7 +341,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
         Route::post('/', [BudgetController::class, 'store'])->middleware('permission:create_budget');
         Route::put('/{id}', [BudgetController::class, 'update'])->middleware('permission:edit_budget');
-        Route::delete('/{id}', [BudgetController::class, 'destroy'])->middleware('permission:edit_budget');
+        Route::delete('/{id}', [BudgetController::class, 'destroy'])->middleware('permission:delete_budget');
     });
 
     // Financial Management - Cash Advances

@@ -35,5 +35,14 @@ class AppServiceProvider extends ServiceProvider
             ->response(fn () => response()->json([
                 'message' => 'Too many login attempts. Please try again in a minute.',
             ], 429)));
+
+        // Rate limiter: max 120 authenticated API requests per minute per user+IP
+        RateLimiter::for('api', fn (Request $request) => Limit::perMinute(
+            (int) env('RATE_LIMIT_PER_MINUTE', 120)
+        )
+            ->by(($request->user()?->id ?: 'guest') . '|' . $request->ip())
+            ->response(fn () => response()->json([
+                'message' => 'Too many requests. Please slow down.',
+            ], 429)));
     }
 }

@@ -9,7 +9,7 @@ use Illuminate\Http\Request;
 
 class AuditController extends Controller
 {
-    protected $auditService;
+    protected AuditService $auditService;
 
     public function __construct(AuditService $auditService)
     {
@@ -43,18 +43,21 @@ class AuditController extends Controller
      */
     public function entityHistory(Request $request): JsonResponse
     {
+        $allowed = [
+            'Employee', 'User', 'LeaveRequest', 'ServiceRecord', 'Training',
+            'AttendanceRecord', 'ServiceCredit', 'Supplier', 'PurchaseRequest',
+            'Quotation', 'PurchaseOrder', 'Delivery', 'InventoryItem', 'StockCard',
+            'InventoryAdjustment', 'PhysicalCount', 'Budget', 'CashAdvance',
+            'Disbursement', 'Liquidation', 'Transaction', 'Document',
+        ];
+
         $request->validate([
-            'type' => 'required|string',
+            'type' => ['required', 'string', 'in:' . implode(',', $allowed)],
             'id' => 'required|integer',
         ]);
 
-        $type = $request->input('type');
+        $type = "App\\Models\\{$request->input('type')}";
         $id = $request->input('id');
-
-        // Convert short type to full class name if needed
-        if (!str_contains($type, '\\')) {
-            $type = "App\\Models\\{$type}";
-        }
 
         $history = $this->auditService->getEntityHistory($type, $id);
 
@@ -86,7 +89,7 @@ class AuditController extends Controller
      */
     public function myActivity(Request $request): JsonResponse
     {
-        $perPage = $request->input('per_page', 50);
+        $perPage = $this->getPerPage($request, 50);
         $logs = $this->auditService->getUserActivity($request->user()->id, $perPage);
 
         return response()->json($logs);
@@ -97,11 +100,13 @@ class AuditController extends Controller
      */
     public function byModule(Request $request, string $module): JsonResponse
     {
-        $request->validate([
-            'per_page' => 'nullable|integer|min:1|max:100',
-        ]);
+        $allowedModules = ['HR', 'Procurement', 'Financial', 'Inventory', 'System'];
 
-        $perPage = $request->input('per_page', 50);
+        if (!in_array($module, $allowedModules, true)) {
+            return response()->json(['message' => 'Invalid module specified.'], 422);
+        }
+
+        $perPage = $this->getPerPage($request, 50);
         $logs = $this->auditService->getModuleActivity($module, $perPage);
 
         return response()->json($logs);

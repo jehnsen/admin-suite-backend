@@ -142,10 +142,10 @@ class AttendanceRecordController extends Controller
             ], 201);
 
         } catch (\Exception $e) {
+            report($e);
             return response()->json([
                 'message' => 'Failed to create attendance record.',
-                'error' => $e->getMessage(),
-            ], 422);
+            ], 500);
         }
     }
 
@@ -173,10 +173,10 @@ class AttendanceRecordController extends Controller
             ]);
 
         } catch (\Exception $e) {
+            report($e);
             return response()->json([
                 'message' => 'Failed to update attendance record.',
-                'error' => $e->getMessage(),
-            ], 422);
+            ], 500);
         }
     }
 
@@ -203,10 +203,10 @@ class AttendanceRecordController extends Controller
             ]);
 
         } catch (\Exception $e) {
+            report($e);
             return response()->json([
                 'message' => 'Failed to delete attendance record.',
-                'error' => $e->getMessage(),
-            ], 422);
+            ], 500);
         }
     }
 
@@ -235,10 +235,10 @@ class AttendanceRecordController extends Controller
             ]);
 
         } catch (\Exception $e) {
+            report($e);
             return response()->json([
                 'message' => 'Failed to approve attendance record.',
-                'error' => $e->getMessage(),
-            ], 422);
+            ], 500);
         }
     }
 
@@ -268,10 +268,10 @@ class AttendanceRecordController extends Controller
             ], $statusCode);
 
         } catch (\Exception $e) {
+            report($e);
             return response()->json([
                 'message' => 'CSV import failed.',
-                'error' => $e->getMessage(),
-            ], 422);
+            ], 500);
         }
     }
 

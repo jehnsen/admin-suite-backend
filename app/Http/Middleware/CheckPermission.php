@@ -17,8 +17,7 @@ class CheckPermission
     {
         if (!$request->user() || !$request->user()->hasPermissionTo($permission)) {
             return response()->json([
-                'message' => 'This action is unauthorized. You do not have the required permission.',
-                'required_permission' => $permission
+                'message' => 'This action is unauthorized.',
             ], 403);
         }
 
