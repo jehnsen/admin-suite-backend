@@ -70,7 +70,6 @@ class DashboardController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'message' => 'Failed to retrieve dashboard metrics.',
-                'error' => $e->getMessage()
             ], 500);
         }
     }
@@ -106,7 +105,6 @@ class DashboardController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'message' => 'Failed to retrieve expiring budgets.',
-                'error' => $e->getMessage()
             ], 500);
         }
     }
@@ -146,7 +144,6 @@ class DashboardController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'message' => 'Failed to retrieve critical stock items.',
-                'error' => $e->getMessage()
             ], 500);
         }
     }
@@ -189,7 +186,6 @@ class DashboardController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'message' => 'Failed to retrieve step increments due.',
-                'error' => $e->getMessage()
             ], 500);
         }
     }

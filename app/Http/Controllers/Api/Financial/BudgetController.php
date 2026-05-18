@@ -38,7 +38,8 @@ class BudgetController extends Controller
 
             return response()->json($budgets);
         } catch (\Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 500);
+            report($e);
+            return response()->json(['message' => 'An unexpected error occurred. Please try again.'], 500);
         }
     }
 
@@ -57,7 +58,8 @@ class BudgetController extends Controller
 
             return response()->json(['data' => $budget]);
         } catch (\Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 500);
+            report($e);
+            return response()->json(['message' => 'An unexpected error occurred. Please try again.'], 500);
         }
     }
 
@@ -74,7 +76,8 @@ class BudgetController extends Controller
                 'data' => $budget,
             ], 201);
         } catch (\Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 500);
+            report($e);
+            return response()->json(['message' => 'An unexpected error occurred. Please try again.'], 500);
         }
     }
 
@@ -92,7 +95,8 @@ class BudgetController extends Controller
                 'data' => $budget,
             ]);
         } catch (\Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 500);
+            report($e);
+            return response()->json(['message' => 'An unexpected error occurred. Please try again.'], 500);
         }
     }
 
@@ -107,7 +111,8 @@ class BudgetController extends Controller
 
             return response()->json(['message' => 'Budget deleted successfully.']);
         } catch (\Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 500);
+            report($e);
+            return response()->json(['message' => 'An unexpected error occurred. Please try again.'], 500);
         }
     }
 
@@ -125,7 +130,8 @@ class BudgetController extends Controller
                 'data' => $budget,
             ]);
         } catch (\Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 500);
+            report($e);
+            return response()->json(['message' => 'An unexpected error occurred. Please try again.'], 500);
         }
     }
 
@@ -143,7 +149,8 @@ class BudgetController extends Controller
                 'data' => $budget,
             ]);
         } catch (\Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 500);
+            report($e);
+            return response()->json(['message' => 'An unexpected error occurred. Please try again.'], 500);
         }
     }
 
@@ -161,7 +168,8 @@ class BudgetController extends Controller
                 'data' => $budget,
             ]);
         } catch (\Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 500);
+            report($e);
+            return response()->json(['message' => 'An unexpected error occurred. Please try again.'], 500);
         }
     }
 
@@ -176,7 +184,8 @@ class BudgetController extends Controller
 
             return response()->json($budgets);
         } catch (\Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 500);
+            report($e);
+            return response()->json(['message' => 'An unexpected error occurred. Please try again.'], 500);
         }
     }
 
@@ -191,7 +200,8 @@ class BudgetController extends Controller
 
             return response()->json($budgets);
         } catch (\Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 500);
+            report($e);
+            return response()->json(['message' => 'An unexpected error occurred. Please try again.'], 500);
         }
     }
 
@@ -206,7 +216,8 @@ class BudgetController extends Controller
 
             return response()->json($budgets);
         } catch (\Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 500);
+            report($e);
+            return response()->json(['message' => 'An unexpected error occurred. Please try again.'], 500);
         }
     }
 
@@ -220,7 +231,8 @@ class BudgetController extends Controller
 
             return response()->json(['data' => $utilization]);
         } catch (\Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 500);
+            report($e);
+            return response()->json(['message' => 'An unexpected error occurred. Please try again.'], 500);
         }
     }
 
@@ -234,7 +246,8 @@ class BudgetController extends Controller
 
             return response()->json(['data' => $budgets]);
         } catch (\Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 500);
+            report($e);
+            return response()->json(['message' => 'An unexpected error occurred. Please try again.'], 500);
         }
     }
 
@@ -248,7 +261,8 @@ class BudgetController extends Controller
 
             return response()->json(['data' => $statistics]);
         } catch (\Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 500);
+            report($e);
+            return response()->json(['message' => 'An unexpected error occurred. Please try again.'], 500);
         }
     }
 
@@ -266,7 +280,8 @@ class BudgetController extends Controller
                 'data' => $budget,
             ]);
         } catch (\Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 500);
+            report($e);
+            return response()->json(['message' => 'An unexpected error occurred. Please try again.'], 500);
         }
     }
 }

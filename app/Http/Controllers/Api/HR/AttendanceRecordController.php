@@ -59,12 +59,13 @@ class AttendanceRecordController extends Controller
      * @queryParam date_to date End date. Example: 2025-02-28
      * @queryParam status string Filter by status. Example: Present
      */
-    public function byEmployee(Request $request, int $employeeId): AnonymousResourceCollection
+    public function byEmployee(Request $request, string $employeeId): AnonymousResourceCollection
     {
         $this->authorize('viewAny', AttendanceRecord::class);
 
+        $id = \App\Models\Employee::where('uuid', $employeeId)->value('id') ?? 0;
         $filters = $request->only(['date_from', 'date_to', 'status']);
-        $records = $this->attendanceService->getEmployeeAttendance($employeeId, $filters);
+        $records = $this->attendanceService->getEmployeeAttendance($id, $filters);
 
         return AttendanceRecordResource::collection($records);
     }
@@ -78,15 +79,16 @@ class AttendanceRecordController extends Controller
      * @queryParam year integer Year. Example: 2025
      * @queryParam month integer Month (1-12). Example: 2
      */
-    public function summary(Request $request, int $employeeId): JsonResponse
+    public function summary(Request $request, string $employeeId): JsonResponse
     {
         $this->authorize('viewAny', AttendanceRecord::class);
 
+        $id = \App\Models\Employee::where('uuid', $employeeId)->value('id') ?? 0;
         $year = $request->input('year', now()->year);
         $month = $request->input('month', now()->month);
 
         $summary = $this->attendanceService->getEmployeeAttendanceSummary(
-            $employeeId,
+            $id,
             $year,
             $month
         );

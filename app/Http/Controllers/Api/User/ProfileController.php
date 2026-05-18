@@ -30,7 +30,8 @@ class ProfileController extends Controller
                 ]
             ]);
         } catch (\Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 500);
+            report($e);
+            return response()->json(['message' => 'An unexpected error occurred. Please try again.'], 500);
         }
     }
 
@@ -53,7 +54,8 @@ class ProfileController extends Controller
                 'data' => $user->fresh(),
             ]);
         } catch (\Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 500);
+            report($e);
+            return response()->json(['message' => 'An unexpected error occurred. Please try again.'], 500);
         }
     }
 
@@ -86,7 +88,8 @@ class ProfileController extends Controller
                 'message' => 'Password changed successfully.'
             ]);
         } catch (\Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 500);
+            report($e);
+            return response()->json(['message' => 'An unexpected error occurred. Please try again.'], 500);
         }
     }
 
@@ -128,7 +131,8 @@ class ProfileController extends Controller
 
             return response()->json(['data' => $stats]);
         } catch (\Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 500);
+            report($e);
+            return response()->json(['message' => 'An unexpected error occurred. Please try again.'], 500);
         }
     }
 
@@ -185,7 +189,8 @@ class ProfileController extends Controller
 
             return response()->json(['data' => $activities]);
         } catch (\Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 500);
+            report($e);
+            return response()->json(['message' => 'An unexpected error occurred. Please try again.'], 500);
         }
     }
 }

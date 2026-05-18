@@ -59,7 +59,6 @@ class DeliveryAssetTaggingController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to retrieve pending assets',
-                'error' => $e->getMessage(),
             ], 500);
         }
     }
@@ -105,7 +104,6 @@ class DeliveryAssetTaggingController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to tag assets',
-                'error' => $e->getMessage(),
             ], 500);
         }
     }

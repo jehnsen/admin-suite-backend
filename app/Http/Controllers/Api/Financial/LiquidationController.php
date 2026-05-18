@@ -61,7 +61,7 @@ class LiquidationController extends Controller
             ], 201);
         } catch (\Exception $e) {
             report($e);
-            return response()->json(['message' => $e->getMessage()], 422);
+            return response()->json(['message' => 'An unexpected error occurred. Please try again.'], 500);
         }
     }
 
@@ -80,7 +80,7 @@ class LiquidationController extends Controller
             ]);
         } catch (\Exception $e) {
             report($e);
-            return response()->json(['message' => $e->getMessage()], 422);
+            return response()->json(['message' => 'An unexpected error occurred. Please try again.'], 500);
         }
     }
 
@@ -96,7 +96,7 @@ class LiquidationController extends Controller
             return response()->json(['message' => 'Liquidation deleted successfully.']);
         } catch (\Exception $e) {
             report($e);
-            return response()->json(['message' => $e->getMessage()], 422);
+            return response()->json(['message' => 'An unexpected error occurred. Please try again.'], 500);
         }
     }
 
@@ -115,7 +115,7 @@ class LiquidationController extends Controller
             ], 201);
         } catch (\Exception $e) {
             report($e);
-            return response()->json(['message' => $e->getMessage()], 422);
+            return response()->json(['message' => 'An unexpected error occurred. Please try again.'], 500);
         }
     }
 
@@ -135,7 +135,7 @@ class LiquidationController extends Controller
             ]);
         } catch (\Exception $e) {
             report($e);
-            return response()->json(['message' => $e->getMessage()], 422);
+            return response()->json(['message' => 'An unexpected error occurred. Please try again.'], 500);
         }
     }
 
@@ -162,7 +162,7 @@ class LiquidationController extends Controller
             ]);
         } catch (\Exception $e) {
             report($e);
-            return response()->json(['message' => $e->getMessage()], 422);
+            return response()->json(['message' => 'An unexpected error occurred. Please try again.'], 500);
         }
     }
 

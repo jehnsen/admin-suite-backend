@@ -31,7 +31,8 @@ class InventoryItemController extends Controller
 
             return response()->json($items);
         } catch (\Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 500);
+            report($e);
+            return response()->json(['message' => 'An unexpected error occurred. Please try again.'], 500);
         }
     }
 
@@ -50,7 +51,8 @@ class InventoryItemController extends Controller
 
             return response()->json(['data' => $item]);
         } catch (\Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 500);
+            report($e);
+            return response()->json(['message' => 'An unexpected error occurred. Please try again.'], 500);
         }
     }
 
@@ -69,7 +71,8 @@ class InventoryItemController extends Controller
 
             return response()->json(['data' => $data]);
         } catch (\Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 500);
+            report($e);
+            return response()->json(['message' => 'An unexpected error occurred. Please try again.'], 500);
         }
     }
 
@@ -86,7 +89,8 @@ class InventoryItemController extends Controller
                 'data' => $item,
             ], 201);
         } catch (\Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 500);
+            report($e);
+            return response()->json(['message' => 'An unexpected error occurred. Please try again.'], 500);
         }
     }
 
@@ -104,7 +108,8 @@ class InventoryItemController extends Controller
                 'data' => $item,
             ]);
         } catch (\Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 500);
+            report($e);
+            return response()->json(['message' => 'An unexpected error occurred. Please try again.'], 500);
         }
     }
 
@@ -123,7 +128,8 @@ class InventoryItemController extends Controller
 
             return response()->json(['message' => 'Inventory item deleted successfully.']);
         } catch (\Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 500);
+            report($e);
+            return response()->json(['message' => 'An unexpected error occurred. Please try again.'], 500);
         }
     }
 
@@ -144,7 +150,8 @@ class InventoryItemController extends Controller
 
             return response()->json($items);
         } catch (\Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 500);
+            report($e);
+            return response()->json(['message' => 'An unexpected error occurred. Please try again.'], 500);
         }
     }
 
@@ -158,7 +165,8 @@ class InventoryItemController extends Controller
 
             return response()->json(['data' => $items]);
         } catch (\Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 500);
+            report($e);
+            return response()->json(['message' => 'An unexpected error occurred. Please try again.'], 500);
         }
     }
 
@@ -173,7 +181,8 @@ class InventoryItemController extends Controller
 
             return response()->json(['data' => $items]);
         } catch (\Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 500);
+            report($e);
+            return response()->json(['message' => 'An unexpected error occurred. Please try again.'], 500);
         }
     }
 
@@ -187,7 +196,8 @@ class InventoryItemController extends Controller
 
             return response()->json(['data' => $stats]);
         } catch (\Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 500);
+            report($e);
+            return response()->json(['message' => 'An unexpected error occurred. Please try again.'], 500);
         }
     }
 }

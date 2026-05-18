@@ -57,13 +57,14 @@ class ServiceCreditController extends Controller
     /**
      * Get service credits for specific employee.
      */
-    public function byEmployee(int $employeeId, Request $request): AnonymousResourceCollection
+    public function byEmployee(string $employeeId, Request $request): AnonymousResourceCollection
     {
         $this->authorize('viewAny', ServiceCredit::class);
 
+        $id = \App\Models\Employee::where('uuid', $employeeId)->value('id') ?? 0;
         $filters = $request->only(['credit_type', 'status', 'work_date_from', 'work_date_to']);
 
-        $serviceCredits = $this->serviceCreditService->getEmployeeServiceCredits($employeeId, $filters);
+        $serviceCredits = $this->serviceCreditService->getEmployeeServiceCredits($id, $filters);
 
         return ServiceCreditResource::collection($serviceCredits);
     }
@@ -71,9 +72,11 @@ class ServiceCreditController extends Controller
     /**
      * Get service credit summary for employee.
      */
-    public function summary(int $employeeId): JsonResponse
+    public function summary(string $employeeId): JsonResponse
     {
         $this->authorize('viewAny', ServiceCredit::class);
+
+        $employeeId = \App\Models\Employee::where('uuid', $employeeId)->value('id') ?? 0;
 
         try {
             $summary = $this->serviceCreditService->getEmployeeServiceCreditSummary($employeeId);
@@ -85,7 +88,7 @@ class ServiceCreditController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => $e->getMessage()
+                'message' => 'An unexpected error occurred. Please try again.'
             ], 422);
         }
     }
@@ -122,7 +125,7 @@ class ServiceCreditController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => $e->getMessage()
+                'message' => 'An unexpected error occurred. Please try again.'
             ], 422);
         }
     }
@@ -154,7 +157,7 @@ class ServiceCreditController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => $e->getMessage()
+                'message' => 'An unexpected error occurred. Please try again.'
             ], 422);
         }
     }
@@ -185,7 +188,7 @@ class ServiceCreditController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => $e->getMessage()
+                'message' => 'An unexpected error occurred. Please try again.'
             ], 422);
         }
     }
@@ -225,7 +228,7 @@ class ServiceCreditController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => $e->getMessage()
+                'message' => 'An unexpected error occurred. Please try again.'
             ], 422);
         }
     }
@@ -265,7 +268,7 @@ class ServiceCreditController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => $e->getMessage()
+                'message' => 'An unexpected error occurred. Please try again.'
             ], 422);
         }
     }
@@ -291,7 +294,7 @@ class ServiceCreditController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => $e->getMessage()
+                'message' => 'An unexpected error occurred. Please try again.'
             ], 422);
         }
     }
@@ -322,7 +325,7 @@ class ServiceCreditController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => $e->getMessage()
+                'message' => 'An unexpected error occurred. Please try again.'
             ], 422);
         }
     }

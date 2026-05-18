@@ -79,7 +79,7 @@ class LeaveRequestController extends Controller
             ], 201);
         } catch (\Exception $e) {
             return response()->json([
-                'message' => $e->getMessage(),
+                'message' => 'An unexpected error occurred. Please try again.',
             ], 422);
         }
     }
@@ -206,7 +206,7 @@ class LeaveRequestController extends Controller
             ]);
         } catch (\Exception $e) {
             return response()->json([
-                'message' => $e->getMessage(),
+                'message' => 'An unexpected error occurred. Please try again.',
             ], 422);
         }
     }
@@ -287,7 +287,7 @@ class LeaveRequestController extends Controller
             ]);
         } catch (\Exception $e) {
             return response()->json([
-                'message' => $e->getMessage(),
+                'message' => 'An unexpected error occurred. Please try again.',
             ], 422);
         }
     }

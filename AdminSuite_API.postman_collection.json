@@ -1,14 +1,13 @@
 {
 	"info": {
-		"_postman_id": "adminsuite-api-2025",
-		"name": "AdminSuite API - DTR & Service Credits",
-		"description": "Complete API collection for AdminSuite ERP - DTR (Daily Time Record) and Service Credits Management System for Philippine Public Schools",
-		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "adminsuite"
+		"_postman_id": "adminsuite-api-2026",
+		"name": "AdminSuite API",
+		"description": "Complete API collection for AdminSuite ERP — Administrative Officer II, Department of Education.\n\n**Auth:** All protected endpoints require `Authorization: Bearer {{auth_token}}`. The Login request auto-saves the token.\n\n**IDs:** All resource `{id}` route parameters are UUIDs. Set the `uuid` collection variable to the UUID you want to test.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
 		{
-			"name": "Authentication",
+			"name": "Auth",
 			"item": [
 				{
 					"name": "Login",
@@ -18,8 +17,9 @@
 							"script": {
 								"exec": [
 									"if (pm.response.code === 200) {",
-									"    var jsonData = pm.response.json();",
-									"    pm.environment.set(\"auth_token\", jsonData.token);",
+									"    var json = pm.response.json();",
+									"    pm.collectionVariables.set('auth_token', json.token);",
+									"    pm.collectionVariables.set('user_id', json.user.id);",
 									"}"
 								],
 								"type": "text/javascript"
@@ -28,15 +28,10 @@
 					],
 					"request": {
 						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
+						"header": [{"key": "Content-Type", "value": "application/json"}],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"email\": \"admin@school.deped.gov.ph\",\n    \"password\": \"password123\"\n}"
+							"raw": "{\n    \"email\": \"admin@school.deped.gov.ph\",\n    \"password\": \"password\"\n}"
 						},
 						"url": {
 							"raw": "{{base_url}}/api/auth/login",
@@ -50,688 +45,11 @@
 					"name": "Logout",
 					"request": {
 						"method": "POST",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{auth_token}}"
-							}
-						],
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
 						"url": {
 							"raw": "{{base_url}}/api/auth/logout",
 							"host": ["{{base_url}}"],
 							"path": ["api", "auth", "logout"]
-						}
-					},
-					"response": []
-				}
-			]
-		},
-		{
-			"name": "Attendance Records (DTR)",
-			"item": [
-				{
-					"name": "List Attendance Records",
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{auth_token}}"
-							}
-						],
-						"url": {
-							"raw": "{{base_url}}/api/attendance-records?per_page=15&employee_id=&attendance_date_from=&attendance_date_to=&status=",
-							"host": ["{{base_url}}"],
-							"path": ["api", "attendance-records"],
-							"query": [
-								{
-									"key": "per_page",
-									"value": "15"
-								},
-								{
-									"key": "employee_id",
-									"value": ""
-								},
-								{
-									"key": "attendance_date_from",
-									"value": ""
-								},
-								{
-									"key": "attendance_date_to",
-									"value": ""
-								},
-								{
-									"key": "status",
-									"value": ""
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Get Attendance Statistics",
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{auth_token}}"
-							}
-						],
-						"url": {
-							"raw": "{{base_url}}/api/attendance-records/statistics",
-							"host": ["{{base_url}}"],
-							"path": ["api", "attendance-records", "statistics"]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Get Employee Attendance",
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{auth_token}}"
-							}
-						],
-						"url": {
-							"raw": "{{base_url}}/api/attendance-records/employee/1?month=2&year=2025",
-							"host": ["{{base_url}}"],
-							"path": ["api", "attendance-records", "employee", "1"],
-							"query": [
-								{
-									"key": "month",
-									"value": "2"
-								},
-								{
-									"key": "year",
-									"value": "2025"
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Get Employee Monthly Summary",
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{auth_token}}"
-							}
-						],
-						"url": {
-							"raw": "{{base_url}}/api/attendance-records/employee/1/summary?month=2&year=2025",
-							"host": ["{{base_url}}"],
-							"path": ["api", "attendance-records", "employee", "1", "summary"],
-							"query": [
-								{
-									"key": "month",
-									"value": "2"
-								},
-								{
-									"key": "year",
-									"value": "2025"
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Get Attendance Record",
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{auth_token}}"
-							}
-						],
-						"url": {
-							"raw": "{{base_url}}/api/attendance-records/1",
-							"host": ["{{base_url}}"],
-							"path": ["api", "attendance-records", "1"]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Create Attendance Record",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{auth_token}}"
-							},
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"employee_id\": 1,\n    \"attendance_date\": \"2025-02-06\",\n    \"time_in\": \"07:30:00\",\n    \"time_out\": \"16:30:00\",\n    \"lunch_out\": \"12:00:00\",\n    \"lunch_in\": \"13:00:00\",\n    \"status\": \"Present\",\n    \"remarks\": \"Regular day\"\n}"
-						},
-						"url": {
-							"raw": "{{base_url}}/api/attendance-records",
-							"host": ["{{base_url}}"],
-							"path": ["api", "attendance-records"]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Create Attendance with Undertime",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{auth_token}}"
-							},
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"employee_id\": 1,\n    \"attendance_date\": \"2025-02-06\",\n    \"time_in\": \"07:30:00\",\n    \"time_out\": \"15:00:00\",\n    \"status\": \"Present\",\n    \"remarks\": \"Left early for appointment\"\n}"
-						},
-						"url": {
-							"raw": "{{base_url}}/api/attendance-records",
-							"host": ["{{base_url}}"],
-							"path": ["api", "attendance-records"]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Create Attendance with Late",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{auth_token}}"
-							},
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"employee_id\": 1,\n    \"attendance_date\": \"2025-02-06\",\n    \"time_in\": \"08:00:00\",\n    \"time_out\": \"16:30:00\",\n    \"status\": \"Present\",\n    \"remarks\": \"Traffic\"\n}"
-						},
-						"url": {
-							"raw": "{{base_url}}/api/attendance-records",
-							"host": ["{{base_url}}"],
-							"path": ["api", "attendance-records"]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Create Absence Record",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{auth_token}}"
-							},
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"employee_id\": 1,\n    \"attendance_date\": \"2025-02-06\",\n    \"status\": \"Absent\",\n    \"remarks\": \"Sick leave\"\n}"
-						},
-						"url": {
-							"raw": "{{base_url}}/api/attendance-records",
-							"host": ["{{base_url}}"],
-							"path": ["api", "attendance-records"]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Import Attendance CSV",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{auth_token}}"
-							}
-						],
-						"body": {
-							"mode": "formdata",
-							"formdata": [
-								{
-									"key": "file",
-									"type": "file",
-									"src": "/path/to/attendance.csv"
-								}
-							]
-						},
-						"url": {
-							"raw": "{{base_url}}/api/attendance-records/import-csv",
-							"host": ["{{base_url}}"],
-							"path": ["api", "attendance-records", "import-csv"]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Update Attendance Record",
-					"request": {
-						"method": "PUT",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{auth_token}}"
-							},
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"time_out\": \"17:00:00\",\n    \"remarks\": \"Extended for meeting\"\n}"
-						},
-						"url": {
-							"raw": "{{base_url}}/api/attendance-records/1",
-							"host": ["{{base_url}}"],
-							"path": ["api", "attendance-records", "1"]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Approve Attendance Record",
-					"request": {
-						"method": "PUT",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{auth_token}}"
-							}
-						],
-						"url": {
-							"raw": "{{base_url}}/api/attendance-records/1/approve",
-							"host": ["{{base_url}}"],
-							"path": ["api", "attendance-records", "1", "approve"]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Delete Attendance Record",
-					"request": {
-						"method": "DELETE",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{auth_token}}"
-							}
-						],
-						"url": {
-							"raw": "{{base_url}}/api/attendance-records/1",
-							"host": ["{{base_url}}"],
-							"path": ["api", "attendance-records", "1"]
-						}
-					},
-					"response": []
-				}
-			]
-		},
-		{
-			"name": "Service Credits",
-			"item": [
-				{
-					"name": "List Service Credits",
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{auth_token}}"
-							}
-						],
-						"url": {
-							"raw": "{{base_url}}/api/service-credits?per_page=15&employee_id=&credit_type=&status=",
-							"host": ["{{base_url}}"],
-							"path": ["api", "service-credits"],
-							"query": [
-								{
-									"key": "per_page",
-									"value": "15"
-								},
-								{
-									"key": "employee_id",
-									"value": ""
-								},
-								{
-									"key": "credit_type",
-									"value": "",
-									"description": "Summer Work, Holiday Work, Overtime, Special Duty, Weekend Work"
-								},
-								{
-									"key": "status",
-									"value": "",
-									"description": "Pending, Approved, Rejected, Expired"
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Get Pending Approvals",
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{auth_token}}"
-							}
-						],
-						"url": {
-							"raw": "{{base_url}}/api/service-credits/pending",
-							"host": ["{{base_url}}"],
-							"path": ["api", "service-credits", "pending"]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Get Employee Service Credits",
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{auth_token}}"
-							}
-						],
-						"url": {
-							"raw": "{{base_url}}/api/service-credits/employee/1",
-							"host": ["{{base_url}}"],
-							"path": ["api", "service-credits", "employee", "1"]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Get Employee Credit Summary",
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{auth_token}}"
-							}
-						],
-						"url": {
-							"raw": "{{base_url}}/api/service-credits/employee/1/summary",
-							"host": ["{{base_url}}"],
-							"path": ["api", "service-credits", "employee", "1", "summary"]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Get Service Credit",
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{auth_token}}"
-							}
-						],
-						"url": {
-							"raw": "{{base_url}}/api/service-credits/1",
-							"host": ["{{base_url}}"],
-							"path": ["api", "service-credits", "1"]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Create Service Credit - Summer Work",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{auth_token}}"
-							},
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"employee_id\": 1,\n    \"credit_type\": \"Summer Work\",\n    \"work_date\": \"2024-04-15\",\n    \"hours_worked\": 8,\n    \"description\": \"Summer school tutoring program\"\n}"
-						},
-						"url": {
-							"raw": "{{base_url}}/api/service-credits",
-							"host": ["{{base_url}}"],
-							"path": ["api", "service-credits"]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Create Service Credit - Holiday Work",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{auth_token}}"
-							},
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"employee_id\": 1,\n    \"credit_type\": \"Holiday Work\",\n    \"work_date\": \"2024-12-25\",\n    \"hours_worked\": 8,\n    \"description\": \"Christmas school event duty\"\n}"
-						},
-						"url": {
-							"raw": "{{base_url}}/api/service-credits",
-							"host": ["{{base_url}}"],
-							"path": ["api", "service-credits"]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Create Service Credit - Overtime",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{auth_token}}"
-							},
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"employee_id\": 1,\n    \"credit_type\": \"Overtime\",\n    \"work_date\": \"2025-01-20\",\n    \"hours_worked\": 4,\n    \"description\": \"Evening parent-teacher conference\"\n}"
-						},
-						"url": {
-							"raw": "{{base_url}}/api/service-credits",
-							"host": ["{{base_url}}"],
-							"path": ["api", "service-credits"]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Update Service Credit",
-					"request": {
-						"method": "PUT",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{auth_token}}"
-							},
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"hours_worked\": 12,\n    \"description\": \"Extended summer program - full day\"\n}"
-						},
-						"url": {
-							"raw": "{{base_url}}/api/service-credits/1",
-							"host": ["{{base_url}}"],
-							"path": ["api", "service-credits", "1"]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Approve Service Credit",
-					"request": {
-						"method": "PUT",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{auth_token}}"
-							},
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"remarks\": \"Approved by School Head - verified summer program attendance\"\n}"
-						},
-						"url": {
-							"raw": "{{base_url}}/api/service-credits/1/approve",
-							"host": ["{{base_url}}"],
-							"path": ["api", "service-credits", "1", "approve"]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Reject Service Credit",
-					"request": {
-						"method": "PUT",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{auth_token}}"
-							},
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"reason\": \"Insufficient documentation - need signed attendance sheet from coordinator\"\n}"
-						},
-						"url": {
-							"raw": "{{base_url}}/api/service-credits/1/reject",
-							"host": ["{{base_url}}"],
-							"path": ["api", "service-credits", "1", "reject"]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Apply Service Credit Offset (FIFO)",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{auth_token}}"
-							},
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"employee_id\": 1,\n    \"attendance_record_id\": 25,\n    \"credits_to_use\": 1.0,\n    \"reason\": \"Offsetting absence on Feb 5, 2025\"\n}"
-						},
-						"url": {
-							"raw": "{{base_url}}/api/service-credits/apply-offset",
-							"host": ["{{base_url}}"],
-							"path": ["api", "service-credits", "apply-offset"]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Revert Service Credit Offset",
-					"request": {
-						"method": "PUT",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{auth_token}}"
-							},
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"reason\": \"Wrong attendance record selected - should be Feb 6 not Feb 5\"\n}"
-						},
-						"url": {
-							"raw": "{{base_url}}/api/service-credits/offsets/10/revert",
-							"host": ["{{base_url}}"],
-							"path": ["api", "service-credits", "offsets", "10", "revert"]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Delete Service Credit",
-					"request": {
-						"method": "DELETE",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{auth_token}}"
-							}
-						],
-						"url": {
-							"raw": "{{base_url}}/api/service-credits/1",
-							"host": ["{{base_url}}"],
-							"path": ["api", "service-credits", "1"]
 						}
 					},
 					"response": []
@@ -750,38 +68,2704 @@
 				}
 			},
 			"response": []
+		},
+		{
+			"name": "Dashboard",
+			"item": [
+				{
+					"name": "Get Metrics",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {"raw": "{{base_url}}/api/dashboard/metrics", "host": ["{{base_url}}"], "path": ["api", "dashboard", "metrics"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Expiring Budgets",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {"raw": "{{base_url}}/api/dashboard/expiring-budgets", "host": ["{{base_url}}"], "path": ["api", "dashboard", "expiring-budgets"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Critical Stock",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {"raw": "{{base_url}}/api/dashboard/critical-stock", "host": ["{{base_url}}"], "path": ["api", "dashboard", "critical-stock"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Step Increments Due",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {"raw": "{{base_url}}/api/dashboard/step-increments-due", "host": ["{{base_url}}"], "path": ["api", "dashboard", "step-increments-due"]}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Profile (My Account)",
+			"item": [
+				{
+					"name": "Get My Profile",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {"raw": "{{base_url}}/api/profile", "host": ["{{base_url}}"], "path": ["api", "profile"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Update My Profile",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{"key": "Authorization", "value": "Bearer {{auth_token}}"},
+							{"key": "Content-Type", "value": "application/json"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Juan dela Cruz\"\n}"
+						},
+						"url": {"raw": "{{base_url}}/api/profile", "host": ["{{base_url}}"], "path": ["api", "profile"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Change Password",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{"key": "Authorization", "value": "Bearer {{auth_token}}"},
+							{"key": "Content-Type", "value": "application/json"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"current_password\": \"password\",\n    \"password\": \"NewSecurePass123!\",\n    \"password_confirmation\": \"NewSecurePass123!\"\n}"
+						},
+						"url": {"raw": "{{base_url}}/api/profile/change-password", "host": ["{{base_url}}"], "path": ["api", "profile", "change-password"]}
+					},
+					"response": []
+				},
+				{
+					"name": "My Statistics",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {"raw": "{{base_url}}/api/profile/statistics", "host": ["{{base_url}}"], "path": ["api", "profile", "statistics"]}
+					},
+					"response": []
+				},
+				{
+					"name": "My Activity Log",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {"raw": "{{base_url}}/api/profile/activities", "host": ["{{base_url}}"], "path": ["api", "profile", "activities"]}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "User Management",
+			"item": [
+				{
+					"name": "List Users",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {
+							"raw": "{{base_url}}/api/users?per_page=15&search=&role=",
+							"host": ["{{base_url}}"],
+							"path": ["api", "users"],
+							"query": [
+								{"key": "per_page", "value": "15"},
+								{"key": "search", "value": "", "description": "Search by name or email"},
+								{"key": "role", "value": "", "description": "Filter by role: Super Admin, Admin Officer, School Head, Teacher/Staff"}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "User Statistics",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {"raw": "{{base_url}}/api/users/statistics", "host": ["{{base_url}}"], "path": ["api", "users", "statistics"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Get User",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {"raw": "{{base_url}}/api/users/{{uuid}}", "host": ["{{base_url}}"], "path": ["api", "users", "{{uuid}}"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Create User",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Authorization", "value": "Bearer {{auth_token}}"},
+							{"key": "Content-Type", "value": "application/json"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Maria Santos\",\n    \"email\": \"maria.santos@deped.gov.ph\",\n    \"password\": \"SecurePass123!\",\n    \"role\": \"Teacher/Staff\",\n    \"employee_id\": null\n}"
+						},
+						"url": {"raw": "{{base_url}}/api/users", "host": ["{{base_url}}"], "path": ["api", "users"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Update User",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{"key": "Authorization", "value": "Bearer {{auth_token}}"},
+							{"key": "Content-Type", "value": "application/json"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Maria P. Santos\"\n}"
+						},
+						"url": {"raw": "{{base_url}}/api/users/{{uuid}}", "host": ["{{base_url}}"], "path": ["api", "users", "{{uuid}}"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete User",
+					"request": {
+						"method": "DELETE",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {"raw": "{{base_url}}/api/users/{{uuid}}", "host": ["{{base_url}}"], "path": ["api", "users", "{{uuid}}"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Reset User Password",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Authorization", "value": "Bearer {{auth_token}}"},
+							{"key": "Content-Type", "value": "application/json"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"password\": null\n}",
+							"options": {"raw": {"language": "json"}}
+						},
+						"url": {"raw": "{{base_url}}/api/users/{{uuid}}/reset-password", "host": ["{{base_url}}"], "path": ["api", "users", "{{uuid}}", "reset-password"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Assign Role",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Authorization", "value": "Bearer {{auth_token}}"},
+							{"key": "Content-Type", "value": "application/json"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"role\": \"Admin Officer\"\n}"
+						},
+						"url": {"raw": "{{base_url}}/api/users/{{uuid}}/assign-role", "host": ["{{base_url}}"], "path": ["api", "users", "{{uuid}}", "assign-role"]}
+					},
+					"response": []
+				},
+				{
+					"name": "List All Permissions",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {"raw": "{{base_url}}/api/permissions", "host": ["{{base_url}}"], "path": ["api", "permissions"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Sync User Permissions",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{"key": "Authorization", "value": "Bearer {{auth_token}}"},
+							{"key": "Content-Type", "value": "application/json"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"permissions\": [\n        \"create_leave_request\",\n        \"view_attendance\",\n        \"export_reports\"\n    ]\n}"
+						},
+						"url": {"raw": "{{base_url}}/api/users/{{uuid}}/permissions", "host": ["{{base_url}}"], "path": ["api", "users", "{{uuid}}", "permissions"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Give User Permissions",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Authorization", "value": "Bearer {{auth_token}}"},
+							{"key": "Content-Type", "value": "application/json"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"permissions\": [\"export_reports\"]\n}"
+						},
+						"url": {"raw": "{{base_url}}/api/users/{{uuid}}/permissions/give", "host": ["{{base_url}}"], "path": ["api", "users", "{{uuid}}", "permissions", "give"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Revoke User Permissions",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Authorization", "value": "Bearer {{auth_token}}"},
+							{"key": "Content-Type", "value": "application/json"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"permissions\": [\"export_reports\"]\n}"
+						},
+						"url": {"raw": "{{base_url}}/api/users/{{uuid}}/permissions/revoke", "host": ["{{base_url}}"], "path": ["api", "users", "{{uuid}}", "permissions", "revoke"]}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "HR - Employees",
+			"item": [
+				{
+					"name": "List Employees",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {
+							"raw": "{{base_url}}/api/employees?per_page=15&status=Active&position=&employment_status=&search=",
+							"host": ["{{base_url}}"],
+							"path": ["api", "employees"],
+							"query": [
+								{"key": "per_page", "value": "15"},
+								{"key": "status", "value": "Active", "description": "Active, Inactive, On Leave, Retired, Resigned"},
+								{"key": "position", "value": ""},
+								{"key": "employment_status", "value": "", "description": "Permanent, Temporary, Casual, Contractual, Substitute"},
+								{"key": "search", "value": ""}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Search Employees",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {
+							"raw": "{{base_url}}/api/employees/search?search=Juan",
+							"host": ["{{base_url}}"],
+							"path": ["api", "employees", "search"],
+							"query": [{"key": "search", "value": "Juan"}]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Employee Statistics",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {"raw": "{{base_url}}/api/employees/statistics", "host": ["{{base_url}}"], "path": ["api", "employees", "statistics"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Employee",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {"raw": "{{base_url}}/api/employees/{{uuid}}", "host": ["{{base_url}}"], "path": ["api", "employees", "{{uuid}}"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Employee",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Authorization", "value": "Bearer {{auth_token}}"},
+							{"key": "Content-Type", "value": "application/json"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"first_name\": \"Juan\",\n    \"middle_name\": \"Santos\",\n    \"last_name\": \"dela Cruz\",\n    \"date_of_birth\": \"1990-05-15\",\n    \"gender\": \"Male\",\n    \"civil_status\": \"Married\",\n    \"email\": \"juan.delacruz@deped.gov.ph\",\n    \"mobile_number\": \"+63917-555-1234\",\n    \"address\": \"123 Rizal St.\",\n    \"city\": \"San Pedro\",\n    \"province\": \"Laguna\",\n    \"zip_code\": \"4023\",\n    \"plantilla_item_no\": \"ITEM-2024-001\",\n    \"position\": \"Teacher I\",\n    \"salary_grade\": 11,\n    \"step_increment\": 1,\n    \"monthly_salary\": 25439.00,\n    \"employment_status\": \"Permanent\",\n    \"date_hired\": \"2024-01-15\"\n}"
+						},
+						"url": {"raw": "{{base_url}}/api/employees", "host": ["{{base_url}}"], "path": ["api", "employees"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Employee",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{"key": "Authorization", "value": "Bearer {{auth_token}}"},
+							{"key": "Content-Type", "value": "application/json"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"mobile_number\": \"+63917-555-9999\",\n    \"address\": \"456 Bonifacio Ave.\",\n    \"civil_status\": \"Married\"\n}"
+						},
+						"url": {"raw": "{{base_url}}/api/employees/{{uuid}}", "host": ["{{base_url}}"], "path": ["api", "employees", "{{uuid}}"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Employee",
+					"request": {
+						"method": "DELETE",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {"raw": "{{base_url}}/api/employees/{{uuid}}", "host": ["{{base_url}}"], "path": ["api", "employees", "{{uuid}}"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Promote Employee",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Authorization", "value": "Bearer {{auth_token}}"},
+							{"key": "Content-Type", "value": "application/json"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"new_position\": \"Teacher II\",\n    \"new_salary_grade\": 12,\n    \"new_monthly_salary\": 27608.00,\n    \"effective_date\": \"2024-07-01\"\n}"
+						},
+						"url": {"raw": "{{base_url}}/api/employees/{{uuid}}/promote", "host": ["{{base_url}}"], "path": ["api", "employees", "{{uuid}}", "promote"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Monthly Leave Credits (Bulk)",
+					"request": {
+						"method": "POST",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {"raw": "{{base_url}}/api/employees/update-monthly-leave-credits", "host": ["{{base_url}}"], "path": ["api", "employees", "update-monthly-leave-credits"]}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "HR - Leave Requests",
+			"item": [
+				{
+					"name": "List Leave Requests",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {
+							"raw": "{{base_url}}/api/leave-requests?per_page=15&status=&employee_id=",
+							"host": ["{{base_url}}"],
+							"path": ["api", "leave-requests"],
+							"query": [
+								{"key": "per_page", "value": "15"},
+								{"key": "status", "value": "", "description": "Pending, Recommended, Approved, Disapproved, Cancelled"},
+								{"key": "employee_id", "value": ""}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Pending Leave Requests",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {"raw": "{{base_url}}/api/leave-requests/pending", "host": ["{{base_url}}"], "path": ["api", "leave-requests", "pending"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Leave Request Statistics",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {"raw": "{{base_url}}/api/leave-requests/statistics", "host": ["{{base_url}}"], "path": ["api", "leave-requests", "statistics"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Leave Request",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {"raw": "{{base_url}}/api/leave-requests/{{uuid}}", "host": ["{{base_url}}"], "path": ["api", "leave-requests", "{{uuid}}"]}
+					},
+					"response": []
+				},
+				{
+					"name": "File Leave Request",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Authorization", "value": "Bearer {{auth_token}}"},
+							{"key": "Content-Type", "value": "application/json"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"employee_id\": 1,\n    \"leave_type\": \"Vacation Leave\",\n    \"start_date\": \"2024-12-20\",\n    \"end_date\": \"2024-12-22\",\n    \"reason\": \"Christmas vacation with family\"\n}"
+						},
+						"url": {"raw": "{{base_url}}/api/leave-requests", "host": ["{{base_url}}"], "path": ["api", "leave-requests"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Recommend Leave Request",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{"key": "Authorization", "value": "Bearer {{auth_token}}"},
+							{"key": "Content-Type", "value": "application/json"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"remarks\": \"Endorsed for approval. No pending tasks during leave period.\"\n}"
+						},
+						"url": {"raw": "{{base_url}}/api/leave-requests/{{uuid}}/recommend", "host": ["{{base_url}}"], "path": ["api", "leave-requests", "{{uuid}}", "recommend"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Approve Leave Request",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{"key": "Authorization", "value": "Bearer {{auth_token}}"},
+							{"key": "Content-Type", "value": "application/json"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"remarks\": \"Approved.\"\n}"
+						},
+						"url": {"raw": "{{base_url}}/api/leave-requests/{{uuid}}/approve", "host": ["{{base_url}}"], "path": ["api", "leave-requests", "{{uuid}}", "approve"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Disapprove Leave Request",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{"key": "Authorization", "value": "Bearer {{auth_token}}"},
+							{"key": "Content-Type", "value": "application/json"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"reason\": \"Insufficient leave credits.\"\n}"
+						},
+						"url": {"raw": "{{base_url}}/api/leave-requests/{{uuid}}/disapprove", "host": ["{{base_url}}"], "path": ["api", "leave-requests", "{{uuid}}", "disapprove"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Cancel Leave Request",
+					"request": {
+						"method": "PUT",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {"raw": "{{base_url}}/api/leave-requests/{{uuid}}/cancel", "host": ["{{base_url}}"], "path": ["api", "leave-requests", "{{uuid}}", "cancel"]}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "HR - Service Records",
+			"item": [
+				{
+					"name": "Service Records by Employee",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {"raw": "{{base_url}}/api/service-records/employee/{{employee_id}}", "host": ["{{base_url}}"], "path": ["api", "service-records", "employee", "{{employee_id}}"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Service Record",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {"raw": "{{base_url}}/api/service-records/{{uuid}}", "host": ["{{base_url}}"], "path": ["api", "service-records", "{{uuid}}"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Service Record",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Authorization", "value": "Bearer {{auth_token}}"},
+							{"key": "Content-Type", "value": "application/json"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"employee_id\": 1,\n    \"position\": \"Teacher I\",\n    \"from_date\": \"2024-01-15\",\n    \"to_date\": null,\n    \"appointment_status\": \"Permanent\",\n    \"salary\": 25439.00,\n    \"station\": \"Laguna National High School\"\n}"
+						},
+						"url": {"raw": "{{base_url}}/api/service-records", "host": ["{{base_url}}"], "path": ["api", "service-records"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Service Record",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{"key": "Authorization", "value": "Bearer {{auth_token}}"},
+							{"key": "Content-Type", "value": "application/json"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"to_date\": \"2024-12-31\"\n}"
+						},
+						"url": {"raw": "{{base_url}}/api/service-records/{{uuid}}", "host": ["{{base_url}}"], "path": ["api", "service-records", "{{uuid}}"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Service Record",
+					"request": {
+						"method": "DELETE",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {"raw": "{{base_url}}/api/service-records/{{uuid}}", "host": ["{{base_url}}"], "path": ["api", "service-records", "{{uuid}}"]}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "HR - Trainings",
+			"item": [
+				{
+					"name": "List Trainings",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {
+							"raw": "{{base_url}}/api/trainings?per_page=15",
+							"host": ["{{base_url}}"],
+							"path": ["api", "trainings"],
+							"query": [{"key": "per_page", "value": "15"}]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Training Statistics",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {"raw": "{{base_url}}/api/trainings/statistics", "host": ["{{base_url}}"], "path": ["api", "trainings", "statistics"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Trainings by Type",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {"raw": "{{base_url}}/api/trainings/type/In-Service", "host": ["{{base_url}}"], "path": ["api", "trainings", "type", "In-Service"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Trainings by Year",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {"raw": "{{base_url}}/api/trainings/year/2024", "host": ["{{base_url}}"], "path": ["api", "trainings", "year", "2024"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Trainings by Employee",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {"raw": "{{base_url}}/api/trainings/employee/{{employee_id}}", "host": ["{{base_url}}"], "path": ["api", "trainings", "employee", "{{employee_id}}"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Completed Trainings by Employee",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {"raw": "{{base_url}}/api/trainings/employee/{{employee_id}}/completed", "host": ["{{base_url}}"], "path": ["api", "trainings", "employee", "{{employee_id}}", "completed"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Training",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {"raw": "{{base_url}}/api/trainings/{{uuid}}", "host": ["{{base_url}}"], "path": ["api", "trainings", "{{uuid}}"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Training",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Authorization", "value": "Bearer {{auth_token}}"},
+							{"key": "Content-Type", "value": "application/json"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"employee_id\": 1,\n    \"title\": \"DepEd LAC Session: ICT Integration\",\n    \"training_type\": \"In-Service\",\n    \"conducted_by\": \"DepEd Region IV-A\",\n    \"venue\": \"School Library\",\n    \"start_date\": \"2024-03-15\",\n    \"end_date\": \"2024-03-15\",\n    \"hours\": 8,\n    \"status\": \"Completed\"\n}"
+						},
+						"url": {"raw": "{{base_url}}/api/trainings", "host": ["{{base_url}}"], "path": ["api", "trainings"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Training",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{"key": "Authorization", "value": "Bearer {{auth_token}}"},
+							{"key": "Content-Type", "value": "application/json"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"status\": \"Completed\",\n    \"hours\": 16\n}"
+						},
+						"url": {"raw": "{{base_url}}/api/trainings/{{uuid}}", "host": ["{{base_url}}"], "path": ["api", "trainings", "{{uuid}}"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Training",
+					"request": {
+						"method": "DELETE",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {"raw": "{{base_url}}/api/trainings/{{uuid}}", "host": ["{{base_url}}"], "path": ["api", "trainings", "{{uuid}}"]}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "HR - Attendance Records (DTR)",
+			"item": [
+				{
+					"name": "List Attendance Records",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {
+							"raw": "{{base_url}}/api/attendance-records?per_page=15&employee_id=&date_from=&date_to=&status=",
+							"host": ["{{base_url}}"],
+							"path": ["api", "attendance-records"],
+							"query": [
+								{"key": "per_page", "value": "15"},
+								{"key": "employee_id", "value": ""},
+								{"key": "date_from", "value": ""},
+								{"key": "date_to", "value": ""},
+								{"key": "status", "value": "", "description": "Present, Absent, Late, Half-Day"}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Attendance Statistics",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {"raw": "{{base_url}}/api/attendance-records/statistics", "host": ["{{base_url}}"], "path": ["api", "attendance-records", "statistics"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Attendance by Employee",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {
+							"raw": "{{base_url}}/api/attendance-records/employee/{{employee_id}}?date_from=2025-02-01&date_to=2025-02-28",
+							"host": ["{{base_url}}"],
+							"path": ["api", "attendance-records", "employee", "{{employee_id}}"],
+							"query": [
+								{"key": "date_from", "value": "2025-02-01"},
+								{"key": "date_to", "value": "2025-02-28"}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Employee Monthly Summary",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {
+							"raw": "{{base_url}}/api/attendance-records/employee/{{employee_id}}/summary?year=2025&month=2",
+							"host": ["{{base_url}}"],
+							"path": ["api", "attendance-records", "employee", "{{employee_id}}", "summary"],
+							"query": [
+								{"key": "year", "value": "2025"},
+								{"key": "month", "value": "2"}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Attendance Record",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {"raw": "{{base_url}}/api/attendance-records/{{uuid}}", "host": ["{{base_url}}"], "path": ["api", "attendance-records", "{{uuid}}"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Attendance Record",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Authorization", "value": "Bearer {{auth_token}}"},
+							{"key": "Content-Type", "value": "application/json"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"employee_id\": 1,\n    \"attendance_date\": \"2025-02-06\",\n    \"time_in\": \"07:30:00\",\n    \"time_out\": \"16:30:00\",\n    \"lunch_out\": \"12:00:00\",\n    \"lunch_in\": \"13:00:00\",\n    \"status\": \"Present\",\n    \"remarks\": \"Regular day\"\n}"
+						},
+						"url": {"raw": "{{base_url}}/api/attendance-records", "host": ["{{base_url}}"], "path": ["api", "attendance-records"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Import Attendance CSV",
+					"request": {
+						"method": "POST",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"body": {
+							"mode": "formdata",
+							"formdata": [{"key": "file", "type": "file", "src": "/path/to/attendance.csv"}]
+						},
+						"url": {"raw": "{{base_url}}/api/attendance-records/import-csv", "host": ["{{base_url}}"], "path": ["api", "attendance-records", "import-csv"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Attendance Record",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{"key": "Authorization", "value": "Bearer {{auth_token}}"},
+							{"key": "Content-Type", "value": "application/json"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"time_out\": \"17:00:00\",\n    \"remarks\": \"Extended for faculty meeting\"\n}"
+						},
+						"url": {"raw": "{{base_url}}/api/attendance-records/{{uuid}}", "host": ["{{base_url}}"], "path": ["api", "attendance-records", "{{uuid}}"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Approve Attendance Record",
+					"request": {
+						"method": "PUT",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {"raw": "{{base_url}}/api/attendance-records/{{uuid}}/approve", "host": ["{{base_url}}"], "path": ["api", "attendance-records", "{{uuid}}", "approve"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Attendance Record",
+					"request": {
+						"method": "DELETE",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {"raw": "{{base_url}}/api/attendance-records/{{uuid}}", "host": ["{{base_url}}"], "path": ["api", "attendance-records", "{{uuid}}"]}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "HR - Service Credits",
+			"item": [
+				{
+					"name": "List Service Credits",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {
+							"raw": "{{base_url}}/api/service-credits?per_page=15&employee_id=&credit_type=&status=",
+							"host": ["{{base_url}}"],
+							"path": ["api", "service-credits"],
+							"query": [
+								{"key": "per_page", "value": "15"},
+								{"key": "employee_id", "value": ""},
+								{"key": "credit_type", "value": "", "description": "Summer Work, Holiday Work, Overtime, Special Duty, Weekend Work"},
+								{"key": "status", "value": "", "description": "Pending, Approved, Rejected, Expired"}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Pending Approvals",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {"raw": "{{base_url}}/api/service-credits/pending", "host": ["{{base_url}}"], "path": ["api", "service-credits", "pending"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Service Credits by Employee",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {"raw": "{{base_url}}/api/service-credits/employee/{{employee_id}}", "host": ["{{base_url}}"], "path": ["api", "service-credits", "employee", "{{employee_id}}"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Employee Credit Summary",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {"raw": "{{base_url}}/api/service-credits/employee/{{employee_id}}/summary", "host": ["{{base_url}}"], "path": ["api", "service-credits", "employee", "{{employee_id}}", "summary"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Service Credit",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {"raw": "{{base_url}}/api/service-credits/{{uuid}}", "host": ["{{base_url}}"], "path": ["api", "service-credits", "{{uuid}}"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Service Credit",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Authorization", "value": "Bearer {{auth_token}}"},
+							{"key": "Content-Type", "value": "application/json"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"employee_id\": 1,\n    \"credit_type\": \"Holiday Work\",\n    \"work_date\": \"2024-12-25\",\n    \"hours_worked\": 8,\n    \"description\": \"Christmas school event duty\"\n}"
+						},
+						"url": {"raw": "{{base_url}}/api/service-credits", "host": ["{{base_url}}"], "path": ["api", "service-credits"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Service Credit",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{"key": "Authorization", "value": "Bearer {{auth_token}}"},
+							{"key": "Content-Type", "value": "application/json"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"hours_worked\": 12,\n    \"description\": \"Extended holiday duty - full day\"\n}"
+						},
+						"url": {"raw": "{{base_url}}/api/service-credits/{{uuid}}", "host": ["{{base_url}}"], "path": ["api", "service-credits", "{{uuid}}"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Approve Service Credit",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{"key": "Authorization", "value": "Bearer {{auth_token}}"},
+							{"key": "Content-Type", "value": "application/json"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"remarks\": \"Approved — verified attendance sheet attached.\"\n}"
+						},
+						"url": {"raw": "{{base_url}}/api/service-credits/{{uuid}}/approve", "host": ["{{base_url}}"], "path": ["api", "service-credits", "{{uuid}}", "approve"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Reject Service Credit",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{"key": "Authorization", "value": "Bearer {{auth_token}}"},
+							{"key": "Content-Type", "value": "application/json"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"reason\": \"Insufficient documentation — please attach signed attendance sheet.\"\n}"
+						},
+						"url": {"raw": "{{base_url}}/api/service-credits/{{uuid}}/reject", "host": ["{{base_url}}"], "path": ["api", "service-credits", "{{uuid}}", "reject"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Apply Offset (FIFO)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Authorization", "value": "Bearer {{auth_token}}"},
+							{"key": "Content-Type", "value": "application/json"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"employee_id\": 1,\n    \"attendance_record_id\": 25,\n    \"credits_to_use\": 1.0,\n    \"reason\": \"Offsetting absence on Feb 5, 2025\"\n}"
+						},
+						"url": {"raw": "{{base_url}}/api/service-credits/apply-offset", "host": ["{{base_url}}"], "path": ["api", "service-credits", "apply-offset"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Revert Credit Offset",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{"key": "Authorization", "value": "Bearer {{auth_token}}"},
+							{"key": "Content-Type", "value": "application/json"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"reason\": \"Wrong attendance record selected.\"\n}"
+						},
+						"url": {"raw": "{{base_url}}/api/service-credits/offsets/{{uuid}}/revert", "host": ["{{base_url}}"], "path": ["api", "service-credits", "offsets", "{{uuid}}", "revert"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Service Credit",
+					"request": {
+						"method": "DELETE",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {"raw": "{{base_url}}/api/service-credits/{{uuid}}", "host": ["{{base_url}}"], "path": ["api", "service-credits", "{{uuid}}"]}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Procurement - Suppliers",
+			"item": [
+				{
+					"name": "List Suppliers",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {"raw": "{{base_url}}/api/suppliers?per_page=15", "host": ["{{base_url}}"], "path": ["api", "suppliers"], "query": [{"key": "per_page", "value": "15"}]}
+					},
+					"response": []
+				},
+				{
+					"name": "Active Suppliers",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {"raw": "{{base_url}}/api/suppliers/active", "host": ["{{base_url}}"], "path": ["api", "suppliers", "active"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Search Suppliers",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {"raw": "{{base_url}}/api/suppliers/search?query=hardware", "host": ["{{base_url}}"], "path": ["api", "suppliers", "search"], "query": [{"key": "query", "value": "hardware"}]}
+					},
+					"response": []
+				},
+				{
+					"name": "Supplier Statistics",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {"raw": "{{base_url}}/api/suppliers/statistics", "host": ["{{base_url}}"], "path": ["api", "suppliers", "statistics"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Supplier",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {"raw": "{{base_url}}/api/suppliers/{{uuid}}", "host": ["{{base_url}}"], "path": ["api", "suppliers", "{{uuid}}"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Supplier",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Authorization", "value": "Bearer {{auth_token}}"},
+							{"key": "Content-Type", "value": "application/json"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"ABC School Supplies Inc.\",\n    \"contact_person\": \"Pedro Reyes\",\n    \"email\": \"pedro@abcsupplies.com\",\n    \"phone\": \"02-8123-4567\",\n    \"address\": \"123 Quezon Ave., Quezon City\",\n    \"tin\": \"123-456-789-000\",\n    \"status\": \"Active\"\n}"
+						},
+						"url": {"raw": "{{base_url}}/api/suppliers", "host": ["{{base_url}}"], "path": ["api", "suppliers"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Supplier",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{"key": "Authorization", "value": "Bearer {{auth_token}}"},
+							{"key": "Content-Type", "value": "application/json"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"phone\": \"02-8999-1234\",\n    \"status\": \"Active\"\n}"
+						},
+						"url": {"raw": "{{base_url}}/api/suppliers/{{uuid}}", "host": ["{{base_url}}"], "path": ["api", "suppliers", "{{uuid}}"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Supplier",
+					"request": {
+						"method": "DELETE",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {"raw": "{{base_url}}/api/suppliers/{{uuid}}", "host": ["{{base_url}}"], "path": ["api", "suppliers", "{{uuid}}"]}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Procurement - Purchase Requests",
+			"item": [
+				{
+					"name": "List Purchase Requests",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {"raw": "{{base_url}}/api/purchase-requests?per_page=15&status=", "host": ["{{base_url}}"], "path": ["api", "purchase-requests"], "query": [{"key": "per_page", "value": "15"}, {"key": "status", "value": ""}]}
+					},
+					"response": []
+				},
+				{
+					"name": "Pending Purchase Requests",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {"raw": "{{base_url}}/api/purchase-requests/pending", "host": ["{{base_url}}"], "path": ["api", "purchase-requests", "pending"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Purchase Request Statistics",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {"raw": "{{base_url}}/api/purchase-requests/statistics", "host": ["{{base_url}}"], "path": ["api", "purchase-requests", "statistics"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Purchase Request",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {"raw": "{{base_url}}/api/purchase-requests/{{uuid}}", "host": ["{{base_url}}"], "path": ["api", "purchase-requests", "{{uuid}}"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Purchase Request",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Authorization", "value": "Bearer {{auth_token}}"},
+							{"key": "Content-Type", "value": "application/json"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"purpose\": \"Office supplies for Q1 2025\",\n    \"fund_source\": \"MOOE\",\n    \"items\": [\n        {\"description\": \"Bond Paper A4\", \"quantity\": 10, \"unit\": \"ream\", \"unit_cost\": 250.00},\n        {\"description\": \"Ballpen (Black)\", \"quantity\": 50, \"unit\": \"piece\", \"unit_cost\": 15.00}\n    ]\n}"
+						},
+						"url": {"raw": "{{base_url}}/api/purchase-requests", "host": ["{{base_url}}"], "path": ["api", "purchase-requests"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Submit Purchase Request",
+					"request": {
+						"method": "PUT",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {"raw": "{{base_url}}/api/purchase-requests/{{uuid}}/submit", "host": ["{{base_url}}"], "path": ["api", "purchase-requests", "{{uuid}}", "submit"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Recommend Purchase Request",
+					"request": {
+						"method": "PUT",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {"raw": "{{base_url}}/api/purchase-requests/{{uuid}}/recommend", "host": ["{{base_url}}"], "path": ["api", "purchase-requests", "{{uuid}}", "recommend"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Approve Purchase Request",
+					"request": {
+						"method": "PUT",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {"raw": "{{base_url}}/api/purchase-requests/{{uuid}}/approve", "host": ["{{base_url}}"], "path": ["api", "purchase-requests", "{{uuid}}", "approve"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Disapprove Purchase Request",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{"key": "Authorization", "value": "Bearer {{auth_token}}"},
+							{"key": "Content-Type", "value": "application/json"}
+						],
+						"body": {"mode": "raw", "raw": "{\n    \"reason\": \"Budget allocation exceeded.\"\n}"},
+						"url": {"raw": "{{base_url}}/api/purchase-requests/{{uuid}}/disapprove", "host": ["{{base_url}}"], "path": ["api", "purchase-requests", "{{uuid}}", "disapprove"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Cancel Purchase Request",
+					"request": {
+						"method": "PUT",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {"raw": "{{base_url}}/api/purchase-requests/{{uuid}}/cancel", "host": ["{{base_url}}"], "path": ["api", "purchase-requests", "{{uuid}}", "cancel"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Purchase Request",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{"key": "Authorization", "value": "Bearer {{auth_token}}"},
+							{"key": "Content-Type", "value": "application/json"}
+						],
+						"body": {"mode": "raw", "raw": "{\n    \"purpose\": \"Office supplies for Q1 2025 — updated\"\n}"},
+						"url": {"raw": "{{base_url}}/api/purchase-requests/{{uuid}}", "host": ["{{base_url}}"], "path": ["api", "purchase-requests", "{{uuid}}"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Purchase Request",
+					"request": {
+						"method": "DELETE",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {"raw": "{{base_url}}/api/purchase-requests/{{uuid}}", "host": ["{{base_url}}"], "path": ["api", "purchase-requests", "{{uuid}}"]}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Procurement - Quotations",
+			"item": [
+				{
+					"name": "List Quotations",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {"raw": "{{base_url}}/api/quotations?per_page=15", "host": ["{{base_url}}"], "path": ["api", "quotations"], "query": [{"key": "per_page", "value": "15"}]}
+					},
+					"response": []
+				},
+				{
+					"name": "Quotations by Purchase Request",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {"raw": "{{base_url}}/api/quotations/purchase-request/{{uuid}}", "host": ["{{base_url}}"], "path": ["api", "quotations", "purchase-request", "{{uuid}}"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Quotation",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {"raw": "{{base_url}}/api/quotations/{{uuid}}", "host": ["{{base_url}}"], "path": ["api", "quotations", "{{uuid}}"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Quotation",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Authorization", "value": "Bearer {{auth_token}}"},
+							{"key": "Content-Type", "value": "application/json"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"purchase_request_id\": 1,\n    \"supplier_id\": 1,\n    \"quotation_date\": \"2025-01-20\",\n    \"validity_days\": 30,\n    \"items\": [\n        {\"purchase_request_item_id\": 1, \"unit_cost\": 240.00},\n        {\"purchase_request_item_id\": 2, \"unit_cost\": 14.00}\n    ]\n}"
+						},
+						"url": {"raw": "{{base_url}}/api/quotations", "host": ["{{base_url}}"], "path": ["api", "quotations"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Select Quotation (Award)",
+					"request": {
+						"method": "PUT",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {"raw": "{{base_url}}/api/quotations/{{uuid}}/select", "host": ["{{base_url}}"], "path": ["api", "quotations", "{{uuid}}", "select"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Evaluate All Quotations for PR",
+					"request": {
+						"method": "PUT",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {"raw": "{{base_url}}/api/quotations/purchase-request/{{uuid}}/evaluate", "host": ["{{base_url}}"], "path": ["api", "quotations", "purchase-request", "{{uuid}}", "evaluate"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Quotation",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{"key": "Authorization", "value": "Bearer {{auth_token}}"},
+							{"key": "Content-Type", "value": "application/json"}
+						],
+						"body": {"mode": "raw", "raw": "{\n    \"validity_days\": 60\n}"},
+						"url": {"raw": "{{base_url}}/api/quotations/{{uuid}}", "host": ["{{base_url}}"], "path": ["api", "quotations", "{{uuid}}"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Quotation",
+					"request": {
+						"method": "DELETE",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {"raw": "{{base_url}}/api/quotations/{{uuid}}", "host": ["{{base_url}}"], "path": ["api", "quotations", "{{uuid}}"]}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Procurement - Purchase Orders",
+			"item": [
+				{
+					"name": "List Purchase Orders",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {"raw": "{{base_url}}/api/purchase-orders?per_page=15", "host": ["{{base_url}}"], "path": ["api", "purchase-orders"], "query": [{"key": "per_page", "value": "15"}]}
+					},
+					"response": []
+				},
+				{
+					"name": "Pending Purchase Orders",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {"raw": "{{base_url}}/api/purchase-orders/pending", "host": ["{{base_url}}"], "path": ["api", "purchase-orders", "pending"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Purchase Order Statistics",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {"raw": "{{base_url}}/api/purchase-orders/statistics", "host": ["{{base_url}}"], "path": ["api", "purchase-orders", "statistics"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Purchase Order",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {"raw": "{{base_url}}/api/purchase-orders/{{uuid}}", "host": ["{{base_url}}"], "path": ["api", "purchase-orders", "{{uuid}}"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Purchase Order",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Authorization", "value": "Bearer {{auth_token}}"},
+							{"key": "Content-Type", "value": "application/json"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"purchase_request_id\": 1,\n    \"supplier_id\": 1,\n    \"quotation_id\": 1,\n    \"delivery_date\": \"2025-02-15\",\n    \"delivery_location\": \"School Property Office\"\n}"
+						},
+						"url": {"raw": "{{base_url}}/api/purchase-orders", "host": ["{{base_url}}"], "path": ["api", "purchase-orders"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Approve Purchase Order",
+					"request": {
+						"method": "PUT",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {"raw": "{{base_url}}/api/purchase-orders/{{uuid}}/approve", "host": ["{{base_url}}"], "path": ["api", "purchase-orders", "{{uuid}}", "approve"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Send to Supplier",
+					"request": {
+						"method": "PUT",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {"raw": "{{base_url}}/api/purchase-orders/{{uuid}}/send-to-supplier", "host": ["{{base_url}}"], "path": ["api", "purchase-orders", "{{uuid}}", "send-to-supplier"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Cancel Purchase Order",
+					"request": {
+						"method": "PUT",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {"raw": "{{base_url}}/api/purchase-orders/{{uuid}}/cancel", "host": ["{{base_url}}"], "path": ["api", "purchase-orders", "{{uuid}}", "cancel"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Purchase Order",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{"key": "Authorization", "value": "Bearer {{auth_token}}"},
+							{"key": "Content-Type", "value": "application/json"}
+						],
+						"body": {"mode": "raw", "raw": "{\n    \"delivery_date\": \"2025-02-28\"\n}"},
+						"url": {"raw": "{{base_url}}/api/purchase-orders/{{uuid}}", "host": ["{{base_url}}"], "path": ["api", "purchase-orders", "{{uuid}}"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Purchase Order",
+					"request": {
+						"method": "DELETE",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {"raw": "{{base_url}}/api/purchase-orders/{{uuid}}", "host": ["{{base_url}}"], "path": ["api", "purchase-orders", "{{uuid}}"]}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Procurement - Deliveries",
+			"item": [
+				{
+					"name": "List Deliveries",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {"raw": "{{base_url}}/api/deliveries?per_page=15", "host": ["{{base_url}}"], "path": ["api", "deliveries"], "query": [{"key": "per_page", "value": "15"}]}
+					},
+					"response": []
+				},
+				{
+					"name": "Pending Deliveries",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {"raw": "{{base_url}}/api/deliveries/pending", "host": ["{{base_url}}"], "path": ["api", "deliveries", "pending"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Delivery Statistics",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {"raw": "{{base_url}}/api/deliveries/statistics", "host": ["{{base_url}}"], "path": ["api", "deliveries", "statistics"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Deliveries by Purchase Order",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {"raw": "{{base_url}}/api/deliveries/purchase-order/{{uuid}}", "host": ["{{base_url}}"], "path": ["api", "deliveries", "purchase-order", "{{uuid}}"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Delivery",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {"raw": "{{base_url}}/api/deliveries/{{uuid}}", "host": ["{{base_url}}"], "path": ["api", "deliveries", "{{uuid}}"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Pending Assets for Delivery",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {"raw": "{{base_url}}/api/deliveries/{{uuid}}/pending-assets", "host": ["{{base_url}}"], "path": ["api", "deliveries", "{{uuid}}", "pending-assets"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Delivery",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Authorization", "value": "Bearer {{auth_token}}"},
+							{"key": "Content-Type", "value": "application/json"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"purchase_order_id\": 1,\n    \"delivery_date\": \"2025-02-10\",\n    \"dr_number\": \"DR-2025-001\",\n    \"items\": [\n        {\"purchase_order_item_id\": 1, \"quantity_delivered\": 10}\n    ]\n}"
+						},
+						"url": {"raw": "{{base_url}}/api/deliveries", "host": ["{{base_url}}"], "path": ["api", "deliveries"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Inspect Delivery (IAR)",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{"key": "Authorization", "value": "Bearer {{auth_token}}"},
+							{"key": "Content-Type", "value": "application/json"}
+						],
+						"body": {"mode": "raw", "raw": "{\n    \"inspection_remarks\": \"All items in good condition.\"\n}"},
+						"url": {"raw": "{{base_url}}/api/deliveries/{{uuid}}/inspect", "host": ["{{base_url}}"], "path": ["api", "deliveries", "{{uuid}}", "inspect"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Accept Delivery",
+					"request": {
+						"method": "PUT",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {"raw": "{{base_url}}/api/deliveries/{{uuid}}/accept", "host": ["{{base_url}}"], "path": ["api", "deliveries", "{{uuid}}", "accept"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Reject Delivery",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{"key": "Authorization", "value": "Bearer {{auth_token}}"},
+							{"key": "Content-Type", "value": "application/json"}
+						],
+						"body": {"mode": "raw", "raw": "{\n    \"reason\": \"Items do not match specifications in PO.\"\n}"},
+						"url": {"raw": "{{base_url}}/api/deliveries/{{uuid}}/reject", "host": ["{{base_url}}"], "path": ["api", "deliveries", "{{uuid}}", "reject"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Tag Assets",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Authorization", "value": "Bearer {{auth_token}}"},
+							{"key": "Content-Type", "value": "application/json"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"items\": [\n        {\"delivery_item_id\": 1, \"property_number\": \"PROP-2025-001\", \"serial_number\": \"SN-ABC123\"}\n    ]\n}"
+						},
+						"url": {"raw": "{{base_url}}/api/deliveries/{{uuid}}/tag-assets", "host": ["{{base_url}}"], "path": ["api", "deliveries", "{{uuid}}", "tag-assets"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Delivery",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{"key": "Authorization", "value": "Bearer {{auth_token}}"},
+							{"key": "Content-Type", "value": "application/json"}
+						],
+						"body": {"mode": "raw", "raw": "{\n    \"dr_number\": \"DR-2025-001-REV\"\n}"},
+						"url": {"raw": "{{base_url}}/api/deliveries/{{uuid}}", "host": ["{{base_url}}"], "path": ["api", "deliveries", "{{uuid}}"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Delivery",
+					"request": {
+						"method": "DELETE",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {"raw": "{{base_url}}/api/deliveries/{{uuid}}", "host": ["{{base_url}}"], "path": ["api", "deliveries", "{{uuid}}"]}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Inventory - Items",
+			"item": [
+				{
+					"name": "List Inventory Items",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {"raw": "{{base_url}}/api/inventory-items?per_page=15", "host": ["{{base_url}}"], "path": ["api", "inventory-items"], "query": [{"key": "per_page", "value": "15"}]}
+					},
+					"response": []
+				},
+				{
+					"name": "Items with Balances",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {"raw": "{{base_url}}/api/inventory-items/with-balances", "host": ["{{base_url}}"], "path": ["api", "inventory-items", "with-balances"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Low Stock Alert",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {"raw": "{{base_url}}/api/inventory-items/low-stock", "host": ["{{base_url}}"], "path": ["api", "inventory-items", "low-stock"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Inventory Statistics",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {"raw": "{{base_url}}/api/inventory-items/statistics", "host": ["{{base_url}}"], "path": ["api", "inventory-items", "statistics"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Search Inventory Items",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {"raw": "{{base_url}}/api/inventory-items/search?query=paper", "host": ["{{base_url}}"], "path": ["api", "inventory-items", "search"], "query": [{"key": "query", "value": "paper"}]}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Inventory Item",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {"raw": "{{base_url}}/api/inventory-items/{{uuid}}", "host": ["{{base_url}}"], "path": ["api", "inventory-items", "{{uuid}}"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Item with Balance",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {"raw": "{{base_url}}/api/inventory-items/{{uuid}}/with-balance", "host": ["{{base_url}}"], "path": ["api", "inventory-items", "{{uuid}}", "with-balance"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Inventory Item",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Authorization", "value": "Bearer {{auth_token}}"},
+							{"key": "Content-Type", "value": "application/json"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"item_code\": \"ITEM-2025-001\",\n    \"description\": \"Bond Paper A4 80gsm\",\n    \"unit_of_measure\": \"ream\",\n    \"category\": \"Office Supplies\",\n    \"reorder_point\": 5\n}"
+						},
+						"url": {"raw": "{{base_url}}/api/inventory-items", "host": ["{{base_url}}"], "path": ["api", "inventory-items"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Inventory Item",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{"key": "Authorization", "value": "Bearer {{auth_token}}"},
+							{"key": "Content-Type", "value": "application/json"}
+						],
+						"body": {"mode": "raw", "raw": "{\n    \"reorder_point\": 10\n}"},
+						"url": {"raw": "{{base_url}}/api/inventory-items/{{uuid}}", "host": ["{{base_url}}"], "path": ["api", "inventory-items", "{{uuid}}"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Inventory Item",
+					"request": {
+						"method": "DELETE",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {"raw": "{{base_url}}/api/inventory-items/{{uuid}}", "host": ["{{base_url}}"], "path": ["api", "inventory-items", "{{uuid}}"]}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Inventory - Stock Cards",
+			"item": [
+				{
+					"name": "List Stock Cards",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {"raw": "{{base_url}}/api/stock-cards?per_page=15", "host": ["{{base_url}}"], "path": ["api", "stock-cards"], "query": [{"key": "per_page", "value": "15"}]}
+					},
+					"response": []
+				},
+				{
+					"name": "Stock Cards by Item",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {"raw": "{{base_url}}/api/stock-cards/item/{{uuid}}", "host": ["{{base_url}}"], "path": ["api", "stock-cards", "item", "{{uuid}}"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Current Balance for Item",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {"raw": "{{base_url}}/api/stock-cards/item/{{uuid}}/balance", "host": ["{{base_url}}"], "path": ["api", "stock-cards", "item", "{{uuid}}", "balance"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Stock Card",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {"raw": "{{base_url}}/api/stock-cards/{{uuid}}", "host": ["{{base_url}}"], "path": ["api", "stock-cards", "{{uuid}}"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Stock In",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Authorization", "value": "Bearer {{auth_token}}"},
+							{"key": "Content-Type", "value": "application/json"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"inventory_item_id\": 1,\n    \"quantity\": 50,\n    \"unit_cost\": 250.00,\n    \"reference_number\": \"DR-2025-001\",\n    \"remarks\": \"Received from ABC Supplies\"\n}"
+						},
+						"url": {"raw": "{{base_url}}/api/stock-cards/stock-in", "host": ["{{base_url}}"], "path": ["api", "stock-cards", "stock-in"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Stock Out (Issue)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Authorization", "value": "Bearer {{auth_token}}"},
+							{"key": "Content-Type", "value": "application/json"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"inventory_item_id\": 1,\n    \"quantity\": 5,\n    \"issued_to\": \"Grade 7 English Department\",\n    \"remarks\": \"For first quarter assessments\"\n}"
+						},
+						"url": {"raw": "{{base_url}}/api/stock-cards/stock-out", "host": ["{{base_url}}"], "path": ["api", "stock-cards", "stock-out"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Record Donation",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Authorization", "value": "Bearer {{auth_token}}"},
+							{"key": "Content-Type", "value": "application/json"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"inventory_item_id\": 1,\n    \"quantity\": 20,\n    \"donor\": \"PTA Association\",\n    \"remarks\": \"Annual donation drive 2025\"\n}"
+						},
+						"url": {"raw": "{{base_url}}/api/stock-cards/donation", "host": ["{{base_url}}"], "path": ["api", "stock-cards", "donation"]}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Inventory - Adjustments",
+			"item": [
+				{
+					"name": "List Adjustments",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {"raw": "{{base_url}}/api/inventory-adjustments?per_page=15", "host": ["{{base_url}}"], "path": ["api", "inventory-adjustments"], "query": [{"key": "per_page", "value": "15"}]}
+					},
+					"response": []
+				},
+				{
+					"name": "Pending Adjustments",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {"raw": "{{base_url}}/api/inventory-adjustments/pending", "host": ["{{base_url}}"], "path": ["api", "inventory-adjustments", "pending"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Adjustment",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {"raw": "{{base_url}}/api/inventory-adjustments/{{uuid}}", "host": ["{{base_url}}"], "path": ["api", "inventory-adjustments", "{{uuid}}"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Adjustment",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Authorization", "value": "Bearer {{auth_token}}"},
+							{"key": "Content-Type", "value": "application/json"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"inventory_item_id\": 1,\n    \"adjustment_type\": \"Decrease\",\n    \"quantity\": 3,\n    \"reason\": \"Damaged items discovered during physical count\"\n}"
+						},
+						"url": {"raw": "{{base_url}}/api/inventory-adjustments", "host": ["{{base_url}}"], "path": ["api", "inventory-adjustments"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Approve Adjustment",
+					"request": {
+						"method": "PUT",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {"raw": "{{base_url}}/api/inventory-adjustments/{{uuid}}/approve", "host": ["{{base_url}}"], "path": ["api", "inventory-adjustments", "{{uuid}}", "approve"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Reject Adjustment",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{"key": "Authorization", "value": "Bearer {{auth_token}}"},
+							{"key": "Content-Type", "value": "application/json"}
+						],
+						"body": {"mode": "raw", "raw": "{\n    \"reason\": \"Insufficient justification provided.\"\n}"},
+						"url": {"raw": "{{base_url}}/api/inventory-adjustments/{{uuid}}/reject", "host": ["{{base_url}}"], "path": ["api", "inventory-adjustments", "{{uuid}}", "reject"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Adjustment",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{"key": "Authorization", "value": "Bearer {{auth_token}}"},
+							{"key": "Content-Type", "value": "application/json"}
+						],
+						"body": {"mode": "raw", "raw": "{\n    \"reason\": \"Updated — items verified as damaged by property custodian.\"\n}"},
+						"url": {"raw": "{{base_url}}/api/inventory-adjustments/{{uuid}}", "host": ["{{base_url}}"], "path": ["api", "inventory-adjustments", "{{uuid}}"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Adjustment",
+					"request": {
+						"method": "DELETE",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {"raw": "{{base_url}}/api/inventory-adjustments/{{uuid}}", "host": ["{{base_url}}"], "path": ["api", "inventory-adjustments", "{{uuid}}"]}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Inventory - Physical Counts",
+			"item": [
+				{
+					"name": "List Physical Counts",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {"raw": "{{base_url}}/api/physical-counts?per_page=15", "host": ["{{base_url}}"], "path": ["api", "physical-counts"], "query": [{"key": "per_page", "value": "15"}]}
+					},
+					"response": []
+				},
+				{
+					"name": "Counts with Variances",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {"raw": "{{base_url}}/api/physical-counts/with-variances", "host": ["{{base_url}}"], "path": ["api", "physical-counts", "with-variances"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Physical Count",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {"raw": "{{base_url}}/api/physical-counts/{{uuid}}", "host": ["{{base_url}}"], "path": ["api", "physical-counts", "{{uuid}}"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Record Physical Count",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Authorization", "value": "Bearer {{auth_token}}"},
+							{"key": "Content-Type", "value": "application/json"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"inventory_item_id\": 1,\n    \"count_date\": \"2025-01-31\",\n    \"physical_count\": 42,\n    \"remarks\": \"Semi-annual physical count Q1 2025\"\n}"
+						},
+						"url": {"raw": "{{base_url}}/api/physical-counts", "host": ["{{base_url}}"], "path": ["api", "physical-counts"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Physical Count",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{"key": "Authorization", "value": "Bearer {{auth_token}}"},
+							{"key": "Content-Type", "value": "application/json"}
+						],
+						"body": {"mode": "raw", "raw": "{\n    \"physical_count\": 45,\n    \"remarks\": \"Recount after locating misplaced items.\"\n}"},
+						"url": {"raw": "{{base_url}}/api/physical-counts/{{uuid}}", "host": ["{{base_url}}"], "path": ["api", "physical-counts", "{{uuid}}"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Physical Count",
+					"request": {
+						"method": "DELETE",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {"raw": "{{base_url}}/api/physical-counts/{{uuid}}", "host": ["{{base_url}}"], "path": ["api", "physical-counts", "{{uuid}}"]}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Financial - Budgets",
+			"item": [
+				{
+					"name": "List Budgets",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {
+							"raw": "{{base_url}}/api/budgets?per_page=15&status=&fund_source=&fiscal_year=",
+							"host": ["{{base_url}}"],
+							"path": ["api", "budgets"],
+							"query": [
+								{"key": "per_page", "value": "15"},
+								{"key": "status", "value": "", "description": "Draft, Pending, Active, Closed"},
+								{"key": "fund_source", "value": "", "description": "MOOE, SEF, Canteen, Donations"},
+								{"key": "fiscal_year", "value": ""}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Active Budgets",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {"raw": "{{base_url}}/api/budgets/active", "host": ["{{base_url}}"], "path": ["api", "budgets", "active"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Budget Utilization",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {"raw": "{{base_url}}/api/budgets/utilization", "host": ["{{base_url}}"], "path": ["api", "budgets", "utilization"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Nearly Depleted Budgets (≥90%)",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {"raw": "{{base_url}}/api/budgets/nearly-depleted", "host": ["{{base_url}}"], "path": ["api", "budgets", "nearly-depleted"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Budget Statistics",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {"raw": "{{base_url}}/api/budgets/statistics", "host": ["{{base_url}}"], "path": ["api", "budgets", "statistics"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Budgets by Fiscal Year",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {"raw": "{{base_url}}/api/budgets/fiscal-year/2025", "host": ["{{base_url}}"], "path": ["api", "budgets", "fiscal-year", "2025"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Budgets by Fund Source",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {"raw": "{{base_url}}/api/budgets/fund-source/MOOE", "host": ["{{base_url}}"], "path": ["api", "budgets", "fund-source", "MOOE"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Budget",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {"raw": "{{base_url}}/api/budgets/{{uuid}}", "host": ["{{base_url}}"], "path": ["api", "budgets", "{{uuid}}"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Budget",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Authorization", "value": "Bearer {{auth_token}}"},
+							{"key": "Content-Type", "value": "application/json"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"title\": \"MOOE Q1 2025\",\n    \"fund_source\": \"MOOE\",\n    \"total_amount\": 500000.00,\n    \"fiscal_year\": 2025,\n    \"quarter\": 1,\n    \"description\": \"Maintenance and Other Operating Expenses - First Quarter\"\n}"
+						},
+						"url": {"raw": "{{base_url}}/api/budgets", "host": ["{{base_url}}"], "path": ["api", "budgets"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Budget",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{"key": "Authorization", "value": "Bearer {{auth_token}}"},
+							{"key": "Content-Type", "value": "application/json"}
+						],
+						"body": {"mode": "raw", "raw": "{\n    \"description\": \"Updated description.\"\n}"},
+						"url": {"raw": "{{base_url}}/api/budgets/{{uuid}}", "host": ["{{base_url}}"], "path": ["api", "budgets", "{{uuid}}"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Approve Budget",
+					"request": {
+						"method": "PUT",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {"raw": "{{base_url}}/api/budgets/{{uuid}}/approve", "host": ["{{base_url}}"], "path": ["api", "budgets", "{{uuid}}", "approve"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Activate Budget",
+					"request": {
+						"method": "PUT",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {"raw": "{{base_url}}/api/budgets/{{uuid}}/activate", "host": ["{{base_url}}"], "path": ["api", "budgets", "{{uuid}}", "activate"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Close Budget",
+					"request": {
+						"method": "PUT",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {"raw": "{{base_url}}/api/budgets/{{uuid}}/close", "host": ["{{base_url}}"], "path": ["api", "budgets", "{{uuid}}", "close"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Utilization",
+					"request": {
+						"method": "PUT",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {"raw": "{{base_url}}/api/budgets/{{uuid}}/update-utilization", "host": ["{{base_url}}"], "path": ["api", "budgets", "{{uuid}}", "update-utilization"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Budget",
+					"request": {
+						"method": "DELETE",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {"raw": "{{base_url}}/api/budgets/{{uuid}}", "host": ["{{base_url}}"], "path": ["api", "budgets", "{{uuid}}"]}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Financial - Cash Advances",
+			"item": [
+				{
+					"name": "List Cash Advances",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {"raw": "{{base_url}}/api/cash-advances?per_page=15", "host": ["{{base_url}}"], "path": ["api", "cash-advances"], "query": [{"key": "per_page", "value": "15"}]}
+					},
+					"response": []
+				},
+				{
+					"name": "Pending Cash Advances",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {"raw": "{{base_url}}/api/cash-advances/pending", "host": ["{{base_url}}"], "path": ["api", "cash-advances", "pending"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Overdue Cash Advances",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {"raw": "{{base_url}}/api/cash-advances/overdue", "host": ["{{base_url}}"], "path": ["api", "cash-advances", "overdue"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Cash Advance Statistics",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {"raw": "{{base_url}}/api/cash-advances/statistics", "host": ["{{base_url}}"], "path": ["api", "cash-advances", "statistics"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Cash Advances by Employee",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {"raw": "{{base_url}}/api/cash-advances/employee/{{employee_id}}", "host": ["{{base_url}}"], "path": ["api", "cash-advances", "employee", "{{employee_id}}"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Cash Advance",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {"raw": "{{base_url}}/api/cash-advances/{{uuid}}", "host": ["{{base_url}}"], "path": ["api", "cash-advances", "{{uuid}}"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Cash Advance",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Authorization", "value": "Bearer {{auth_token}}"},
+							{"key": "Content-Type", "value": "application/json"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"employee_id\": 1,\n    \"budget_id\": 1,\n    \"amount\": 15000.00,\n    \"purpose\": \"Transportation and meals for DepEd Region IV-A training\",\n    \"expected_liquidation_date\": \"2025-02-28\"\n}"
+						},
+						"url": {"raw": "{{base_url}}/api/cash-advances", "host": ["{{base_url}}"], "path": ["api", "cash-advances"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Approve Cash Advance",
+					"request": {
+						"method": "PUT",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {"raw": "{{base_url}}/api/cash-advances/{{uuid}}/approve", "host": ["{{base_url}}"], "path": ["api", "cash-advances", "{{uuid}}", "approve"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Release Cash Advance",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{"key": "Authorization", "value": "Bearer {{auth_token}}"},
+							{"key": "Content-Type", "value": "application/json"}
+						],
+						"body": {"mode": "raw", "raw": "{\n    \"check_number\": \"CHK-2025-001\",\n    \"release_date\": \"2025-01-25\"\n}"},
+						"url": {"raw": "{{base_url}}/api/cash-advances/{{uuid}}/release", "host": ["{{base_url}}"], "path": ["api", "cash-advances", "{{uuid}}", "release"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Cash Advance",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{"key": "Authorization", "value": "Bearer {{auth_token}}"},
+							{"key": "Content-Type", "value": "application/json"}
+						],
+						"body": {"mode": "raw", "raw": "{\n    \"expected_liquidation_date\": \"2025-03-15\"\n}"},
+						"url": {"raw": "{{base_url}}/api/cash-advances/{{uuid}}", "host": ["{{base_url}}"], "path": ["api", "cash-advances", "{{uuid}}"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Cash Advance",
+					"request": {
+						"method": "DELETE",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {"raw": "{{base_url}}/api/cash-advances/{{uuid}}", "host": ["{{base_url}}"], "path": ["api", "cash-advances", "{{uuid}}"]}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Financial - Disbursements",
+			"item": [
+				{
+					"name": "List Disbursements",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {"raw": "{{base_url}}/api/disbursements?per_page=15", "host": ["{{base_url}}"], "path": ["api", "disbursements"], "query": [{"key": "per_page", "value": "15"}]}
+					},
+					"response": []
+				},
+				{
+					"name": "Pending Disbursements",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {"raw": "{{base_url}}/api/disbursements/pending", "host": ["{{base_url}}"], "path": ["api", "disbursements", "pending"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Disbursement Statistics",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {"raw": "{{base_url}}/api/disbursements/statistics", "host": ["{{base_url}}"], "path": ["api", "disbursements", "statistics"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Disbursement",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {"raw": "{{base_url}}/api/disbursements/{{uuid}}", "host": ["{{base_url}}"], "path": ["api", "disbursements", "{{uuid}}"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Disbursement",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Authorization", "value": "Bearer {{auth_token}}"},
+							{"key": "Content-Type", "value": "application/json"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"budget_id\": 1,\n    \"payee\": \"ABC School Supplies Inc.\",\n    \"amount\": 12500.00,\n    \"description\": \"Payment for office supplies - PO-2025-001\",\n    \"disbursement_date\": \"2025-02-10\"\n}"
+						},
+						"url": {"raw": "{{base_url}}/api/disbursements", "host": ["{{base_url}}"], "path": ["api", "disbursements"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Certify Disbursement",
+					"request": {
+						"method": "PUT",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {"raw": "{{base_url}}/api/disbursements/{{uuid}}/certify", "host": ["{{base_url}}"], "path": ["api", "disbursements", "{{uuid}}", "certify"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Approve Disbursement",
+					"request": {
+						"method": "PUT",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {"raw": "{{base_url}}/api/disbursements/{{uuid}}/approve", "host": ["{{base_url}}"], "path": ["api", "disbursements", "{{uuid}}", "approve"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Mark as Paid",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{"key": "Authorization", "value": "Bearer {{auth_token}}"},
+							{"key": "Content-Type", "value": "application/json"}
+						],
+						"body": {"mode": "raw", "raw": "{\n    \"payment_date\": \"2025-02-12\",\n    \"check_number\": \"CHK-2025-005\"\n}"},
+						"url": {"raw": "{{base_url}}/api/disbursements/{{uuid}}/mark-paid", "host": ["{{base_url}}"], "path": ["api", "disbursements", "{{uuid}}", "mark-paid"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Disbursement",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{"key": "Authorization", "value": "Bearer {{auth_token}}"},
+							{"key": "Content-Type", "value": "application/json"}
+						],
+						"body": {"mode": "raw", "raw": "{\n    \"description\": \"Updated description\"\n}"},
+						"url": {"raw": "{{base_url}}/api/disbursements/{{uuid}}", "host": ["{{base_url}}"], "path": ["api", "disbursements", "{{uuid}}"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Disbursement",
+					"request": {
+						"method": "DELETE",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {"raw": "{{base_url}}/api/disbursements/{{uuid}}", "host": ["{{base_url}}"], "path": ["api", "disbursements", "{{uuid}}"]}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Financial - Liquidations",
+			"item": [
+				{
+					"name": "List Liquidations",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {"raw": "{{base_url}}/api/liquidations?per_page=15", "host": ["{{base_url}}"], "path": ["api", "liquidations"], "query": [{"key": "per_page", "value": "15"}]}
+					},
+					"response": []
+				},
+				{
+					"name": "Pending Liquidations",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {"raw": "{{base_url}}/api/liquidations/pending", "host": ["{{base_url}}"], "path": ["api", "liquidations", "pending"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Liquidations by Cash Advance",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {"raw": "{{base_url}}/api/liquidations/cash-advance/{{uuid}}", "host": ["{{base_url}}"], "path": ["api", "liquidations", "cash-advance", "{{uuid}}"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Liquidation",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {"raw": "{{base_url}}/api/liquidations/{{uuid}}", "host": ["{{base_url}}"], "path": ["api", "liquidations", "{{uuid}}"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Liquidation",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Authorization", "value": "Bearer {{auth_token}}"},
+							{"key": "Content-Type", "value": "application/json"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"cash_advance_id\": 1,\n    \"liquidation_date\": \"2025-02-25\",\n    \"remarks\": \"Full liquidation of training cash advance\"\n}"
+						},
+						"url": {"raw": "{{base_url}}/api/liquidations", "host": ["{{base_url}}"], "path": ["api", "liquidations"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Add Liquidation Item",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Authorization", "value": "Bearer {{auth_token}}"},
+							{"key": "Content-Type", "value": "application/json"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"description\": \"Bus fare to Region IV-A office\",\n    \"amount\": 250.00,\n    \"or_number\": \"OR-2025-00123\",\n    \"receipt_date\": \"2025-01-28\"\n}"
+						},
+						"url": {"raw": "{{base_url}}/api/liquidations/{{uuid}}/items", "host": ["{{base_url}}"], "path": ["api", "liquidations", "{{uuid}}", "items"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Approve Liquidation",
+					"request": {
+						"method": "PUT",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {"raw": "{{base_url}}/api/liquidations/{{uuid}}/approve", "host": ["{{base_url}}"], "path": ["api", "liquidations", "{{uuid}}", "approve"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Reject Liquidation",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{"key": "Authorization", "value": "Bearer {{auth_token}}"},
+							{"key": "Content-Type", "value": "application/json"}
+						],
+						"body": {"mode": "raw", "raw": "{\n    \"reason\": \"OR numbers are missing for items 2 and 3.\"\n}"},
+						"url": {"raw": "{{base_url}}/api/liquidations/{{uuid}}/reject", "host": ["{{base_url}}"], "path": ["api", "liquidations", "{{uuid}}", "reject"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Liquidation",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{"key": "Authorization", "value": "Bearer {{auth_token}}"},
+							{"key": "Content-Type", "value": "application/json"}
+						],
+						"body": {"mode": "raw", "raw": "{\n    \"remarks\": \"Partial liquidation — balance to be refunded.\"\n}"},
+						"url": {"raw": "{{base_url}}/api/liquidations/{{uuid}}", "host": ["{{base_url}}"], "path": ["api", "liquidations", "{{uuid}}"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Liquidation",
+					"request": {
+						"method": "DELETE",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {"raw": "{{base_url}}/api/liquidations/{{uuid}}", "host": ["{{base_url}}"], "path": ["api", "liquidations", "{{uuid}}"]}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Financial - Transactions",
+			"item": [
+				{
+					"name": "List Transactions",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {"raw": "{{base_url}}/api/transactions?per_page=15", "host": ["{{base_url}}"], "path": ["api", "transactions"], "query": [{"key": "per_page", "value": "15"}]}
+					},
+					"response": []
+				},
+				{
+					"name": "Recent Transactions",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {"raw": "{{base_url}}/api/transactions/recent", "host": ["{{base_url}}"], "path": ["api", "transactions", "recent"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Transaction Statistics",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {"raw": "{{base_url}}/api/transactions/statistics", "host": ["{{base_url}}"], "path": ["api", "transactions", "statistics"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Transaction",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {"raw": "{{base_url}}/api/transactions/{{uuid}}", "host": ["{{base_url}}"], "path": ["api", "transactions", "{{uuid}}"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Transaction",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Authorization", "value": "Bearer {{auth_token}}"},
+							{"key": "Content-Type", "value": "application/json"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"budget_id\": 1,\n    \"transaction_type\": \"Expense\",\n    \"amount\": 5000.00,\n    \"description\": \"Utility bills February 2025\",\n    \"transaction_date\": \"2025-02-05\"\n}"
+						},
+						"url": {"raw": "{{base_url}}/api/transactions", "host": ["{{base_url}}"], "path": ["api", "transactions"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Verify Transaction",
+					"request": {
+						"method": "PUT",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {"raw": "{{base_url}}/api/transactions/{{uuid}}/verify", "host": ["{{base_url}}"], "path": ["api", "transactions", "{{uuid}}", "verify"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Transaction",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{"key": "Authorization", "value": "Bearer {{auth_token}}"},
+							{"key": "Content-Type", "value": "application/json"}
+						],
+						"body": {"mode": "raw", "raw": "{\n    \"description\": \"Updated description\"\n}"},
+						"url": {"raw": "{{base_url}}/api/transactions/{{uuid}}", "host": ["{{base_url}}"], "path": ["api", "transactions", "{{uuid}}"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Transaction",
+					"request": {
+						"method": "DELETE",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {"raw": "{{base_url}}/api/transactions/{{uuid}}", "host": ["{{base_url}}"], "path": ["api", "transactions", "{{uuid}}"]}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Documents",
+			"item": [
+				{
+					"name": "List Documents (by Entity)",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {
+							"raw": "{{base_url}}/api/documents?documentable_type=Employee&documentable_id=1",
+							"host": ["{{base_url}}"],
+							"path": ["api", "documents"],
+							"query": [
+								{"key": "documentable_type", "value": "Employee", "description": "Employee, Budget, CashAdvance, Disbursement, etc."},
+								{"key": "documentable_id", "value": "1"}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Document Metadata",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {"raw": "{{base_url}}/api/documents/{{uuid}}", "host": ["{{base_url}}"], "path": ["api", "documents", "{{uuid}}"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Upload Document",
+					"request": {
+						"method": "POST",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{"key": "file", "type": "file", "src": "/path/to/document.pdf"},
+								{"key": "documentable_type", "value": "Employee"},
+								{"key": "documentable_id", "value": "1"},
+								{"key": "document_type", "value": "201_file", "description": "official_receipt, purchase_order, delivery_receipt, iar, 201_file"},
+								{"key": "description", "value": "Employee ID copy"}
+							]
+						},
+						"url": {"raw": "{{base_url}}/api/documents/upload", "host": ["{{base_url}}"], "path": ["api", "documents", "upload"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Document",
+					"request": {
+						"method": "DELETE",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {"raw": "{{base_url}}/api/documents/{{uuid}}", "host": ["{{base_url}}"], "path": ["api", "documents", "{{uuid}}"]}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Audit Trail",
+			"item": [
+				{
+					"name": "Get Audit Logs",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {
+							"raw": "{{base_url}}/api/audit/logs?per_page=50&module=&event=&date_from=&date_to=",
+							"host": ["{{base_url}}"],
+							"path": ["api", "audit", "logs"],
+							"query": [
+								{"key": "per_page", "value": "50"},
+								{"key": "module", "value": "", "description": "HR, Procurement, Financial, Inventory, System"},
+								{"key": "event", "value": "", "description": "created, updated, deleted"},
+								{"key": "date_from", "value": ""},
+								{"key": "date_to", "value": ""}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Entity History",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {
+							"raw": "{{base_url}}/api/audit/entity-history?type=Employee&id=1",
+							"host": ["{{base_url}}"],
+							"path": ["api", "audit", "entity-history"],
+							"query": [
+								{"key": "type", "value": "Employee", "description": "Employee, User, LeaveRequest, Budget, etc."},
+								{"key": "id", "value": "1"}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Audit Report",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {
+							"raw": "{{base_url}}/api/audit/report?date_from=2025-01-01&date_to=2025-01-31",
+							"host": ["{{base_url}}"],
+							"path": ["api", "audit", "report"],
+							"query": [
+								{"key": "date_from", "value": "2025-01-01"},
+								{"key": "date_to", "value": "2025-01-31"}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "My Activity",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {"raw": "{{base_url}}/api/audit/my-activity?per_page=50", "host": ["{{base_url}}"], "path": ["api", "audit", "my-activity"], "query": [{"key": "per_page", "value": "50"}]}
+					},
+					"response": []
+				},
+				{
+					"name": "Audit by Module",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {"raw": "{{base_url}}/api/audit/module/HR", "host": ["{{base_url}}"], "path": ["api", "audit", "module", "HR"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Audit Log Detail",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {"raw": "{{base_url}}/api/audit/{{uuid}}", "host": ["{{base_url}}"], "path": ["api", "audit", "{{uuid}}"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Export Audit Logs (COA)",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {
+							"raw": "{{base_url}}/api/audit/export?date_from=2025-01-01&date_to=2025-01-31&module=",
+							"host": ["{{base_url}}"],
+							"path": ["api", "audit", "export"],
+							"query": [
+								{"key": "date_from", "value": "2025-01-01"},
+								{"key": "date_to", "value": "2025-01-31"},
+								{"key": "module", "value": ""}
+							]
+						}
+					},
+					"response": []
+				}
+			]
 		}
 	],
 	"event": [
 		{
 			"listen": "prerequest",
-			"script": {
-				"type": "text/javascript",
-				"exec": [
-					""
-				]
-			}
+			"script": {"type": "text/javascript", "exec": [""]}
 		},
 		{
 			"listen": "test",
-			"script": {
-				"type": "text/javascript",
-				"exec": [
-					""
-				]
-			}
+			"script": {"type": "text/javascript", "exec": [""]}
 		}
 	],
 	"variable": [
-		{
-			"key": "base_url",
-			"value": "http://localhost:8000",
-			"type": "string"
-		},
-		{
-			"key": "auth_token",
-			"value": "",
-			"type": "string"
-		}
+		{"key": "base_url", "value": "http://localhost:8000", "type": "string"},
+		{"key": "auth_token", "value": "", "type": "string"},
+		{"key": "uuid", "value": "", "type": "string", "description": "Set this to the UUID of the resource you are testing"},
+		{"key": "employee_id", "value": "1", "type": "string", "description": "Integer employee ID for sub-resource filters"}
 	]
 }

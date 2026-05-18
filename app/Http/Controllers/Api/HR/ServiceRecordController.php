@@ -31,9 +31,10 @@ class ServiceRecordController extends Controller
      *   "data": []
      * }
      */
-    public function byEmployee(int $employeeId): AnonymousResourceCollection
+    public function byEmployee(string $employeeId): AnonymousResourceCollection
     {
-        $serviceRecords = $this->serviceRecordService->getServiceHistory($employeeId);
+        $id = \App\Models\Employee::where('uuid', $employeeId)->value('id') ?? 0;
+        $serviceRecords = $this->serviceRecordService->getServiceHistory($id);
 
         return ServiceRecordResource::collection($serviceRecords);
     }

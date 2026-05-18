@@ -32,7 +32,8 @@ class StockCardController extends Controller
 
             return response()->json($stockCards);
         } catch (\Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 500);
+            report($e);
+            return response()->json(['message' => 'An unexpected error occurred. Please try again.'], 500);
         }
     }
 
@@ -51,7 +52,8 @@ class StockCardController extends Controller
 
             return response()->json(['data' => $stockCard]);
         } catch (\Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 500);
+            report($e);
+            return response()->json(['message' => 'An unexpected error occurred. Please try again.'], 500);
         }
     }
 
@@ -68,7 +70,8 @@ class StockCardController extends Controller
                 'data' => $stockCard,
             ], 201);
         } catch (\Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 500);
+            report($e);
+            return response()->json(['message' => 'An unexpected error occurred. Please try again.'], 500);
         }
     }
 
@@ -85,7 +88,8 @@ class StockCardController extends Controller
                 'data' => $stockCard,
             ], 201);
         } catch (\Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 500);
+            report($e);
+            return response()->json(['message' => 'An unexpected error occurred. Please try again.'], 500);
         }
     }
 
@@ -102,7 +106,8 @@ class StockCardController extends Controller
                 'data' => $stockCard,
             ], 201);
         } catch (\Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 500);
+            report($e);
+            return response()->json(['message' => 'An unexpected error occurred. Please try again.'], 500);
         }
     }
 
@@ -116,7 +121,8 @@ class StockCardController extends Controller
 
             return response()->json(['data' => $stockCards]);
         } catch (\Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 500);
+            report($e);
+            return response()->json(['message' => 'An unexpected error occurred. Please try again.'], 500);
         }
     }
 
@@ -133,7 +139,8 @@ class StockCardController extends Controller
                 'current_balance' => $balance,
             ]);
         } catch (\Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 500);
+            report($e);
+            return response()->json(['message' => 'An unexpected error occurred. Please try again.'], 500);
         }
     }
 }

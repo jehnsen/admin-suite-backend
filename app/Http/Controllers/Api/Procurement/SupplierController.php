@@ -31,7 +31,8 @@ class SupplierController extends Controller
 
             return response()->json($suppliers);
         } catch (\Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 500);
+            report($e);
+            return response()->json(['message' => 'An unexpected error occurred. Please try again.'], 500);
         }
     }
 
@@ -50,7 +51,8 @@ class SupplierController extends Controller
 
             return response()->json(['data' => $supplier]);
         } catch (\Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 500);
+            report($e);
+            return response()->json(['message' => 'An unexpected error occurred. Please try again.'], 500);
         }
     }
 
@@ -67,7 +69,8 @@ class SupplierController extends Controller
                 'data' => $supplier,
             ], 201);
         } catch (\Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 500);
+            report($e);
+            return response()->json(['message' => 'An unexpected error occurred. Please try again.'], 500);
         }
     }
 
@@ -85,7 +88,8 @@ class SupplierController extends Controller
                 'data' => $supplier,
             ]);
         } catch (\Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 500);
+            report($e);
+            return response()->json(['message' => 'An unexpected error occurred. Please try again.'], 500);
         }
     }
 
@@ -100,7 +104,8 @@ class SupplierController extends Controller
 
             return response()->json(['message' => 'Supplier deleted successfully.']);
         } catch (\Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 500);
+            report($e);
+            return response()->json(['message' => 'An unexpected error occurred. Please try again.'], 500);
         }
     }
 
@@ -115,7 +120,8 @@ class SupplierController extends Controller
 
             return response()->json($suppliers);
         } catch (\Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 500);
+            report($e);
+            return response()->json(['message' => 'An unexpected error occurred. Please try again.'], 500);
         }
     }
 
@@ -132,7 +138,8 @@ class SupplierController extends Controller
 
             return response()->json($suppliers);
         } catch (\Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 500);
+            report($e);
+            return response()->json(['message' => 'An unexpected error occurred. Please try again.'], 500);
         }
     }
 
@@ -146,7 +153,8 @@ class SupplierController extends Controller
 
             return response()->json(['data' => $statistics]);
         } catch (\Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 500);
+            report($e);
+            return response()->json(['message' => 'An unexpected error occurred. Please try again.'], 500);
         }
     }
 }

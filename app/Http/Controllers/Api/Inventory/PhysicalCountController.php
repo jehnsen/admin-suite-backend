@@ -31,7 +31,8 @@ class PhysicalCountController extends Controller
 
             return response()->json($physicalCounts);
         } catch (\Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 500);
+            report($e);
+            return response()->json(['message' => 'An unexpected error occurred. Please try again.'], 500);
         }
     }
 
@@ -50,7 +51,8 @@ class PhysicalCountController extends Controller
 
             return response()->json(['data' => $physicalCount]);
         } catch (\Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 500);
+            report($e);
+            return response()->json(['message' => 'An unexpected error occurred. Please try again.'], 500);
         }
     }
 
@@ -67,7 +69,8 @@ class PhysicalCountController extends Controller
                 'data' => $physicalCount,
             ], 201);
         } catch (\Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 500);
+            report($e);
+            return response()->json(['message' => 'An unexpected error occurred. Please try again.'], 500);
         }
     }
 
@@ -85,7 +88,8 @@ class PhysicalCountController extends Controller
                 'data' => $physicalCount,
             ]);
         } catch (\Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 500);
+            report($e);
+            return response()->json(['message' => 'An unexpected error occurred. Please try again.'], 500);
         }
     }
 
@@ -100,7 +104,8 @@ class PhysicalCountController extends Controller
 
             return response()->json(['message' => 'Physical count deleted successfully.']);
         } catch (\Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 500);
+            report($e);
+            return response()->json(['message' => 'An unexpected error occurred. Please try again.'], 500);
         }
     }
 
@@ -115,7 +120,8 @@ class PhysicalCountController extends Controller
 
             return response()->json($physicalCounts);
         } catch (\Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 500);
+            report($e);
+            return response()->json(['message' => 'An unexpected error occurred. Please try again.'], 500);
         }
     }
 }

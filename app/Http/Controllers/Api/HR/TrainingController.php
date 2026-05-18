@@ -40,7 +40,8 @@ class TrainingController extends Controller
 
             return response()->json($trainings);
         } catch (\Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 500);
+            report($e);
+            return response()->json(['message' => 'An unexpected error occurred. Please try again.'], 500);
         }
     }
 
@@ -59,36 +60,47 @@ class TrainingController extends Controller
 
             return response()->json(['data' => $training]);
         } catch (\Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 500);
+            report($e);
+            return response()->json(['message' => 'An unexpected error occurred. Please try again.'], 500);
         }
     }
 
     /**
      * Get trainings by employee ID
      */
-    public function byEmployee(int $employeeId, Request $request): JsonResponse
+    public function byEmployee(string $employeeId, Request $request): JsonResponse
     {
+        $id = \App\Models\Employee::where('uuid', $employeeId)->value('id');
+        if (!$id) {
+            return response()->json(['message' => 'Employee not found.'], 404);
+        }
         try {
             $perPage = $this->getPerPage($request);
-            $trainings = $this->trainingService->getTrainingsByEmployee($employeeId, $perPage);
+            $trainings = $this->trainingService->getTrainingsByEmployee($id, $perPage);
 
             return response()->json($trainings);
         } catch (\Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 500);
+            report($e);
+            return response()->json(['message' => 'An unexpected error occurred. Please try again.'], 500);
         }
     }
 
     /**
      * Get completed trainings for an employee
      */
-    public function completedByEmployee(int $employeeId): JsonResponse
+    public function completedByEmployee(string $employeeId): JsonResponse
     {
+        $id = \App\Models\Employee::where('uuid', $employeeId)->value('id');
+        if (!$id) {
+            return response()->json(['message' => 'Employee not found.'], 404);
+        }
         try {
-            $trainings = $this->trainingService->getCompletedTrainings($employeeId);
+            $trainings = $this->trainingService->getCompletedTrainings($id);
 
             return response()->json(['data' => $trainings]);
         } catch (\Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 500);
+            report($e);
+            return response()->json(['message' => 'An unexpected error occurred. Please try again.'], 500);
         }
     }
 
@@ -105,7 +117,8 @@ class TrainingController extends Controller
                 'data' => $training,
             ], 201);
         } catch (\Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 500);
+            report($e);
+            return response()->json(['message' => 'An unexpected error occurred. Please try again.'], 500);
         }
     }
 
@@ -123,7 +136,8 @@ class TrainingController extends Controller
                 'data' => $training,
             ]);
         } catch (\Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 500);
+            report($e);
+            return response()->json(['message' => 'An unexpected error occurred. Please try again.'], 500);
         }
     }
 
@@ -142,7 +156,8 @@ class TrainingController extends Controller
 
             return response()->json(['message' => 'Training record deleted successfully.']);
         } catch (\Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 500);
+            report($e);
+            return response()->json(['message' => 'An unexpected error occurred. Please try again.'], 500);
         }
     }
 
@@ -157,7 +172,8 @@ class TrainingController extends Controller
 
             return response()->json($trainings);
         } catch (\Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 500);
+            report($e);
+            return response()->json(['message' => 'An unexpected error occurred. Please try again.'], 500);
         }
     }
 
@@ -172,7 +188,8 @@ class TrainingController extends Controller
 
             return response()->json($trainings);
         } catch (\Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 500);
+            report($e);
+            return response()->json(['message' => 'An unexpected error occurred. Please try again.'], 500);
         }
     }
 
@@ -187,7 +204,8 @@ class TrainingController extends Controller
 
             return response()->json(['data' => $stats]);
         } catch (\Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 500);
+            report($e);
+            return response()->json(['message' => 'An unexpected error occurred. Please try again.'], 500);
         }
     }
 }

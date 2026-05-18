@@ -63,7 +63,7 @@ class CashAdvanceController extends Controller
             ], 201);
         } catch (\Exception $e) {
             report($e);
-            return response()->json(['message' => $e->getMessage()], 422);
+            return response()->json(['message' => 'An unexpected error occurred. Please try again.'], 500);
         }
     }
 
@@ -82,7 +82,7 @@ class CashAdvanceController extends Controller
             ]);
         } catch (\Exception $e) {
             report($e);
-            return response()->json(['message' => $e->getMessage()], 422);
+            return response()->json(['message' => 'An unexpected error occurred. Please try again.'], 500);
         }
     }
 
@@ -98,7 +98,7 @@ class CashAdvanceController extends Controller
             return response()->json(['message' => 'Cash advance deleted successfully.']);
         } catch (\Exception $e) {
             report($e);
-            return response()->json(['message' => $e->getMessage()], 422);
+            return response()->json(['message' => 'An unexpected error occurred. Please try again.'], 500);
         }
     }
 
@@ -117,7 +117,7 @@ class CashAdvanceController extends Controller
             ]);
         } catch (\Exception $e) {
             report($e);
-            return response()->json(['message' => $e->getMessage()], 422);
+            return response()->json(['message' => 'An unexpected error occurred. Please try again.'], 500);
         }
     }
 
@@ -136,7 +136,7 @@ class CashAdvanceController extends Controller
             ]);
         } catch (\Exception $e) {
             report($e);
-            return response()->json(['message' => $e->getMessage()], 422);
+            return response()->json(['message' => 'An unexpected error occurred. Please try again.'], 500);
         }
     }
 
@@ -165,9 +165,10 @@ class CashAdvanceController extends Controller
     /**
      * Get cash advances by employee
      */
-    public function byEmployee(int $employeeId): JsonResponse
+    public function byEmployee(string $employeeId): JsonResponse
     {
-        $cashAdvances = $this->cashAdvanceService->getCashAdvancesByEmployee($employeeId);
+        $id = \App\Models\Employee::where('uuid', $employeeId)->value('id') ?? 0;
+        $cashAdvances = $this->cashAdvanceService->getCashAdvancesByEmployee($id);
 
         return response()->json(['data' => $cashAdvances]);
     }
