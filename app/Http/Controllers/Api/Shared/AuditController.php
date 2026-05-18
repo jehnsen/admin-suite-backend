@@ -115,8 +115,9 @@ class AuditController extends Controller
     /**
      * Get single audit log details
      */
-    public function show(int $id): JsonResponse
+    public function show(string $uuid): JsonResponse
     {
+        $id = \App\Models\Activity::where('uuid', $uuid)->value('id') ?? 0;
         $log = $this->auditService->getAuditLogDetails($id);
 
         if (!$log) {

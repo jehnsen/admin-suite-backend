@@ -15,11 +15,11 @@ class ServiceRecordResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'id' => $this->id,
+            'id' => $this->uuid,
 
             // Employee
             'employee' => $this->whenLoaded('employee', fn() => [
-                'id' => $this->employee->id,
+                'id' => $this->employee->uuid,
                 'employee_number' => $this->employee->employee_number,
                 'full_name' => $this->employee->full_name,
             ]),

@@ -69,8 +69,9 @@ class DocumentController extends Controller
     /**
      * Show document metadata
      */
-    public function show(int $id): JsonResponse
+    public function show(string $uuid): JsonResponse
     {
+        $id = \App\Models\Document::where('uuid', $uuid)->value('id') ?? 0;
         $document = $this->documentService->getDocumentById($id);
 
         if (!$document) {
@@ -90,8 +91,9 @@ class DocumentController extends Controller
     /**
      * Download document file
      */
-    public function download(int $id)
+    public function download(string $uuid)
     {
+        $id = \App\Models\Document::where('uuid', $uuid)->value('id') ?? 0;
         try {
             $document = $this->documentService->getDocumentById($id);
 
@@ -116,8 +118,9 @@ class DocumentController extends Controller
     /**
      * Delete document (soft delete)
      */
-    public function destroy(int $id): JsonResponse
+    public function destroy(string $uuid): JsonResponse
     {
+        $id = \App\Models\Document::where('uuid', $uuid)->value('id') ?? 0;
         $document = $this->documentService->getDocumentById($id);
 
         if (!$document) {

@@ -93,8 +93,9 @@ class LeaveRequestController extends Controller
      *   "data": {}
      * }
      */
-    public function show(int $id): JsonResponse
+    public function show(string $uuid): JsonResponse
     {
+        $id = \App\Models\LeaveRequest::where('uuid', $uuid)->value('id') ?? 0;
         $leaveRequest = $this->leaveRequestService->findLeaveRequestById($id);
 
         if (!$leaveRequest) {
@@ -123,8 +124,9 @@ class LeaveRequestController extends Controller
      *   "data": {}
      * }
      */
-    public function recommend(Request $request, int $id): JsonResponse
+    public function recommend(Request $request, string $uuid): JsonResponse
     {
+        $id = \App\Models\LeaveRequest::where('uuid', $uuid)->value('id') ?? 0;
         $validated = $request->validate([
             'recommended_by' => 'nullable|integer|exists:employees,id',
             'remarks' => 'nullable|string|max:500',
@@ -171,8 +173,9 @@ class LeaveRequestController extends Controller
      *   "message": "Insufficient leave credits."
      * }
      */
-    public function approve(Request $request, int $id): JsonResponse
+    public function approve(Request $request, string $uuid): JsonResponse
     {
+        $id = \App\Models\LeaveRequest::where('uuid', $uuid)->value('id') ?? 0;
         $validated = $request->validate([
             'approved_by' => 'nullable|integer|exists:employees,id',
             'remarks' => 'nullable|string|max:500',
@@ -222,8 +225,9 @@ class LeaveRequestController extends Controller
      *   "data": {}
      * }
      */
-    public function disapprove(Request $request, int $id): JsonResponse
+    public function disapprove(Request $request, string $uuid): JsonResponse
     {
+        $id = \App\Models\LeaveRequest::where('uuid', $uuid)->value('id') ?? 0;
         $validated = $request->validate([
             'disapproved_by' => 'required|integer|exists:employees,id',
             'reason' => 'required|string|max:500',
@@ -262,8 +266,9 @@ class LeaveRequestController extends Controller
      *   "data": {}
      * }
      */
-    public function cancel(int $id): JsonResponse
+    public function cancel(string $uuid): JsonResponse
     {
+        $id = \App\Models\LeaveRequest::where('uuid', $uuid)->value('id') ?? 0;
         $leaveRequest = $this->leaveRequestService->findLeaveRequestById($id);
 
         if (!$leaveRequest) {

@@ -21,8 +21,9 @@ class DeliveryAssetTaggingController extends Controller
     /**
      * Get pending assets that need tagging for a delivery
      */
-    public function getPendingAssets(int $deliveryId): JsonResponse
+    public function getPendingAssets(string $deliveryUuid): JsonResponse
     {
+        $deliveryId = \App\Models\Delivery::where('uuid', $deliveryUuid)->value('id') ?? 0;
         try {
             $delivery = Delivery::with(['items.inventoryItems'])->findOrFail($deliveryId);
 
@@ -66,8 +67,9 @@ class DeliveryAssetTaggingController extends Controller
     /**
      * Tag assets with serial numbers and property numbers
      */
-    public function tagAssets(TagDeliveryAssetsRequest $request, int $deliveryId): JsonResponse
+    public function tagAssets(TagDeliveryAssetsRequest $request, string $deliveryUuid): JsonResponse
     {
+        $deliveryId = \App\Models\Delivery::where('uuid', $deliveryUuid)->value('id') ?? 0;
         try {
             $delivery = Delivery::findOrFail($deliveryId);
 

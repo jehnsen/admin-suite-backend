@@ -37,8 +37,9 @@ class PurchaseRequestController extends Controller
     /**
      * Get purchase request by ID
      */
-    public function show(int $id): JsonResponse
+    public function show(string $uuid): JsonResponse
     {
+        $id = \App\Models\PurchaseRequest::where('uuid', $uuid)->value('id') ?? 0;
         $pr = $this->prService->getPurchaseRequestById($id);
 
         if (!$pr) {
@@ -69,8 +70,9 @@ class PurchaseRequestController extends Controller
     /**
      * Update purchase request
      */
-    public function update(UpdatePurchaseRequestRequest $request, int $id): JsonResponse
+    public function update(UpdatePurchaseRequestRequest $request, string $uuid): JsonResponse
     {
+        $id = \App\Models\PurchaseRequest::where('uuid', $uuid)->value('id') ?? 0;
         try {
             $pr = $this->prService->updatePurchaseRequest($id, $request->validated());
 
@@ -87,8 +89,9 @@ class PurchaseRequestController extends Controller
     /**
      * Delete purchase request
      */
-    public function destroy(int $id): JsonResponse
+    public function destroy(string $uuid): JsonResponse
     {
+        $id = \App\Models\PurchaseRequest::where('uuid', $uuid)->value('id') ?? 0;
         try {
             $this->prService->deletePurchaseRequest($id);
 
@@ -102,8 +105,9 @@ class PurchaseRequestController extends Controller
     /**
      * Submit purchase request
      */
-    public function submit(int $id): JsonResponse
+    public function submit(string $uuid): JsonResponse
     {
+        $id = \App\Models\PurchaseRequest::where('uuid', $uuid)->value('id') ?? 0;
         try {
             $pr = $this->prService->submitPurchaseRequest($id);
 
@@ -120,8 +124,9 @@ class PurchaseRequestController extends Controller
     /**
      * Recommend purchase request
      */
-    public function recommend(Request $request, int $id): JsonResponse
+    public function recommend(Request $request, string $uuid): JsonResponse
     {
+        $id = \App\Models\PurchaseRequest::where('uuid', $uuid)->value('id') ?? 0;
         $validated = $request->validate([
             'remarks' => 'nullable|string|max:500',
         ]);
@@ -146,8 +151,9 @@ class PurchaseRequestController extends Controller
     /**
      * Approve purchase request
      */
-    public function approve(Request $request, int $id): JsonResponse
+    public function approve(Request $request, string $uuid): JsonResponse
     {
+        $id = \App\Models\PurchaseRequest::where('uuid', $uuid)->value('id') ?? 0;
         $validated = $request->validate([
             'remarks' => 'nullable|string|max:500',
         ]);
@@ -172,8 +178,9 @@ class PurchaseRequestController extends Controller
     /**
      * Disapprove purchase request
      */
-    public function disapprove(Request $request, int $id): JsonResponse
+    public function disapprove(Request $request, string $uuid): JsonResponse
     {
+        $id = \App\Models\PurchaseRequest::where('uuid', $uuid)->value('id') ?? 0;
         $validated = $request->validate([
             'reason' => 'required|string|max:500',
         ]);
@@ -198,8 +205,9 @@ class PurchaseRequestController extends Controller
     /**
      * Cancel purchase request
      */
-    public function cancel(Request $request, int $id): JsonResponse
+    public function cancel(Request $request, string $uuid): JsonResponse
     {
+        $id = \App\Models\PurchaseRequest::where('uuid', $uuid)->value('id') ?? 0;
         $validated = $request->validate([
             'reason' => 'required|string|max:500',
         ]);

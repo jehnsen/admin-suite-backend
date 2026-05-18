@@ -35,8 +35,9 @@ class DeliveryController extends Controller
     /**
      * Get delivery by ID
      */
-    public function show(int $id): JsonResponse
+    public function show(string $uuid): JsonResponse
     {
+        $id = \App\Models\Delivery::where('uuid', $uuid)->value('id') ?? 0;
         $delivery = $this->deliveryService->getDeliveryById($id);
 
         if (!$delivery) {
@@ -83,8 +84,9 @@ class DeliveryController extends Controller
     /**
      * Update delivery
      */
-    public function update(UpdateDeliveryRequest $request, int $id): JsonResponse
+    public function update(UpdateDeliveryRequest $request, string $uuid): JsonResponse
     {
+        $id = \App\Models\Delivery::where('uuid', $uuid)->value('id') ?? 0;
         try {
             $delivery = $this->deliveryService->updateDelivery($id, $request->validated());
 
@@ -101,8 +103,9 @@ class DeliveryController extends Controller
     /**
      * Delete delivery
      */
-    public function destroy(int $id): JsonResponse
+    public function destroy(string $uuid): JsonResponse
     {
+        $id = \App\Models\Delivery::where('uuid', $uuid)->value('id') ?? 0;
         try {
             $this->deliveryService->deleteDelivery($id);
 
@@ -117,8 +120,9 @@ class DeliveryController extends Controller
      * Inspect delivery
      * The authenticated user is always recorded as the inspector.
      */
-    public function inspect(InspectDeliveryRequest $request, int $id): JsonResponse
+    public function inspect(InspectDeliveryRequest $request, string $uuid): JsonResponse
     {
+        $id = \App\Models\Delivery::where('uuid', $uuid)->value('id') ?? 0;
         try {
             $inspectionData = [
                 'inspected_by'       => $request->user()->id,
@@ -142,8 +146,9 @@ class DeliveryController extends Controller
      * Accept delivery
      * The authenticated user is always recorded as the one who accepted.
      */
-    public function accept(Request $request, int $id): JsonResponse
+    public function accept(Request $request, string $uuid): JsonResponse
     {
+        $id = \App\Models\Delivery::where('uuid', $uuid)->value('id') ?? 0;
         try {
             $delivery = $this->deliveryService->acceptDelivery($id, $request->user()->id);
 
@@ -160,8 +165,9 @@ class DeliveryController extends Controller
     /**
      * Reject delivery
      */
-    public function reject(Request $request, int $id): JsonResponse
+    public function reject(Request $request, string $uuid): JsonResponse
     {
+        $id = \App\Models\Delivery::where('uuid', $uuid)->value('id') ?? 0;
         $validated = $request->validate([
             'reason' => 'required|string|max:500',
         ]);

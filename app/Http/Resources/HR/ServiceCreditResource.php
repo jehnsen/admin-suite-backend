@@ -10,10 +10,10 @@ class ServiceCreditResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'id' => $this->id,
+            'id' => $this->uuid,
             'employee_id' => $this->employee_id,
             'employee' => $this->whenLoaded('employee', fn() => [
-                'id' => $this->employee->id,
+                'id' => $this->employee->uuid,
                 'employee_number' => $this->employee->employee_number,
                 'full_name' => $this->employee->full_name,
             ]),
@@ -39,7 +39,7 @@ class ServiceCreditResource extends JsonResource
             'approved_by' => $this->approved_by,
             'approved_at' => $this->approved_at?->format('Y-m-d H:i:s'),
             'approver' => $this->whenLoaded('approver', fn() => $this->approver ? [
-                'id' => $this->approver->id,
+                'id' => $this->approver->uuid,
                 'full_name' => $this->approver->full_name,
             ] : null),
 

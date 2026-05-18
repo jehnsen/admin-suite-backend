@@ -121,9 +121,11 @@ class EmployeeController extends Controller
      *   "message": "Employee not found."
      * }
      */
-    public function show(int $id): JsonResponse
+    public function show(string $uuid): JsonResponse
     {
-        $employee = $this->employeeService->findEmployeeById($id);
+        $employee = $this->employeeService->findEmployeeById(
+            \App\Models\Employee::where('uuid', $uuid)->value('id') ?? 0
+        );
 
         if (!$employee) {
             return response()->json(['message' => 'Employee not found.'], 404);
@@ -149,9 +151,11 @@ class EmployeeController extends Controller
      *   "data": {}
      * }
      */
-    public function update(UpdateEmployeeRequest $request, int $id): JsonResponse
+    public function update(UpdateEmployeeRequest $request, string $uuid): JsonResponse
     {
-        $employee = $this->employeeService->findEmployeeById($id);
+        $employee = $this->employeeService->findEmployeeById(
+            \App\Models\Employee::where('uuid', $uuid)->value('id') ?? 0
+        );
 
         if (!$employee) {
             return response()->json(['message' => 'Employee not found.'], 404);
@@ -160,7 +164,7 @@ class EmployeeController extends Controller
         // Authorization check
         $this->authorize('update', $employee);
 
-        $employee = $this->employeeService->updateEmployee($id, $request->validated());
+        $employee = $this->employeeService->updateEmployee($employee->id, $request->validated());
 
         return response()->json([
             'message' => 'Employee updated successfully.',
@@ -179,9 +183,11 @@ class EmployeeController extends Controller
      *   "message": "Employee deleted successfully."
      * }
      */
-    public function destroy(int $id): JsonResponse
+    public function destroy(string $uuid): JsonResponse
     {
-        $employee = $this->employeeService->findEmployeeById($id);
+        $employee = $this->employeeService->findEmployeeById(
+            \App\Models\Employee::where('uuid', $uuid)->value('id') ?? 0
+        );
 
         if (!$employee) {
             return response()->json(['message' => 'Employee not found.'], 404);
@@ -190,7 +196,7 @@ class EmployeeController extends Controller
         // Authorization check
         $this->authorize('delete', $employee);
 
-        $this->employeeService->deleteEmployee($id);
+        $this->employeeService->deleteEmployee($employee->id);
 
         return response()->json([
             'message' => 'Employee deleted successfully.',
@@ -213,9 +219,11 @@ class EmployeeController extends Controller
      *   "data": {}
      * }
      */
-    public function promote(PromoteEmployeeRequest $request, int $id): JsonResponse
+    public function promote(PromoteEmployeeRequest $request, string $uuid): JsonResponse
     {
-        $employee = $this->employeeService->findEmployeeById($id);
+        $employee = $this->employeeService->findEmployeeById(
+            \App\Models\Employee::where('uuid', $uuid)->value('id') ?? 0
+        );
 
         if (!$employee) {
             return response()->json(['message' => 'Employee not found.'], 404);
@@ -224,7 +232,7 @@ class EmployeeController extends Controller
         // Authorization check
         $this->authorize('promote', $employee);
 
-        $employee = $this->employeeService->promoteEmployee($id, $request->validated());
+        $employee = $this->employeeService->promoteEmployee($employee->id, $request->validated());
 
         return response()->json([
             'message' => 'Employee promoted successfully.',

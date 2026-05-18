@@ -15,11 +15,11 @@ class LeaveRequestResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'id' => $this->id,
+            'id' => $this->uuid,
 
             // Employee Information
             'employee' => $this->whenLoaded('employee', fn() => [
-                'id' => $this->employee->id,
+                'id' => $this->employee->uuid,
                 'employee_number' => $this->employee->employee_number,
                 'full_name' => $this->employee->full_name,
                 'position' => $this->employee->position,
@@ -46,21 +46,21 @@ class LeaveRequestResource extends JsonResource
 
             // Workflow
             'recommender' => $this->whenLoaded('recommender', fn() => [
-                'id' => $this->recommender?->id,
+                'id' => $this->recommender?->uuid,
                 'full_name' => $this->recommender?->full_name,
             ]),
             'recommended_at' => $this->recommended_at?->format('Y-m-d H:i:s'),
             'recommendation_remarks' => $this->recommendation_remarks,
 
             'approver' => $this->whenLoaded('approver', fn() => [
-                'id' => $this->approver?->id,
+                'id' => $this->approver?->uuid,
                 'full_name' => $this->approver?->full_name,
             ]),
             'approved_at' => $this->approved_at?->format('Y-m-d H:i:s'),
             'approval_remarks' => $this->approval_remarks,
 
             'disapprover' => $this->whenLoaded('disapprover', fn() => [
-                'id' => $this->disapprover?->id,
+                'id' => $this->disapprover?->uuid,
                 'full_name' => $this->disapprover?->full_name,
             ]),
             'disapproved_at' => $this->disapproved_at?->format('Y-m-d H:i:s'),

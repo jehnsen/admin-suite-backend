@@ -38,8 +38,9 @@ class InventoryItemController extends Controller
     /**
      * Get inventory item by ID
      */
-    public function show(int $id): JsonResponse
+    public function show(string $uuid): JsonResponse
     {
+        $id = \App\Models\InventoryItem::where('uuid', $uuid)->value('id') ?? 0;
         try {
             $item = $this->inventoryItemService->getInventoryItemById($id);
 
@@ -56,8 +57,9 @@ class InventoryItemController extends Controller
     /**
      * Get inventory item with current stock balance
      */
-    public function showWithBalance(int $id): JsonResponse
+    public function showWithBalance(string $uuid): JsonResponse
     {
+        $id = \App\Models\InventoryItem::where('uuid', $uuid)->value('id') ?? 0;
         try {
             $data = $this->inventoryItemService->getInventoryItemWithBalance($id);
 
@@ -91,8 +93,9 @@ class InventoryItemController extends Controller
     /**
      * Update inventory item
      */
-    public function update(UpdateInventoryItemRequest $request, int $id): JsonResponse
+    public function update(UpdateInventoryItemRequest $request, string $uuid): JsonResponse
     {
+        $id = \App\Models\InventoryItem::where('uuid', $uuid)->value('id') ?? 0;
         try {
             $item = $this->inventoryItemService->updateInventoryItem($id, $request->validated());
 
@@ -108,8 +111,9 @@ class InventoryItemController extends Controller
     /**
      * Delete inventory item
      */
-    public function destroy(int $id): JsonResponse
+    public function destroy(string $uuid): JsonResponse
     {
+        $id = \App\Models\InventoryItem::where('uuid', $uuid)->value('id') ?? 0;
         try {
             $deleted = $this->inventoryItemService->deleteInventoryItem($id);
 

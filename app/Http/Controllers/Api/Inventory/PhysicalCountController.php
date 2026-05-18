@@ -38,8 +38,9 @@ class PhysicalCountController extends Controller
     /**
      * Get physical count by ID
      */
-    public function show(int $id): JsonResponse
+    public function show(string $uuid): JsonResponse
     {
+        $id = \App\Models\PhysicalCount::where('uuid', $uuid)->value('id') ?? 0;
         try {
             $physicalCount = $this->physicalCountService->getPhysicalCountById($id);
 
@@ -73,8 +74,9 @@ class PhysicalCountController extends Controller
     /**
      * Update physical count
      */
-    public function update(UpdatePhysicalCountRequest $request, int $id): JsonResponse
+    public function update(UpdatePhysicalCountRequest $request, string $uuid): JsonResponse
     {
+        $id = \App\Models\PhysicalCount::where('uuid', $uuid)->value('id') ?? 0;
         try {
             $physicalCount = $this->physicalCountService->updatePhysicalCount($id, $request->validated());
 
@@ -90,8 +92,9 @@ class PhysicalCountController extends Controller
     /**
      * Delete physical count
      */
-    public function destroy(int $id): JsonResponse
+    public function destroy(string $uuid): JsonResponse
     {
+        $id = \App\Models\PhysicalCount::where('uuid', $uuid)->value('id') ?? 0;
         try {
             $this->physicalCountService->deletePhysicalCount($id);
 

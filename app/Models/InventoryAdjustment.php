@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Traits\HasUuid;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Activitylog\Traits\LogsActivity;
@@ -10,6 +11,8 @@ use Spatie\Activitylog\LogOptions;
 
 class InventoryAdjustment extends Model
 {
+    use HasUuid;
+
     use HasFactory, SoftDeletes, LogsActivity;
 
     protected $fillable = [

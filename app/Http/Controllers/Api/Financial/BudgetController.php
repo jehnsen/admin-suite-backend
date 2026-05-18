@@ -45,8 +45,9 @@ class BudgetController extends Controller
     /**
      * Get budget by ID
      */
-    public function show(int $id): JsonResponse
+    public function show(string $uuid): JsonResponse
     {
+        $id = \App\Models\Budget::where('uuid', $uuid)->value('id') ?? 0;
         try {
             $budget = $this->budgetService->getBudgetById($id);
 
@@ -80,8 +81,9 @@ class BudgetController extends Controller
     /**
      * Update budget
      */
-    public function update(UpdateBudgetRequest $request, int $id): JsonResponse
+    public function update(UpdateBudgetRequest $request, string $uuid): JsonResponse
     {
+        $id = \App\Models\Budget::where('uuid', $uuid)->value('id') ?? 0;
         try {
             $budget = $this->budgetService->updateBudget($id, $request->validated());
 
@@ -97,8 +99,9 @@ class BudgetController extends Controller
     /**
      * Delete budget
      */
-    public function destroy(int $id): JsonResponse
+    public function destroy(string $uuid): JsonResponse
     {
+        $id = \App\Models\Budget::where('uuid', $uuid)->value('id') ?? 0;
         try {
             $this->budgetService->deleteBudget($id);
 
@@ -111,8 +114,9 @@ class BudgetController extends Controller
     /**
      * Approve budget
      */
-    public function approve(Request $request, int $id): JsonResponse
+    public function approve(Request $request, string $uuid): JsonResponse
     {
+        $id = \App\Models\Budget::where('uuid', $uuid)->value('id') ?? 0;
         try {
             $budget = $this->budgetService->approveBudget($id, $request->user()->id);
 
@@ -128,8 +132,9 @@ class BudgetController extends Controller
     /**
      * Activate budget
      */
-    public function activate(int $id): JsonResponse
+    public function activate(string $uuid): JsonResponse
     {
+        $id = \App\Models\Budget::where('uuid', $uuid)->value('id') ?? 0;
         try {
             $budget = $this->budgetService->activateBudget($id);
 
@@ -145,8 +150,9 @@ class BudgetController extends Controller
     /**
      * Close budget
      */
-    public function close(int $id): JsonResponse
+    public function close(string $uuid): JsonResponse
     {
+        $id = \App\Models\Budget::where('uuid', $uuid)->value('id') ?? 0;
         try {
             $budget = $this->budgetService->closeBudget($id);
 
@@ -249,8 +255,9 @@ class BudgetController extends Controller
     /**
      * Manually update budget utilization from expenses
      */
-    public function updateUtilization(int $id): JsonResponse
+    public function updateUtilization(string $uuid): JsonResponse
     {
+        $id = \App\Models\Budget::where('uuid', $uuid)->value('id') ?? 0;
         try {
             $budget = $this->budgetService->updateBudgetUtilization($id);
 

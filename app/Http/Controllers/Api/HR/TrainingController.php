@@ -47,8 +47,9 @@ class TrainingController extends Controller
     /**
      * Get training by ID
      */
-    public function show(int $id): JsonResponse
+    public function show(string $uuid): JsonResponse
     {
+        $id = \App\Models\Training::where('uuid', $uuid)->value('id') ?? 0;
         try {
             $training = $this->trainingService->getTrainingById($id);
 
@@ -111,8 +112,9 @@ class TrainingController extends Controller
     /**
      * Update training record
      */
-    public function update(UpdateTrainingRequest $request, int $id): JsonResponse
+    public function update(UpdateTrainingRequest $request, string $uuid): JsonResponse
     {
+        $id = \App\Models\Training::where('uuid', $uuid)->value('id') ?? 0;
         try {
             $training = $this->trainingService->updateTraining($id, $request->validated());
 
@@ -128,8 +130,9 @@ class TrainingController extends Controller
     /**
      * Delete training record
      */
-    public function destroy(int $id): JsonResponse
+    public function destroy(string $uuid): JsonResponse
     {
+        $id = \App\Models\Training::where('uuid', $uuid)->value('id') ?? 0;
         try {
             $deleted = $this->trainingService->deleteTraining($id);
 

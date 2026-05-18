@@ -14,11 +14,11 @@ class AttendanceRecordResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'id' => $this->id,
+            'id' => $this->uuid,
             'employee_id' => $this->employee_id,
             'employee' => $this->whenLoaded('employee', function () {
                 return [
-                    'id' => $this->employee->id,
+                    'id' => $this->employee->uuid,
                     'employee_number' => $this->employee->employee_number,
                     'full_name' => $this->employee->full_name,
                     'position' => $this->employee->position,
@@ -54,7 +54,7 @@ class AttendanceRecordResource extends JsonResource
             'approved_at' => $this->approved_at?->format('Y-m-d H:i:s'),
             'approver' => $this->whenLoaded('approver', function () {
                 return $this->approver ? [
-                    'id' => $this->approver->id,
+                    'id' => $this->approver->uuid,
                     'full_name' => $this->approver->full_name,
                 ] : null;
             }),
@@ -63,7 +63,7 @@ class AttendanceRecordResource extends JsonResource
             'created_by' => $this->created_by,
             'creator' => $this->whenLoaded('creator', function () {
                 return $this->creator ? [
-                    'id' => $this->creator->id,
+                    'id' => $this->creator->uuid,
                     'name' => $this->creator->name,
                 ] : null;
             }),

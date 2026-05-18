@@ -35,8 +35,9 @@ class DisbursementController extends Controller
     /**
      * Get disbursement by ID
      */
-    public function show(int $id): JsonResponse
+    public function show(string $uuid): JsonResponse
     {
+        $id = \App\Models\Disbursement::where('uuid', $uuid)->value('id') ?? 0;
         $disbursement = $this->disbursementService->getDisbursementById($id);
 
         if (!$disbursement) {
@@ -67,8 +68,9 @@ class DisbursementController extends Controller
     /**
      * Update disbursement voucher
      */
-    public function update(UpdateDisbursementRequest $request, int $id): JsonResponse
+    public function update(UpdateDisbursementRequest $request, string $uuid): JsonResponse
     {
+        $id = \App\Models\Disbursement::where('uuid', $uuid)->value('id') ?? 0;
         try {
             $disbursement = $this->disbursementService->updateDisbursement($id, $request->validated());
 
@@ -85,8 +87,9 @@ class DisbursementController extends Controller
     /**
      * Delete disbursement voucher
      */
-    public function destroy(int $id): JsonResponse
+    public function destroy(string $uuid): JsonResponse
     {
+        $id = \App\Models\Disbursement::where('uuid', $uuid)->value('id') ?? 0;
         try {
             $this->disbursementService->deleteDisbursement($id);
 
@@ -101,8 +104,9 @@ class DisbursementController extends Controller
      * Certify disbursement voucher
      * The authenticated user is always the certifier.
      */
-    public function certify(Request $request, int $id): JsonResponse
+    public function certify(Request $request, string $uuid): JsonResponse
     {
+        $id = \App\Models\Disbursement::where('uuid', $uuid)->value('id') ?? 0;
         try {
             $disbursement = $this->disbursementService->certifyDisbursement($id, $request->user()->id);
 
@@ -120,8 +124,9 @@ class DisbursementController extends Controller
      * Approve disbursement voucher
      * The authenticated user is always the approver.
      */
-    public function approve(Request $request, int $id): JsonResponse
+    public function approve(Request $request, string $uuid): JsonResponse
     {
+        $id = \App\Models\Disbursement::where('uuid', $uuid)->value('id') ?? 0;
         try {
             $disbursement = $this->disbursementService->approveDisbursement($id, $request->user()->id);
 
@@ -139,8 +144,9 @@ class DisbursementController extends Controller
      * Mark disbursement as paid
      * The authenticated user is always recorded as the one who marked it paid.
      */
-    public function markPaid(MarkPaidDisbursementRequest $request, int $id): JsonResponse
+    public function markPaid(MarkPaidDisbursementRequest $request, string $uuid): JsonResponse
     {
+        $id = \App\Models\Disbursement::where('uuid', $uuid)->value('id') ?? 0;
         try {
             $disbursement = $this->disbursementService->markAsPaid(
                 $id,

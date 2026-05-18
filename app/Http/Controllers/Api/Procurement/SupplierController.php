@@ -38,8 +38,9 @@ class SupplierController extends Controller
     /**
      * Get supplier by ID
      */
-    public function show(int $id): JsonResponse
+    public function show(string $uuid): JsonResponse
     {
+        $id = \App\Models\Supplier::where('uuid', $uuid)->value('id') ?? 0;
         try {
             $supplier = $this->supplierService->getSupplierById($id);
 
@@ -73,8 +74,9 @@ class SupplierController extends Controller
     /**
      * Update supplier
      */
-    public function update(UpdateSupplierRequest $request, int $id): JsonResponse
+    public function update(UpdateSupplierRequest $request, string $uuid): JsonResponse
     {
+        $id = \App\Models\Supplier::where('uuid', $uuid)->value('id') ?? 0;
         try {
             $supplier = $this->supplierService->updateSupplier($id, $request->validated());
 
@@ -90,8 +92,9 @@ class SupplierController extends Controller
     /**
      * Delete supplier
      */
-    public function destroy(int $id): JsonResponse
+    public function destroy(string $uuid): JsonResponse
     {
+        $id = \App\Models\Supplier::where('uuid', $uuid)->value('id') ?? 0;
         try {
             $this->supplierService->deleteSupplier($id);
 

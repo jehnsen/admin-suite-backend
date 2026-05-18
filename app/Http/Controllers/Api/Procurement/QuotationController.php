@@ -35,8 +35,9 @@ class QuotationController extends Controller
     /**
      * Get quotation by ID
      */
-    public function show(int $id): JsonResponse
+    public function show(string $uuid): JsonResponse
     {
+        $id = \App\Models\Quotation::where('uuid', $uuid)->value('id') ?? 0;
         $quotation = $this->quotationService->getQuotationById($id);
 
         if (!$quotation) {
@@ -77,8 +78,9 @@ class QuotationController extends Controller
     /**
      * Update quotation
      */
-    public function update(UpdateQuotationRequest $request, int $id): JsonResponse
+    public function update(UpdateQuotationRequest $request, string $uuid): JsonResponse
     {
+        $id = \App\Models\Quotation::where('uuid', $uuid)->value('id') ?? 0;
         try {
             $quotation = $this->quotationService->updateQuotation($id, $request->validated());
 
@@ -95,8 +97,9 @@ class QuotationController extends Controller
     /**
      * Delete quotation
      */
-    public function destroy(int $id): JsonResponse
+    public function destroy(string $uuid): JsonResponse
     {
+        $id = \App\Models\Quotation::where('uuid', $uuid)->value('id') ?? 0;
         try {
             $this->quotationService->deleteQuotation($id);
 
@@ -110,8 +113,9 @@ class QuotationController extends Controller
     /**
      * Select quotation (award)
      */
-    public function select(int $id): JsonResponse
+    public function select(string $uuid): JsonResponse
     {
+        $id = \App\Models\Quotation::where('uuid', $uuid)->value('id') ?? 0;
         try {
             $quotation = $this->quotationService->selectQuotation($id);
 

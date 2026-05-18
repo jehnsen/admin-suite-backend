@@ -73,8 +73,9 @@ class ServiceRecordController extends Controller
      *   "data": {}
      * }
      */
-    public function show(int $id): JsonResponse
+    public function show(string $uuid): JsonResponse
     {
+        $id = \App\Models\ServiceRecord::where('uuid', $uuid)->value('id') ?? 0;
         $serviceRecord = $this->serviceRecordService->findServiceRecordById($id);
 
         if (!$serviceRecord) {
@@ -96,8 +97,9 @@ class ServiceRecordController extends Controller
      *   "data": {}
      * }
      */
-    public function update(StoreServiceRecordRequest $request, int $id): JsonResponse
+    public function update(StoreServiceRecordRequest $request, string $uuid): JsonResponse
     {
+        $id = \App\Models\ServiceRecord::where('uuid', $uuid)->value('id') ?? 0;
         $serviceRecord = $this->serviceRecordService->updateServiceRecord($id, $request->validated());
 
         return response()->json([
@@ -115,8 +117,9 @@ class ServiceRecordController extends Controller
      *   "message": "Service record deleted successfully."
      * }
      */
-    public function destroy(int $id): JsonResponse
+    public function destroy(string $uuid): JsonResponse
     {
+        $id = \App\Models\ServiceRecord::where('uuid', $uuid)->value('id') ?? 0;
         $this->serviceRecordService->deleteServiceRecord($id);
 
         return response()->json([

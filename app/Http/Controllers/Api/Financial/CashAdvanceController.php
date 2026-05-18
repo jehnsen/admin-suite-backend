@@ -34,8 +34,9 @@ class CashAdvanceController extends Controller
     /**
      * Get cash advance by ID
      */
-    public function show(int $id): JsonResponse
+    public function show(string $uuid): JsonResponse
     {
+        $id = \App\Models\CashAdvance::where('uuid', $uuid)->value('id') ?? 0;
         $cashAdvance = $this->cashAdvanceService->getCashAdvanceById($id);
 
         if (!$cashAdvance) {
@@ -69,8 +70,9 @@ class CashAdvanceController extends Controller
     /**
      * Update cash advance
      */
-    public function update(UpdateCashAdvanceRequest $request, int $id): JsonResponse
+    public function update(UpdateCashAdvanceRequest $request, string $uuid): JsonResponse
     {
+        $id = \App\Models\CashAdvance::where('uuid', $uuid)->value('id') ?? 0;
         try {
             $cashAdvance = $this->cashAdvanceService->updateCashAdvance($id, $request->validated());
 
@@ -87,8 +89,9 @@ class CashAdvanceController extends Controller
     /**
      * Delete cash advance
      */
-    public function destroy(int $id): JsonResponse
+    public function destroy(string $uuid): JsonResponse
     {
+        $id = \App\Models\CashAdvance::where('uuid', $uuid)->value('id') ?? 0;
         try {
             $this->cashAdvanceService->deleteCashAdvance($id);
 
@@ -102,8 +105,9 @@ class CashAdvanceController extends Controller
     /**
      * Approve cash advance
      */
-    public function approve(Request $request, int $id): JsonResponse
+    public function approve(Request $request, string $uuid): JsonResponse
     {
+        $id = \App\Models\CashAdvance::where('uuid', $uuid)->value('id') ?? 0;
         try {
             $cashAdvance = $this->cashAdvanceService->approveCashAdvance($id, $request->user()->id);
 
@@ -120,8 +124,9 @@ class CashAdvanceController extends Controller
     /**
      * Release cash advance
      */
-    public function release(Request $request, int $id): JsonResponse
+    public function release(Request $request, string $uuid): JsonResponse
     {
+        $id = \App\Models\CashAdvance::where('uuid', $uuid)->value('id') ?? 0;
         try {
             $cashAdvance = $this->cashAdvanceService->releaseCashAdvance($id, $request->user()->id);
 

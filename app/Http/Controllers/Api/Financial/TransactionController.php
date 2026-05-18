@@ -66,8 +66,9 @@ class TransactionController extends Controller
     /**
      * Get transaction by ID
      */
-    public function show(int $id): JsonResponse
+    public function show(string $uuid): JsonResponse
     {
+        $id = \App\Models\Transaction::where('uuid', $uuid)->value('id') ?? 0;
         try {
             $transaction = Transaction::with([
                 'budget',
@@ -110,8 +111,9 @@ class TransactionController extends Controller
     /**
      * Update transaction
      */
-    public function update(UpdateTransactionRequest $request, int $id): JsonResponse
+    public function update(UpdateTransactionRequest $request, string $uuid): JsonResponse
     {
+        $id = \App\Models\Transaction::where('uuid', $uuid)->value('id') ?? 0;
         try {
             $transaction = Transaction::findOrFail($id);
             $transaction->update($request->validated());
@@ -128,8 +130,9 @@ class TransactionController extends Controller
     /**
      * Delete transaction
      */
-    public function destroy(int $id): JsonResponse
+    public function destroy(string $uuid): JsonResponse
     {
+        $id = \App\Models\Transaction::where('uuid', $uuid)->value('id') ?? 0;
         try {
             $transaction = Transaction::findOrFail($id);
             $transaction->delete();
@@ -202,8 +205,9 @@ class TransactionController extends Controller
     /**
      * Verify transaction
      */
-    public function verify(Request $request, int $id): JsonResponse
+    public function verify(Request $request, string $uuid): JsonResponse
     {
+        $id = \App\Models\Transaction::where('uuid', $uuid)->value('id') ?? 0;
         try {
             $transaction = Transaction::findOrFail($id);
 

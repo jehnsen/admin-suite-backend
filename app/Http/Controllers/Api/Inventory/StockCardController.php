@@ -39,8 +39,9 @@ class StockCardController extends Controller
     /**
      * Get stock card by ID
      */
-    public function show(int $id): JsonResponse
+    public function show(string $uuid): JsonResponse
     {
+        $id = \App\Models\StockCard::where('uuid', $uuid)->value('id') ?? 0;
         try {
             $stockCard = $this->stockCardService->getStockCardById($id);
 

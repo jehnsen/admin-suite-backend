@@ -35,8 +35,9 @@ class InventoryAdjustmentController extends Controller
     /**
      * Get adjustment by ID
      */
-    public function show(int $id): JsonResponse
+    public function show(string $uuid): JsonResponse
     {
+        $id = \App\Models\InventoryAdjustment::where('uuid', $uuid)->value('id') ?? 0;
         $adjustment = $this->adjustmentService->getAdjustmentById($id);
 
         if (!$adjustment) {
@@ -67,8 +68,9 @@ class InventoryAdjustmentController extends Controller
     /**
      * Update inventory adjustment
      */
-    public function update(UpdateInventoryAdjustmentRequest $request, int $id): JsonResponse
+    public function update(UpdateInventoryAdjustmentRequest $request, string $uuid): JsonResponse
     {
+        $id = \App\Models\InventoryAdjustment::where('uuid', $uuid)->value('id') ?? 0;
         try {
             $adjustment = $this->adjustmentService->updateAdjustment($id, $request->validated());
 
@@ -85,8 +87,9 @@ class InventoryAdjustmentController extends Controller
     /**
      * Delete inventory adjustment
      */
-    public function destroy(int $id): JsonResponse
+    public function destroy(string $uuid): JsonResponse
     {
+        $id = \App\Models\InventoryAdjustment::where('uuid', $uuid)->value('id') ?? 0;
         try {
             $this->adjustmentService->deleteAdjustment($id);
 
@@ -101,8 +104,9 @@ class InventoryAdjustmentController extends Controller
      * Approve inventory adjustment
      * The authenticated user is always recorded as the approver.
      */
-    public function approve(Request $request, int $id): JsonResponse
+    public function approve(Request $request, string $uuid): JsonResponse
     {
+        $id = \App\Models\InventoryAdjustment::where('uuid', $uuid)->value('id') ?? 0;
         try {
             $adjustment = $this->adjustmentService->approveAdjustment($id, $request->user()->id);
 
@@ -119,8 +123,9 @@ class InventoryAdjustmentController extends Controller
     /**
      * Reject inventory adjustment
      */
-    public function reject(RejectInventoryAdjustmentRequest $request, int $id): JsonResponse
+    public function reject(RejectInventoryAdjustmentRequest $request, string $uuid): JsonResponse
     {
+        $id = \App\Models\InventoryAdjustment::where('uuid', $uuid)->value('id') ?? 0;
         try {
             $adjustment = $this->adjustmentService->rejectAdjustment(
                 $id,

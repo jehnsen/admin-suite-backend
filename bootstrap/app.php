@@ -23,6 +23,9 @@ return Application::configure(basePath: dirname(__DIR__))
             'permission' => \App\Http\Middleware\CheckPermission::class,
         ]);
 
+        // API-only app — never redirect unauthenticated requests to a login route
+        $middleware->redirectGuestsTo(fn () => null);
+
         // Prepend LogActivity middleware to API group for audit trail
         $middleware->api(prepend: [
             \App\Http\Middleware\LogActivity::class,
@@ -54,11 +57,9 @@ return Application::configure(basePath: dirname(__DIR__))
 
         // 401 - Unauthenticated
         $exceptions->render(function (AuthenticationException $e, $request) {
-            if ($request->is('api/*')) {
-                return response()->json([
-                    'message' => 'Unauthenticated. Please provide a valid token.',
-                ], 401);
-            }
+            return response()->json([
+                'message' => 'Unauthenticated. Please provide a valid token.',
+            ], 401);
         });
 
         // 403 - Spatie permission denied

@@ -35,8 +35,9 @@ class LiquidationController extends Controller
     /**
      * Get liquidation by ID
      */
-    public function show(int $id): JsonResponse
+    public function show(string $uuid): JsonResponse
     {
+        $id = \App\Models\Liquidation::where('uuid', $uuid)->value('id') ?? 0;
         $liquidation = $this->liquidationService->getLiquidationById($id);
 
         if (!$liquidation) {
@@ -67,8 +68,9 @@ class LiquidationController extends Controller
     /**
      * Update liquidation
      */
-    public function update(UpdateLiquidationRequest $request, int $id): JsonResponse
+    public function update(UpdateLiquidationRequest $request, string $uuid): JsonResponse
     {
+        $id = \App\Models\Liquidation::where('uuid', $uuid)->value('id') ?? 0;
         try {
             $liquidation = $this->liquidationService->updateLiquidation($id, $request->validated());
 
@@ -85,8 +87,9 @@ class LiquidationController extends Controller
     /**
      * Delete liquidation
      */
-    public function destroy(int $id): JsonResponse
+    public function destroy(string $uuid): JsonResponse
     {
+        $id = \App\Models\Liquidation::where('uuid', $uuid)->value('id') ?? 0;
         try {
             $this->liquidationService->deleteLiquidation($id);
 
@@ -100,8 +103,9 @@ class LiquidationController extends Controller
     /**
      * Add item to liquidation
      */
-    public function addItem(AddLiquidationItemRequest $request, int $id): JsonResponse
+    public function addItem(AddLiquidationItemRequest $request, string $uuid): JsonResponse
     {
+        $id = \App\Models\Liquidation::where('uuid', $uuid)->value('id') ?? 0;
         try {
             $item = $this->liquidationService->addLiquidationItem($id, $request->validated());
 
@@ -119,8 +123,9 @@ class LiquidationController extends Controller
      * Approve liquidation
      * The authenticated user is always recorded as the approver.
      */
-    public function approve(Request $request, int $id): JsonResponse
+    public function approve(Request $request, string $uuid): JsonResponse
     {
+        $id = \App\Models\Liquidation::where('uuid', $uuid)->value('id') ?? 0;
         try {
             $liquidation = $this->liquidationService->approveLiquidation($id, $request->user()->id);
 
@@ -137,8 +142,9 @@ class LiquidationController extends Controller
     /**
      * Reject liquidation
      */
-    public function reject(Request $request, int $id): JsonResponse
+    public function reject(Request $request, string $uuid): JsonResponse
     {
+        $id = \App\Models\Liquidation::where('uuid', $uuid)->value('id') ?? 0;
         $validated = $request->validate([
             'reason' => 'required|string|max:500',
         ]);

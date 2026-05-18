@@ -200,8 +200,9 @@ class UserManagementController extends Controller
      *   "created_at": "2024-01-15T10:00:00.000000Z"
      * }
      */
-    public function show(int $id): JsonResponse
+    public function show(string $uuid): JsonResponse
     {
+        $id = \App\Models\User::where('uuid', $uuid)->value('id') ?? 0;
         $user = User::with(['roles', 'employee'])->findOrFail($id);
 
         return response()->json([
@@ -241,8 +242,9 @@ class UserManagementController extends Controller
      *   }
      * }
      */
-    public function update(Request $request, int $id): JsonResponse
+    public function update(Request $request, string $uuid): JsonResponse
     {
+        $id = \App\Models\User::where('uuid', $uuid)->value('id') ?? 0;
         $user = User::findOrFail($id);
 
         // Prevent editing Super Admin by non-Super Admin
@@ -293,8 +295,9 @@ class UserManagementController extends Controller
      *   "message": "You cannot delete this user"
      * }
      */
-    public function destroy(int $id): JsonResponse
+    public function destroy(string $uuid): JsonResponse
     {
+        $id = \App\Models\User::where('uuid', $uuid)->value('id') ?? 0;
         $user = User::findOrFail($id);
 
         // Prevent self-deletion
@@ -331,8 +334,9 @@ class UserManagementController extends Controller
      *   "temporary_password": "RandomPass456"
      * }
      */
-    public function resetPassword(Request $request, int $id): JsonResponse
+    public function resetPassword(Request $request, string $uuid): JsonResponse
     {
+        $id = \App\Models\User::where('uuid', $uuid)->value('id') ?? 0;
         $user = User::findOrFail($id);
 
         // Prevent resetting Super Admin password by non-Super Admin
@@ -389,8 +393,9 @@ class UserManagementController extends Controller
      *   }
      * }
      */
-    public function assignRole(Request $request, int $id): JsonResponse
+    public function assignRole(Request $request, string $uuid): JsonResponse
     {
+        $id = \App\Models\User::where('uuid', $uuid)->value('id') ?? 0;
         $user = User::findOrFail($id);
 
         $validated = $request->validate([
@@ -456,8 +461,9 @@ class UserManagementController extends Controller
      *   "all_permissions": ["view_employees", "create_leave_request", "view_audit_logs"]
      * }
      */
-    public function syncPermissions(Request $request, int $id): JsonResponse
+    public function syncPermissions(Request $request, string $uuid): JsonResponse
     {
+        $id = \App\Models\User::where('uuid', $uuid)->value('id') ?? 0;
         $user = User::findOrFail($id);
 
         if ($user->hasRole('Super Admin') && !auth()->user()->hasRole('Super Admin')) {
@@ -494,8 +500,9 @@ class UserManagementController extends Controller
      *   "all_permissions": ["view_employees", "create_leave_request", "export_reports"]
      * }
      */
-    public function givePermissions(Request $request, int $id): JsonResponse
+    public function givePermissions(Request $request, string $uuid): JsonResponse
     {
+        $id = \App\Models\User::where('uuid', $uuid)->value('id') ?? 0;
         $user = User::findOrFail($id);
 
         if ($user->hasRole('Super Admin') && !auth()->user()->hasRole('Super Admin')) {
@@ -534,8 +541,9 @@ class UserManagementController extends Controller
      *   "all_permissions": ["view_employees", "create_leave_request"]
      * }
      */
-    public function revokePermissions(Request $request, int $id): JsonResponse
+    public function revokePermissions(Request $request, string $uuid): JsonResponse
     {
+        $id = \App\Models\User::where('uuid', $uuid)->value('id') ?? 0;
         $user = User::findOrFail($id);
 
         if ($user->hasRole('Super Admin') && !auth()->user()->hasRole('Super Admin')) {

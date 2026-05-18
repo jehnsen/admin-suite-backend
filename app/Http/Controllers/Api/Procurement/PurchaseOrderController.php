@@ -34,8 +34,9 @@ class PurchaseOrderController extends Controller
     /**
      * Get purchase order by ID
      */
-    public function show(int $id): JsonResponse
+    public function show(string $uuid): JsonResponse
     {
+        $id = \App\Models\PurchaseOrder::where('uuid', $uuid)->value('id') ?? 0;
         $po = $this->poService->getPurchaseOrderById($id);
 
         if (!$po) {
@@ -70,8 +71,9 @@ class PurchaseOrderController extends Controller
     /**
      * Update purchase order
      */
-    public function update(UpdatePurchaseOrderRequest $request, int $id): JsonResponse
+    public function update(UpdatePurchaseOrderRequest $request, string $uuid): JsonResponse
     {
+        $id = \App\Models\PurchaseOrder::where('uuid', $uuid)->value('id') ?? 0;
         try {
             $po = $this->poService->updatePurchaseOrder($id, $request->validated());
 
@@ -88,8 +90,9 @@ class PurchaseOrderController extends Controller
     /**
      * Delete purchase order
      */
-    public function destroy(int $id): JsonResponse
+    public function destroy(string $uuid): JsonResponse
     {
+        $id = \App\Models\PurchaseOrder::where('uuid', $uuid)->value('id') ?? 0;
         try {
             $this->poService->deletePurchaseOrder($id);
 
@@ -104,8 +107,9 @@ class PurchaseOrderController extends Controller
      * Approve purchase order
      * The authenticated user is always recorded as the approver.
      */
-    public function approve(Request $request, int $id): JsonResponse
+    public function approve(Request $request, string $uuid): JsonResponse
     {
+        $id = \App\Models\PurchaseOrder::where('uuid', $uuid)->value('id') ?? 0;
         try {
             $po = $this->poService->approvePurchaseOrder($id, $request->user()->id);
 
@@ -122,8 +126,9 @@ class PurchaseOrderController extends Controller
     /**
      * Send PO to supplier
      */
-    public function sendToSupplier(int $id): JsonResponse
+    public function sendToSupplier(string $uuid): JsonResponse
     {
+        $id = \App\Models\PurchaseOrder::where('uuid', $uuid)->value('id') ?? 0;
         try {
             $po = $this->poService->sendToSupplier($id);
 
@@ -140,8 +145,9 @@ class PurchaseOrderController extends Controller
     /**
      * Cancel purchase order
      */
-    public function cancel(Request $request, int $id): JsonResponse
+    public function cancel(Request $request, string $uuid): JsonResponse
     {
+        $id = \App\Models\PurchaseOrder::where('uuid', $uuid)->value('id') ?? 0;
         $validated = $request->validate([
             'reason' => 'required|string|max:500',
         ]);

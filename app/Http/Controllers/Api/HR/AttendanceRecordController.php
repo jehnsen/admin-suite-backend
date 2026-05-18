@@ -99,8 +99,9 @@ class AttendanceRecordController extends Controller
      *
      * @urlParam id integer required Attendance record ID. Example: 1
      */
-    public function show(int $id): JsonResponse
+    public function show(string $uuid): JsonResponse
     {
+        $id = \App\Models\AttendanceRecord::where('uuid', $uuid)->value('id') ?? 0;
         $record = $this->attendanceService->findAttendanceRecordById($id);
 
         if (!$record) {
@@ -154,8 +155,9 @@ class AttendanceRecordController extends Controller
      *
      * @urlParam id integer required Attendance record ID. Example: 1
      */
-    public function update(UpdateAttendanceRecordRequest $request, int $id): JsonResponse
+    public function update(UpdateAttendanceRecordRequest $request, string $uuid): JsonResponse
     {
+        $id = \App\Models\AttendanceRecord::where('uuid', $uuid)->value('id') ?? 0;
         $record = $this->attendanceService->findAttendanceRecordById($id);
 
         if (!$record) {
@@ -185,8 +187,9 @@ class AttendanceRecordController extends Controller
      *
      * @urlParam id integer required Attendance record ID. Example: 1
      */
-    public function destroy(int $id): JsonResponse
+    public function destroy(string $uuid): JsonResponse
     {
+        $id = \App\Models\AttendanceRecord::where('uuid', $uuid)->value('id') ?? 0;
         $record = $this->attendanceService->findAttendanceRecordById($id);
 
         if (!$record) {
@@ -215,8 +218,9 @@ class AttendanceRecordController extends Controller
      *
      * @urlParam id integer required Attendance record ID. Example: 1
      */
-    public function approve(int $id): JsonResponse
+    public function approve(string $uuid): JsonResponse
     {
+        $id = \App\Models\AttendanceRecord::where('uuid', $uuid)->value('id') ?? 0;
         $record = $this->attendanceService->findAttendanceRecordById($id);
 
         if (!$record) {
