@@ -11,7 +11,6 @@ use App\Models\User;
 use App\Models\Employee;
 use App\Models\PurchaseOrder;
 use Carbon\Carbon;
-use Faker\Factory as Faker;
 
 class FinancialSeeder extends Seeder
 {
@@ -22,7 +21,6 @@ class FinancialSeeder extends Seeder
      */
     public function run()
     {
-        $faker = Faker::create();
         $users = User::all();
         $employees = Employee::all();
 
@@ -32,8 +30,7 @@ class FinancialSeeder extends Seeder
         }
 
         // === Create Cash Advances ===
-        $cashAdvance1 = CashAdvance::create([
-            'ca_number' => 'CA-2025-001',
+        $cashAdvance1 = CashAdvance::firstOrCreate(['ca_number' => 'CA-2025-001'], [
             'ca_date' => Carbon::now()->subDays(30),
             'employee_id' => $employees->random()->id,
             'user_id' => $users->random()->id,
@@ -49,8 +46,7 @@ class FinancialSeeder extends Seeder
             'status' => 'Released',
         ]);
 
-        $cashAdvance2 = CashAdvance::create([
-            'ca_number' => 'CA-2025-002',
+        $cashAdvance2 = CashAdvance::firstOrCreate(['ca_number' => 'CA-2025-002'], [
             'ca_date' => Carbon::now()->subDays(20),
             'employee_id' => $employees->random()->id,
             'user_id' => $users->random()->id,
@@ -67,8 +63,7 @@ class FinancialSeeder extends Seeder
         ]);
 
         // === Create Disbursements ===
-        Disbursement::create([
-            'dv_number' => 'DV-2025-001',
+        Disbursement::firstOrCreate(['dv_number' => 'DV-2025-001'], [
             'dv_date' => Carbon::now()->subDays(15),
             'payee_name' => $cashAdvance1->employee->full_name,
             'payee_address' => $cashAdvance1->employee->address,
@@ -93,8 +88,7 @@ class FinancialSeeder extends Seeder
         
         $purchaseOrder = PurchaseOrder::with('supplier')->inRandomOrder()->first();
         if ($purchaseOrder && $purchaseOrder->supplier) {
-            Disbursement::create([
-                'dv_number' => 'DV-2025-002',
+            Disbursement::firstOrCreate(['dv_number' => 'DV-2025-002'], [
                 'dv_date' => Carbon::now()->subDays(10),
                 'payee_name' => $purchaseOrder->supplier->business_name,
                 'payee_address' => $purchaseOrder->supplier->address,
@@ -121,8 +115,7 @@ class FinancialSeeder extends Seeder
 
 
         // === Create Liquidations and Liquidation Items ===
-        $liquidation1 = Liquidation::create([
-            'liquidation_number' => 'LQ-2025-001',
+        $liquidation1 = Liquidation::firstOrCreate(['liquidation_number' => 'LQ-2025-001'], [
             'liquidation_date' => Carbon::now()->subDays(5),
             'cash_advance_id' => $cashAdvance1->id,
             'cash_advance_amount' => $cashAdvance1->amount,
@@ -138,23 +131,25 @@ class FinancialSeeder extends Seeder
             ['expense_date' => Carbon::now()->subDays(18), 'particulars' => 'Meals for 3 days', 'amount' => 1200.00, 'category' => 'Food'],
         ];
 
-        $totalExpenses1 = 0;
-        foreach ($items1 as $index => $item) {
-            $li = LiquidationItem::create(array_merge($item, [
-                'liquidation_id' => $liquidation1->id,
-                'item_number' => $index + 1,
-                'or_invoice_number' => 'OR' . $faker->unique()->numberBetween(1000, 5000),
-            ]));
-            $totalExpenses1 += $li->amount;
-        }
+        if ($liquidation1->wasRecentlyCreated) {
+            $totalExpenses1 = 0;
+            foreach ($items1 as $index => $item) {
+                $li = LiquidationItem::create(array_merge($item, [
+                    'liquidation_id' => $liquidation1->id,
+                    'item_number' => $index + 1,
+                    'or_invoice_number' => 'OR' . (1000 + $index),
+                ]));
+                $totalExpenses1 += $li->amount;
+            }
 
-        $liquidation1->total_expenses = $totalExpenses1;
-        $liquidation1->amount_to_refund = $liquidation1->cash_advance_amount - $totalExpenses1;
-        $liquidation1->save();
-        
-        $cashAdvance1->liquidated_amount = $totalExpenses1;
-        $cashAdvance1->unliquidated_balance = $cashAdvance1->amount - $totalExpenses1;
-        $cashAdvance1->status = 'Fully Liquidated';
-        $cashAdvance1->save();
+            $liquidation1->total_expenses = $totalExpenses1;
+            $liquidation1->amount_to_refund = $liquidation1->cash_advance_amount - $totalExpenses1;
+            $liquidation1->save();
+
+            $cashAdvance1->liquidated_amount = $totalExpenses1;
+            $cashAdvance1->unliquidated_balance = $cashAdvance1->amount - $totalExpenses1;
+            $cashAdvance1->status = 'Fully Liquidated';
+            $cashAdvance1->save();
+        }
     }
 }
