@@ -4,6 +4,10 @@ namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
 
+// Attendance Module
+use App\Interfaces\Attendance\AttendanceRepositoryInterface;
+use App\Repositories\Attendance\AttendanceRepository;
+
 // HR Module
 use App\Interfaces\HR\EmployeeRepositoryInterface;
 use App\Repositories\HR\EmployeeRepository;
@@ -41,6 +45,10 @@ use App\Interfaces\Inventory\InventoryAdjustmentRepositoryInterface;
 use App\Repositories\Inventory\InventoryAdjustmentRepository;
 use App\Interfaces\Inventory\PhysicalCountRepositoryInterface;
 use App\Repositories\Inventory\PhysicalCountRepository;
+use App\Interfaces\Inventory\IssuanceRepositoryInterface;
+use App\Repositories\Inventory\IssuanceRepository;
+use App\Interfaces\Inventory\RequisitionSlipRepositoryInterface;
+use App\Repositories\Inventory\RequisitionSlipRepository;
 
 // Financial Module
 use App\Interfaces\Financial\BudgetRepositoryInterface;
@@ -51,6 +59,8 @@ use App\Interfaces\Financial\DisbursementRepositoryInterface;
 use App\Repositories\Financial\DisbursementRepository;
 use App\Interfaces\Financial\LiquidationRepositoryInterface;
 use App\Repositories\Financial\LiquidationRepository;
+use App\Interfaces\Financial\TransactionRepositoryInterface;
+use App\Repositories\Financial\TransactionRepository;
 
 // Shared Module
 use App\Interfaces\Shared\DocumentRepositoryInterface;
@@ -69,6 +79,9 @@ class RepositoryServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
+        // Attendance Module Repository Bindings
+        $this->app->bind(AttendanceRepositoryInterface::class, AttendanceRepository::class);
+
         // HR Module Repository Bindings
         $this->app->bind(EmployeeRepositoryInterface::class, EmployeeRepository::class);
         $this->app->bind(LeaveRequestRepositoryInterface::class, LeaveRequestRepository::class);
@@ -90,12 +103,15 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(StockCardRepositoryInterface::class, StockCardRepository::class);
         $this->app->bind(InventoryAdjustmentRepositoryInterface::class, InventoryAdjustmentRepository::class);
         $this->app->bind(PhysicalCountRepositoryInterface::class, PhysicalCountRepository::class);
+        $this->app->bind(IssuanceRepositoryInterface::class, IssuanceRepository::class);
+        $this->app->bind(RequisitionSlipRepositoryInterface::class, RequisitionSlipRepository::class);
 
         // Financial Module Repository Bindings
         $this->app->bind(BudgetRepositoryInterface::class, BudgetRepository::class);
         $this->app->bind(CashAdvanceRepositoryInterface::class, CashAdvanceRepository::class);
         $this->app->bind(DisbursementRepositoryInterface::class, DisbursementRepository::class);
         $this->app->bind(LiquidationRepositoryInterface::class, LiquidationRepository::class);
+        $this->app->bind(TransactionRepositoryInterface::class, TransactionRepository::class);
 
         // Shared Module Repository Bindings
         $this->app->bind(DocumentRepositoryInterface::class, DocumentRepository::class);

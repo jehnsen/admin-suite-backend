@@ -20,6 +20,8 @@ use App\Http\Controllers\Api\Inventory\InventoryItemController;
 use App\Http\Controllers\Api\Inventory\StockCardController;
 use App\Http\Controllers\Api\Inventory\InventoryAdjustmentController;
 use App\Http\Controllers\Api\Inventory\PhysicalCountController;
+use App\Http\Controllers\Api\Inventory\IssuanceController;
+use App\Http\Controllers\Api\Inventory\RequisitionSlipController;
 use App\Http\Controllers\Api\Financial\BudgetController;
 use App\Http\Controllers\Api\Financial\CashAdvanceController;
 use App\Http\Controllers\Api\Financial\DisbursementController;
@@ -30,6 +32,8 @@ use App\Http\Controllers\Api\Shared\DocumentController;
 use App\Http\Controllers\Api\Shared\AuditController;
 use App\Http\Controllers\Api\Admin\UserManagementController;
 use App\Http\Controllers\Api\DashboardController;
+use App\Http\Controllers\Api\Attendance\AttendanceController;
+use App\Http\Controllers\Api\Report\ReportController;
 
 /*
 |--------------------------------------------------------------------------
@@ -319,6 +323,39 @@ Route::middleware(['auth:sanctum', 'throttle:api'])->group(function () {
         Route::delete('/{id}', [PhysicalCountController::class, 'destroy'])->middleware('permission:delete_inventory');
     });
 
+    // Inventory Management - Issuances (PAR / ICS)
+    Route::prefix('issuances')->middleware('permission:view_issuances')->group(function () {
+        Route::get('/', [IssuanceController::class, 'index']);
+        Route::get('/search', [IssuanceController::class, 'search']);
+        Route::get('/overdue', [IssuanceController::class, 'overdue']);
+        Route::get('/statistics', [IssuanceController::class, 'statistics']);
+        Route::get('/employee/{employeeId}', [IssuanceController::class, 'byEmployee']);
+        Route::get('/{id}', [IssuanceController::class, 'show']);
+
+        Route::post('/', [IssuanceController::class, 'store'])->middleware('permission:create_issuances');
+        Route::put('/{id}', [IssuanceController::class, 'update'])->middleware('permission:edit_issuances');
+        Route::delete('/{id}', [IssuanceController::class, 'destroy'])->middleware('permission:delete_issuances');
+        Route::put('/{id}/acknowledge', [IssuanceController::class, 'acknowledge'])->middleware('permission:edit_issuances');
+        Route::put('/{id}/return', [IssuanceController::class, 'recordReturn'])->middleware('permission:return_issuances');
+        Route::put('/{id}/transfer', [IssuanceController::class, 'transfer'])->middleware('permission:transfer_issuances');
+    });
+
+    // Inventory Management - Requisition and Issue Slips (RIS)
+    Route::prefix('requisition-slips')->middleware('permission:view_ris')->group(function () {
+        Route::get('/', [RequisitionSlipController::class, 'index']);
+        Route::get('/search', [RequisitionSlipController::class, 'search']);
+        Route::get('/pending', [RequisitionSlipController::class, 'pending']);
+        Route::get('/statistics', [RequisitionSlipController::class, 'statistics']);
+        Route::get('/{id}', [RequisitionSlipController::class, 'show']);
+
+        Route::post('/', [RequisitionSlipController::class, 'store'])->middleware('permission:create_ris');
+        Route::put('/{id}', [RequisitionSlipController::class, 'update'])->middleware('permission:edit_ris');
+        Route::delete('/{id}', [RequisitionSlipController::class, 'destroy'])->middleware('permission:delete_ris');
+        Route::put('/{id}/approve', [RequisitionSlipController::class, 'approve'])->middleware('permission:approve_ris');
+        Route::put('/{id}/release', [RequisitionSlipController::class, 'release'])->middleware('permission:release_ris');
+        Route::put('/{id}/cancel', [RequisitionSlipController::class, 'cancel'])->middleware('permission:edit_ris');
+    });
+
     // Financial Management - Budgets
     Route::prefix('budgets')->middleware('permission:view_budget')->group(function () {
         Route::get('/', [BudgetController::class, 'index']);
@@ -433,6 +470,31 @@ Route::middleware(['auth:sanctum', 'throttle:api'])->group(function () {
         Route::get('/{id}', [AuditController::class, 'show']);
 
         Route::get('/export', [AuditController::class, 'export'])->middleware('permission:export_audit_logs');
+    });
+
+    // Attendance - Biometric CSV Import & DTR
+    Route::prefix('attendance')->middleware('permission:view_attendance')->group(function () {
+        Route::post('/import', [AttendanceController::class, 'import'])->middleware('permission:upload_attendance_csv');
+
+        Route::get('/import-batches', [AttendanceController::class, 'importBatches']);
+        Route::get('/import-batches/{id}', [AttendanceController::class, 'showBatch']);
+        Route::get('/import-batches/{id}/logs', [AttendanceController::class, 'batchLogs']);
+
+        Route::get('/dtr', [AttendanceController::class, 'allDtr']);
+        Route::get('/dtr/{employeeId}', [AttendanceController::class, 'dtrByEmployee']);
+        Route::get('/dtr/{employeeId}/summary', [AttendanceController::class, 'summary']);
+        Route::patch('/dtr/{employeeId}/{date}', [AttendanceController::class, 'correctDtr'])->middleware('permission:edit_attendance');
+
+        Route::get('/export/dtr/{employeeId}', [AttendanceController::class, 'exportDtr'])->middleware('permission:export_attendance');
+    });
+
+    // Reports Module - JSON data for government forms; frontend handles rendering/printing
+    Route::prefix('reports')->middleware('permission:export_reports')->group(function () {
+        Route::get('/form6/{id}', [ReportController::class, 'form6']);
+        Route::get('/ris/{id}', [ReportController::class, 'ris']);
+        Route::get('/dv/{id}', [ReportController::class, 'dv']);
+        Route::get('/iar/{id}', [ReportController::class, 'iar']);
+        Route::get('/pds/{id}', [ReportController::class, 'pds']);
     });
 });
 

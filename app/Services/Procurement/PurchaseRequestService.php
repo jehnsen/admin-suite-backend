@@ -89,11 +89,7 @@ class PurchaseRequestService
             throw new \Exception('Only draft purchase requests can be submitted.');
         }
 
-        if ($pr->items->isEmpty()) {
-            throw new \Exception('Cannot submit purchase request without items.');
-        }
-
-        return $this->prRepository->updateStatus($id, 'Pending');
+        return $this->prRepository->updateStatus($id, 'Submitted');
     }
 
     /**
@@ -103,8 +99,8 @@ class PurchaseRequestService
     {
         $pr = $this->prRepository->getPurchaseRequestById($id);
 
-        if ($pr->status !== 'Pending') {
-            throw new \Exception('Only pending purchase requests can be recommended.');
+        if ($pr->status !== 'Submitted') {
+            throw new \Exception('Only submitted purchase requests can be recommended.');
         }
 
         return $this->prRepository->updateStatus($id, 'Recommended', [

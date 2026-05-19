@@ -2088,7 +2088,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"title\": \"MOOE Q1 2025\",\n    \"fund_source\": \"MOOE\",\n    \"total_amount\": 500000.00,\n    \"fiscal_year\": 2025,\n    \"quarter\": 1,\n    \"description\": \"Maintenance and Other Operating Expenses - First Quarter\"\n}"
+							"raw": "{\n    \"fund_source\": \"MOOE\",\n    \"fiscal_year\": 2025,\n    \"allocated_amount\": 500000.00,\n    \"category\": \"Operating Expenses\",\n    \"classification\": \"AIP\",\n    \"quarter\": \"Q1\",\n    \"description\": \"Maintenance and Other Operating Expenses - First Quarter\"\n}"
 						},
 						"url": {"raw": "{{base_url}}/api/budgets", "host": ["{{base_url}}"], "path": ["api", "budgets"]}
 					},
@@ -2746,6 +2746,453 @@
 								{"key": "module", "value": ""}
 							]
 						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Inventory - Issuances (PAR / ICS)",
+			"item": [
+				{
+					"name": "List Issuances",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {
+							"raw": "{{base_url}}/api/issuances?per_page=15&type=&status=&employee_id=",
+							"host": ["{{base_url}}"],
+							"path": ["api", "issuances"],
+							"query": [
+								{"key": "per_page", "value": "15"},
+								{"key": "type", "value": "", "description": "PAR, ICS"},
+								{"key": "status", "value": "", "description": "Issued, Returned, Transferred"},
+								{"key": "employee_id", "value": ""}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Search Issuances",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {"raw": "{{base_url}}/api/issuances/search?query=", "host": ["{{base_url}}"], "path": ["api", "issuances", "search"], "query": [{"key": "query", "value": ""}]}
+					},
+					"response": []
+				},
+				{
+					"name": "Overdue Issuances",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {"raw": "{{base_url}}/api/issuances/overdue", "host": ["{{base_url}}"], "path": ["api", "issuances", "overdue"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Issuance Statistics",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {"raw": "{{base_url}}/api/issuances/statistics", "host": ["{{base_url}}"], "path": ["api", "issuances", "statistics"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Issuances by Employee",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {"raw": "{{base_url}}/api/issuances/employee/{{employee_id}}", "host": ["{{base_url}}"], "path": ["api", "issuances", "employee", "{{employee_id}}"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Issuance",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {"raw": "{{base_url}}/api/issuances/{{uuid}}", "host": ["{{base_url}}"], "path": ["api", "issuances", "{{uuid}}"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Issuance (PAR/ICS)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Authorization", "value": "Bearer {{auth_token}}"},
+							{"key": "Content-Type", "value": "application/json"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"issuance_type\": \"PAR\",\n    \"employee_id\": 1,\n    \"issuance_date\": \"2025-02-15\",\n    \"items\": [\n        {\"inventory_item_id\": 1, \"quantity\": 1, \"unit_cost\": 15000.00, \"remarks\": \"Newly procured laptop\"}\n    ]\n}"
+						},
+						"url": {"raw": "{{base_url}}/api/issuances", "host": ["{{base_url}}"], "path": ["api", "issuances"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Acknowledge Issuance",
+					"request": {
+						"method": "PUT",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {"raw": "{{base_url}}/api/issuances/{{uuid}}/acknowledge", "host": ["{{base_url}}"], "path": ["api", "issuances", "{{uuid}}", "acknowledge"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Return Issuance",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{"key": "Authorization", "value": "Bearer {{auth_token}}"},
+							{"key": "Content-Type", "value": "application/json"}
+						],
+						"body": {"mode": "raw", "raw": "{\n    \"return_date\": \"2025-06-30\",\n    \"remarks\": \"Item returned in good condition.\"\n}"},
+						"url": {"raw": "{{base_url}}/api/issuances/{{uuid}}/return", "host": ["{{base_url}}"], "path": ["api", "issuances", "{{uuid}}", "return"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Transfer Issuance",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{"key": "Authorization", "value": "Bearer {{auth_token}}"},
+							{"key": "Content-Type", "value": "application/json"}
+						],
+						"body": {"mode": "raw", "raw": "{\n    \"new_employee_id\": 2,\n    \"transfer_date\": \"2025-03-01\",\n    \"remarks\": \"Transferred to new property custodian.\"\n}"},
+						"url": {"raw": "{{base_url}}/api/issuances/{{uuid}}/transfer", "host": ["{{base_url}}"], "path": ["api", "issuances", "{{uuid}}", "transfer"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Issuance",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{"key": "Authorization", "value": "Bearer {{auth_token}}"},
+							{"key": "Content-Type", "value": "application/json"}
+						],
+						"body": {"mode": "raw", "raw": "{\n    \"remarks\": \"Updated remarks.\"\n}"},
+						"url": {"raw": "{{base_url}}/api/issuances/{{uuid}}", "host": ["{{base_url}}"], "path": ["api", "issuances", "{{uuid}}"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Issuance",
+					"request": {
+						"method": "DELETE",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {"raw": "{{base_url}}/api/issuances/{{uuid}}", "host": ["{{base_url}}"], "path": ["api", "issuances", "{{uuid}}"]}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Inventory - Requisition Slips (RIS)",
+			"item": [
+				{
+					"name": "List Requisition Slips",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {
+							"raw": "{{base_url}}/api/requisition-slips?per_page=15&status=",
+							"host": ["{{base_url}}"],
+							"path": ["api", "requisition-slips"],
+							"query": [
+								{"key": "per_page", "value": "15"},
+								{"key": "status", "value": "", "description": "Pending, Approved, Released, Cancelled"}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Search Requisition Slips",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {"raw": "{{base_url}}/api/requisition-slips/search?query=", "host": ["{{base_url}}"], "path": ["api", "requisition-slips", "search"], "query": [{"key": "query", "value": ""}]}
+					},
+					"response": []
+				},
+				{
+					"name": "Pending Requisition Slips",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {"raw": "{{base_url}}/api/requisition-slips/pending", "host": ["{{base_url}}"], "path": ["api", "requisition-slips", "pending"]}
+					},
+					"response": []
+				},
+				{
+					"name": "RIS Statistics",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {"raw": "{{base_url}}/api/requisition-slips/statistics", "host": ["{{base_url}}"], "path": ["api", "requisition-slips", "statistics"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Requisition Slip",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {"raw": "{{base_url}}/api/requisition-slips/{{uuid}}", "host": ["{{base_url}}"], "path": ["api", "requisition-slips", "{{uuid}}"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Requisition Slip",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Authorization", "value": "Bearer {{auth_token}}"},
+							{"key": "Content-Type", "value": "application/json"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"purpose\": \"Office supplies for Science Department\",\n    \"division\": \"Science\",\n    \"items\": [\n        {\"inventory_item_id\": 1, \"quantity_requested\": 5, \"remarks\": \"For lab activities\"}\n    ]\n}"
+						},
+						"url": {"raw": "{{base_url}}/api/requisition-slips", "host": ["{{base_url}}"], "path": ["api", "requisition-slips"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Approve Requisition Slip",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{"key": "Authorization", "value": "Bearer {{auth_token}}"},
+							{"key": "Content-Type", "value": "application/json"}
+						],
+						"body": {"mode": "raw", "raw": "{\n    \"remarks\": \"Approved — items are available in stock.\"\n}"},
+						"url": {"raw": "{{base_url}}/api/requisition-slips/{{uuid}}/approve", "host": ["{{base_url}}"], "path": ["api", "requisition-slips", "{{uuid}}", "approve"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Release Requisition Slip",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{"key": "Authorization", "value": "Bearer {{auth_token}}"},
+							{"key": "Content-Type", "value": "application/json"}
+						],
+						"body": {"mode": "raw", "raw": "{\n    \"release_date\": \"2025-02-20\",\n    \"released_by\": 1\n}"},
+						"url": {"raw": "{{base_url}}/api/requisition-slips/{{uuid}}/release", "host": ["{{base_url}}"], "path": ["api", "requisition-slips", "{{uuid}}", "release"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Cancel Requisition Slip",
+					"request": {
+						"method": "PUT",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {"raw": "{{base_url}}/api/requisition-slips/{{uuid}}/cancel", "host": ["{{base_url}}"], "path": ["api", "requisition-slips", "{{uuid}}", "cancel"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Requisition Slip",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{"key": "Authorization", "value": "Bearer {{auth_token}}"},
+							{"key": "Content-Type", "value": "application/json"}
+						],
+						"body": {"mode": "raw", "raw": "{\n    \"purpose\": \"Updated purpose\"\n}"},
+						"url": {"raw": "{{base_url}}/api/requisition-slips/{{uuid}}", "host": ["{{base_url}}"], "path": ["api", "requisition-slips", "{{uuid}}"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Requisition Slip",
+					"request": {
+						"method": "DELETE",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {"raw": "{{base_url}}/api/requisition-slips/{{uuid}}", "host": ["{{base_url}}"], "path": ["api", "requisition-slips", "{{uuid}}"]}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Attendance - Biometric & DTR",
+			"item": [
+				{
+					"name": "Import Biometric CSV",
+					"request": {
+						"method": "POST",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{"key": "file", "type": "file", "src": "/path/to/biometric_export.csv"},
+								{"key": "machine_id", "type": "text", "value": "MACHINE-01"},
+								{"key": "notes", "type": "text", "value": "February 2025 biometric export"}
+							]
+						},
+						"url": {"raw": "{{base_url}}/api/attendance/import", "host": ["{{base_url}}"], "path": ["api", "attendance", "import"]}
+					},
+					"response": []
+				},
+				{
+					"name": "List Import Batches",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {"raw": "{{base_url}}/api/attendance/import-batches?per_page=15", "host": ["{{base_url}}"], "path": ["api", "attendance", "import-batches"], "query": [{"key": "per_page", "value": "15"}]}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Import Batch",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {"raw": "{{base_url}}/api/attendance/import-batches/{{uuid}}", "host": ["{{base_url}}"], "path": ["api", "attendance", "import-batches", "{{uuid}}"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Batch Processing Logs",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {"raw": "{{base_url}}/api/attendance/import-batches/{{uuid}}/logs", "host": ["{{base_url}}"], "path": ["api", "attendance", "import-batches", "{{uuid}}", "logs"]}
+					},
+					"response": []
+				},
+				{
+					"name": "All DTR Records",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {
+							"raw": "{{base_url}}/api/attendance/dtr?month=2025-02",
+							"host": ["{{base_url}}"],
+							"path": ["api", "attendance", "dtr"],
+							"query": [{"key": "month", "value": "2025-02", "description": "YYYY-MM format"}]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "DTR by Employee",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {
+							"raw": "{{base_url}}/api/attendance/dtr/{{employee_id}}?month=2025-02",
+							"host": ["{{base_url}}"],
+							"path": ["api", "attendance", "dtr", "{{employee_id}}"],
+							"query": [{"key": "month", "value": "2025-02"}]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Employee DTR Summary",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {
+							"raw": "{{base_url}}/api/attendance/dtr/{{employee_id}}/summary?month=2025-02",
+							"host": ["{{base_url}}"],
+							"path": ["api", "attendance", "dtr", "{{employee_id}}", "summary"],
+							"query": [{"key": "month", "value": "2025-02"}]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Correct DTR Entry",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{"key": "Authorization", "value": "Bearer {{auth_token}}"},
+							{"key": "Content-Type", "value": "application/json"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"time_in\": \"07:45:00\",\n    \"time_out\": \"17:00:00\",\n    \"remarks\": \"Corrected — biometric scanner malfunction on this date.\"\n}"
+						},
+						"url": {"raw": "{{base_url}}/api/attendance/dtr/{{employee_id}}/2025-02-10", "host": ["{{base_url}}"], "path": ["api", "attendance", "dtr", "{{employee_id}}", "2025-02-10"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Export DTR",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {
+							"raw": "{{base_url}}/api/attendance/export/dtr/{{employee_id}}?month=2025-02&format=csv",
+							"host": ["{{base_url}}"],
+							"path": ["api", "attendance", "export", "dtr", "{{employee_id}}"],
+							"query": [
+								{"key": "month", "value": "2025-02"},
+								{"key": "format", "value": "csv", "description": "csv or pdf"}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Reports",
+			"item": [
+				{
+					"name": "Form 6 - Attendance Report",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {"raw": "{{base_url}}/api/reports/form6/{{uuid}}", "host": ["{{base_url}}"], "path": ["api", "reports", "form6", "{{uuid}}"]}
+					},
+					"response": []
+				},
+				{
+					"name": "RIS Report",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {"raw": "{{base_url}}/api/reports/ris/{{uuid}}", "host": ["{{base_url}}"], "path": ["api", "reports", "ris", "{{uuid}}"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Disbursement Voucher (DV)",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {"raw": "{{base_url}}/api/reports/dv/{{uuid}}", "host": ["{{base_url}}"], "path": ["api", "reports", "dv", "{{uuid}}"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Inspection and Acceptance Report (IAR)",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {"raw": "{{base_url}}/api/reports/iar/{{uuid}}", "host": ["{{base_url}}"], "path": ["api", "reports", "iar", "{{uuid}}"]}
+					},
+					"response": []
+				},
+				{
+					"name": "Personal Data Sheet (PDS)",
+					"request": {
+						"method": "GET",
+						"header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+						"url": {"raw": "{{base_url}}/api/reports/pds/{{uuid}}", "host": ["{{base_url}}"], "path": ["api", "reports", "pds", "{{uuid}}"]}
 					},
 					"response": []
 				}

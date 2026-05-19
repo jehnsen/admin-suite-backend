@@ -3,9 +3,11 @@
 namespace App\Http\Controllers\Api\Procurement;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\Procurement\PurchaseRequestResource;
 use App\Services\Procurement\PurchaseRequestService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use App\Http\Requests\Procurement\StorePurchaseRequestRequest;
 use App\Http\Requests\Procurement\UpdatePurchaseRequestRequest;
 
@@ -18,10 +20,7 @@ class PurchaseRequestController extends Controller
         $this->prService = $prService;
     }
 
-    /**
-     * Get all purchase requests
-     */
-    public function index(Request $request): JsonResponse
+    public function index(Request $request): AnonymousResourceCollection
     {
         $filters = $request->only([
             'status', 'fund_source', 'procurement_mode',
@@ -31,12 +30,9 @@ class PurchaseRequestController extends Controller
 
         $purchaseRequests = $this->prService->getAllPurchaseRequests($filters, $perPage);
 
-        return response()->json($purchaseRequests);
+        return PurchaseRequestResource::collection($purchaseRequests);
     }
 
-    /**
-     * Get purchase request by ID
-     */
     public function show(string $uuid): JsonResponse
     {
         $id = \App\Models\PurchaseRequest::where('uuid', $uuid)->value('id') ?? 0;
@@ -46,30 +42,33 @@ class PurchaseRequestController extends Controller
             return response()->json(['message' => 'Purchase request not found.'], 404);
         }
 
-        return response()->json(['data' => $pr]);
+        return response()->json(['data' => new PurchaseRequestResource($pr)]);
     }
 
-    /**
-     * Create new purchase request
-     */
     public function store(StorePurchaseRequestRequest $request): JsonResponse
     {
         try {
-            $pr = $this->prService->createPurchaseRequest($request->validated());
+            $validated = $request->validated();
+            $data = array_merge($validated, [
+                'requested_by' => $request->user()->id,
+                'pr_date'      => $validated['pr_date'] ?? now()->format('Y-m-d'),
+                'department'   => $validated['department'] ?? 'Administration',
+            ]);
+
+            $pr = $this->prService->createPurchaseRequest($data);
 
             return response()->json([
                 'message' => 'Purchase request created successfully.',
-                'data'    => $pr,
+                'data'    => new PurchaseRequestResource($pr),
             ], 201);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json(['message' => 'Record not found.'], 404);
         } catch (\Exception $e) {
             report($e);
             return response()->json(['message' => 'An unexpected error occurred. Please try again.'], 500);
         }
     }
 
-    /**
-     * Update purchase request
-     */
     public function update(UpdatePurchaseRequestRequest $request, string $uuid): JsonResponse
     {
         $id = \App\Models\PurchaseRequest::where('uuid', $uuid)->value('id') ?? 0;
@@ -78,17 +77,16 @@ class PurchaseRequestController extends Controller
 
             return response()->json([
                 'message' => 'Purchase request updated successfully.',
-                'data'    => $pr,
+                'data'    => new PurchaseRequestResource($pr),
             ]);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json(['message' => 'Record not found.'], 404);
         } catch (\Exception $e) {
             report($e);
             return response()->json(['message' => 'An unexpected error occurred. Please try again.'], 500);
         }
     }
 
-    /**
-     * Delete purchase request
-     */
     public function destroy(string $uuid): JsonResponse
     {
         $id = \App\Models\PurchaseRequest::where('uuid', $uuid)->value('id') ?? 0;
@@ -96,15 +94,14 @@ class PurchaseRequestController extends Controller
             $this->prService->deletePurchaseRequest($id);
 
             return response()->json(['message' => 'Purchase request deleted successfully.']);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json(['message' => 'Record not found.'], 404);
         } catch (\Exception $e) {
             report($e);
             return response()->json(['message' => 'An unexpected error occurred. Please try again.'], 500);
         }
     }
 
-    /**
-     * Submit purchase request
-     */
     public function submit(string $uuid): JsonResponse
     {
         $id = \App\Models\PurchaseRequest::where('uuid', $uuid)->value('id') ?? 0;
@@ -113,17 +110,16 @@ class PurchaseRequestController extends Controller
 
             return response()->json([
                 'message' => 'Purchase request submitted successfully.',
-                'data'    => $pr,
+                'data'    => new PurchaseRequestResource($pr),
             ]);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json(['message' => 'Record not found.'], 404);
         } catch (\Exception $e) {
             report($e);
             return response()->json(['message' => 'An unexpected error occurred. Please try again.'], 500);
         }
     }
 
-    /**
-     * Recommend purchase request
-     */
     public function recommend(Request $request, string $uuid): JsonResponse
     {
         $id = \App\Models\PurchaseRequest::where('uuid', $uuid)->value('id') ?? 0;
@@ -140,17 +136,16 @@ class PurchaseRequestController extends Controller
 
             return response()->json([
                 'message' => 'Purchase request recommended successfully.',
-                'data'    => $pr,
+                'data'    => new PurchaseRequestResource($pr),
             ]);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json(['message' => 'Record not found.'], 404);
         } catch (\Exception $e) {
             report($e);
             return response()->json(['message' => 'An unexpected error occurred. Please try again.'], 500);
         }
     }
 
-    /**
-     * Approve purchase request
-     */
     public function approve(Request $request, string $uuid): JsonResponse
     {
         $id = \App\Models\PurchaseRequest::where('uuid', $uuid)->value('id') ?? 0;
@@ -167,17 +162,16 @@ class PurchaseRequestController extends Controller
 
             return response()->json([
                 'message' => 'Purchase request approved successfully.',
-                'data'    => $pr,
+                'data'    => new PurchaseRequestResource($pr),
             ]);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json(['message' => 'Record not found.'], 404);
         } catch (\Exception $e) {
             report($e);
             return response()->json(['message' => 'An unexpected error occurred. Please try again.'], 500);
         }
     }
 
-    /**
-     * Disapprove purchase request
-     */
     public function disapprove(Request $request, string $uuid): JsonResponse
     {
         $id = \App\Models\PurchaseRequest::where('uuid', $uuid)->value('id') ?? 0;
@@ -194,17 +188,16 @@ class PurchaseRequestController extends Controller
 
             return response()->json([
                 'message' => 'Purchase request disapproved.',
-                'data'    => $pr,
+                'data'    => new PurchaseRequestResource($pr),
             ]);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json(['message' => 'Record not found.'], 404);
         } catch (\Exception $e) {
             report($e);
             return response()->json(['message' => 'An unexpected error occurred. Please try again.'], 500);
         }
     }
 
-    /**
-     * Cancel purchase request
-     */
     public function cancel(Request $request, string $uuid): JsonResponse
     {
         $id = \App\Models\PurchaseRequest::where('uuid', $uuid)->value('id') ?? 0;
@@ -217,28 +210,24 @@ class PurchaseRequestController extends Controller
 
             return response()->json([
                 'message' => 'Purchase request cancelled.',
-                'data'    => $pr,
+                'data'    => new PurchaseRequestResource($pr),
             ]);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json(['message' => 'Record not found.'], 404);
         } catch (\Exception $e) {
             report($e);
             return response()->json(['message' => 'An unexpected error occurred. Please try again.'], 500);
         }
     }
 
-    /**
-     * Get pending purchase requests
-     */
-    public function pending(Request $request): JsonResponse
+    public function pending(Request $request): AnonymousResourceCollection
     {
         $perPage = $this->getPerPage($request);
         $prs = $this->prService->getPendingPurchaseRequests($perPage);
 
-        return response()->json($prs);
+        return PurchaseRequestResource::collection($prs);
     }
 
-    /**
-     * Get purchase request statistics
-     */
     public function statistics(): JsonResponse
     {
         $statistics = $this->prService->getPurchaseRequestStatistics();

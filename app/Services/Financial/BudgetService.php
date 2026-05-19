@@ -41,7 +41,7 @@ class BudgetService
 
         // Set default values
         $data['utilized_amount'] = $data['utilized_amount'] ?? 0;
-        $data['status'] = $data['status'] ?? 'Active';
+        $data['status'] = $data['status'] ?? 'Pending';
         $data['classification'] = $data['classification'] ?? 'AIP';
 
         // Set date range to fiscal year if not provided
@@ -93,7 +93,7 @@ class BudgetService
         return $this->budgetRepository->deleteBudget($id);
     }
 
-    public function approveBudget(int $id, int $approvedById): Budget
+    public function approveBudget(int $id, ?int $approvedById): Budget
     {
         $data = [
             'status' => 'Approved',

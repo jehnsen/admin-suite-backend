@@ -65,6 +65,8 @@ class LeaveRequestService
         // Check for overlapping leave requests
         $this->checkOverlappingLeaves($data['employee_id'], $data['start_date'], $data['end_date']);
 
+        $data['status'] = $data['status'] ?? 'Pending';
+
         return $this->leaveRequestRepository->createLeaveRequest($data);
     }
 

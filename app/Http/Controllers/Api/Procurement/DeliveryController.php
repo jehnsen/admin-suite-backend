@@ -3,9 +3,11 @@
 namespace App\Http\Controllers\Api\Procurement;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\Procurement\DeliveryResource;
 use App\Services\Procurement\DeliveryService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use App\Http\Requests\Procurement\InspectDeliveryRequest;
 use App\Http\Requests\Procurement\StoreDeliveryRequest;
 use App\Http\Requests\Procurement\UpdateDeliveryRequest;
@@ -19,22 +21,16 @@ class DeliveryController extends Controller
         $this->deliveryService = $deliveryService;
     }
 
-    /**
-     * Get all deliveries
-     */
-    public function index(Request $request): JsonResponse
+    public function index(Request $request): AnonymousResourceCollection
     {
         $filters = $request->only(['status', 'purchase_order_id', 'supplier_id', 'date_from', 'date_to']);
         $perPage = $this->getPerPage($request);
 
         $deliveries = $this->deliveryService->getAllDeliveries($filters, $perPage);
 
-        return response()->json($deliveries);
+        return DeliveryResource::collection($deliveries);
     }
 
-    /**
-     * Get delivery by ID
-     */
     public function show(string $uuid): JsonResponse
     {
         $id = \App\Models\Delivery::where('uuid', $uuid)->value('id') ?? 0;
@@ -44,23 +40,17 @@ class DeliveryController extends Controller
             return response()->json(['message' => 'Delivery not found.'], 404);
         }
 
-        return response()->json(['data' => $delivery]);
+        return response()->json(['data' => new DeliveryResource($delivery)]);
     }
 
-    /**
-     * Get deliveries by purchase order
-     */
-    public function byPurchaseOrder(Request $request, int $poId): JsonResponse
+    public function byPurchaseOrder(Request $request, int $poId): AnonymousResourceCollection
     {
         $perPage = $this->getPerPage($request);
         $deliveries = $this->deliveryService->getDeliveriesByPurchaseOrder($poId, $perPage);
 
-        return response()->json($deliveries);
+        return DeliveryResource::collection($deliveries);
     }
 
-    /**
-     * Create new delivery
-     */
     public function store(StoreDeliveryRequest $request): JsonResponse
     {
         try {
@@ -73,17 +63,16 @@ class DeliveryController extends Controller
 
             return response()->json([
                 'message' => 'Delivery created successfully.',
-                'data'    => $delivery,
+                'data'    => new DeliveryResource($delivery),
             ], 201);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json(['message' => 'Record not found.'], 404);
         } catch (\Exception $e) {
             report($e);
             return response()->json(['message' => 'An unexpected error occurred. Please try again.'], 500);
         }
     }
 
-    /**
-     * Update delivery
-     */
     public function update(UpdateDeliveryRequest $request, string $uuid): JsonResponse
     {
         $id = \App\Models\Delivery::where('uuid', $uuid)->value('id') ?? 0;
@@ -92,17 +81,16 @@ class DeliveryController extends Controller
 
             return response()->json([
                 'message' => 'Delivery updated successfully.',
-                'data'    => $delivery,
+                'data'    => new DeliveryResource($delivery),
             ]);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json(['message' => 'Record not found.'], 404);
         } catch (\Exception $e) {
             report($e);
             return response()->json(['message' => 'An unexpected error occurred. Please try again.'], 500);
         }
     }
 
-    /**
-     * Delete delivery
-     */
     public function destroy(string $uuid): JsonResponse
     {
         $id = \App\Models\Delivery::where('uuid', $uuid)->value('id') ?? 0;
@@ -110,16 +98,14 @@ class DeliveryController extends Controller
             $this->deliveryService->deleteDelivery($id);
 
             return response()->json(['message' => 'Delivery deleted successfully.']);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json(['message' => 'Record not found.'], 404);
         } catch (\Exception $e) {
             report($e);
             return response()->json(['message' => 'An unexpected error occurred. Please try again.'], 500);
         }
     }
 
-    /**
-     * Inspect delivery
-     * The authenticated user is always recorded as the inspector.
-     */
     public function inspect(InspectDeliveryRequest $request, string $uuid): JsonResponse
     {
         $id = \App\Models\Delivery::where('uuid', $uuid)->value('id') ?? 0;
@@ -134,18 +120,16 @@ class DeliveryController extends Controller
 
             return response()->json([
                 'message' => 'Delivery inspected successfully.',
-                'data'    => $delivery,
+                'data'    => new DeliveryResource($delivery),
             ]);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json(['message' => 'Record not found.'], 404);
         } catch (\Exception $e) {
             report($e);
             return response()->json(['message' => 'An unexpected error occurred. Please try again.'], 500);
         }
     }
 
-    /**
-     * Accept delivery
-     * The authenticated user is always recorded as the one who accepted.
-     */
     public function accept(Request $request, string $uuid): JsonResponse
     {
         $id = \App\Models\Delivery::where('uuid', $uuid)->value('id') ?? 0;
@@ -154,17 +138,16 @@ class DeliveryController extends Controller
 
             return response()->json([
                 'message' => 'Delivery accepted successfully.',
-                'data'    => $delivery,
+                'data'    => new DeliveryResource($delivery),
             ]);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json(['message' => 'Record not found.'], 404);
         } catch (\Exception $e) {
             report($e);
             return response()->json(['message' => 'An unexpected error occurred. Please try again.'], 500);
         }
     }
 
-    /**
-     * Reject delivery
-     */
     public function reject(Request $request, string $uuid): JsonResponse
     {
         $id = \App\Models\Delivery::where('uuid', $uuid)->value('id') ?? 0;
@@ -177,28 +160,24 @@ class DeliveryController extends Controller
 
             return response()->json([
                 'message' => 'Delivery rejected.',
-                'data'    => $delivery,
+                'data'    => new DeliveryResource($delivery),
             ]);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json(['message' => 'Record not found.'], 404);
         } catch (\Exception $e) {
             report($e);
             return response()->json(['message' => 'An unexpected error occurred. Please try again.'], 500);
         }
     }
 
-    /**
-     * Get pending deliveries
-     */
-    public function pending(Request $request): JsonResponse
+    public function pending(Request $request): AnonymousResourceCollection
     {
         $perPage = $this->getPerPage($request);
         $deliveries = $this->deliveryService->getPendingDeliveries($perPage);
 
-        return response()->json($deliveries);
+        return DeliveryResource::collection($deliveries);
     }
 
-    /**
-     * Get delivery statistics
-     */
     public function statistics(): JsonResponse
     {
         $statistics = $this->deliveryService->getDeliveryStatistics();

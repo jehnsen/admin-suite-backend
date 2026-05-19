@@ -67,7 +67,7 @@ class LoginController extends Controller
             'message' => 'Login successful',
             'token' => $token,
             'user' => [
-                'id' => $user->id,
+                'id' => $user->uuid,
                 'name' => $user->name,
                 'email' => $user->email,
                 'roles' => $user->getRoleNames(),

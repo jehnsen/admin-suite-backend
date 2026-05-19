@@ -3,9 +3,11 @@
 namespace App\Http\Controllers\Api\Inventory;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\Inventory\InventoryItemResource;
 use App\Services\Inventory\InventoryItemService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use App\Http\Requests\Inventory\StoreInventoryItemRequest;
 use App\Http\Requests\Inventory\UpdateInventoryItemRequest;
 
@@ -18,10 +20,7 @@ class InventoryItemController extends Controller
         $this->inventoryItemService = $inventoryItemService;
     }
 
-    /**
-     * Get all inventory items
-     */
-    public function index(Request $request): JsonResponse
+    public function index(Request $request): AnonymousResourceCollection
     {
         try {
             $filters = $request->only(['category', 'status', 'condition', 'fund_source', 'location']);
@@ -29,16 +28,13 @@ class InventoryItemController extends Controller
 
             $items = $this->inventoryItemService->getAllInventoryItems($filters, $perPage);
 
-            return response()->json($items);
+            return InventoryItemResource::collection($items);
         } catch (\Exception $e) {
             report($e);
-            return response()->json(['message' => 'An unexpected error occurred. Please try again.'], 500);
+            abort(500, 'An unexpected error occurred. Please try again.');
         }
     }
 
-    /**
-     * Get inventory item by ID
-     */
     public function show(string $uuid): JsonResponse
     {
         $id = \App\Models\InventoryItem::where('uuid', $uuid)->value('id') ?? 0;
@@ -49,16 +45,15 @@ class InventoryItemController extends Controller
                 return response()->json(['message' => 'Inventory item not found.'], 404);
             }
 
-            return response()->json(['data' => $item]);
+            return response()->json(['data' => new InventoryItemResource($item)]);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json(['message' => 'Record not found.'], 404);
         } catch (\Exception $e) {
             report($e);
             return response()->json(['message' => 'An unexpected error occurred. Please try again.'], 500);
         }
     }
 
-    /**
-     * Get inventory item with current stock balance
-     */
     public function showWithBalance(string $uuid): JsonResponse
     {
         $id = \App\Models\InventoryItem::where('uuid', $uuid)->value('id') ?? 0;
@@ -70,15 +65,14 @@ class InventoryItemController extends Controller
             }
 
             return response()->json(['data' => $data]);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json(['message' => 'Record not found.'], 404);
         } catch (\Exception $e) {
             report($e);
             return response()->json(['message' => 'An unexpected error occurred. Please try again.'], 500);
         }
     }
 
-    /**
-     * Create new inventory item
-     */
     public function store(StoreInventoryItemRequest $request): JsonResponse
     {
         try {
@@ -86,17 +80,16 @@ class InventoryItemController extends Controller
 
             return response()->json([
                 'message' => 'Inventory item created successfully.',
-                'data' => $item,
+                'data'    => new InventoryItemResource($item),
             ], 201);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json(['message' => 'Record not found.'], 404);
         } catch (\Exception $e) {
             report($e);
             return response()->json(['message' => 'An unexpected error occurred. Please try again.'], 500);
         }
     }
 
-    /**
-     * Update inventory item
-     */
     public function update(UpdateInventoryItemRequest $request, string $uuid): JsonResponse
     {
         $id = \App\Models\InventoryItem::where('uuid', $uuid)->value('id') ?? 0;
@@ -105,17 +98,16 @@ class InventoryItemController extends Controller
 
             return response()->json([
                 'message' => 'Inventory item updated successfully.',
-                'data' => $item,
+                'data'    => new InventoryItemResource($item),
             ]);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json(['message' => 'Record not found.'], 404);
         } catch (\Exception $e) {
             report($e);
             return response()->json(['message' => 'An unexpected error occurred. Please try again.'], 500);
         }
     }
 
-    /**
-     * Delete inventory item
-     */
     public function destroy(string $uuid): JsonResponse
     {
         $id = \App\Models\InventoryItem::where('uuid', $uuid)->value('id') ?? 0;
@@ -127,52 +119,47 @@ class InventoryItemController extends Controller
             }
 
             return response()->json(['message' => 'Inventory item deleted successfully.']);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json(['message' => 'Record not found.'], 404);
         } catch (\Exception $e) {
             report($e);
             return response()->json(['message' => 'An unexpected error occurred. Please try again.'], 500);
         }
     }
 
-    /**
-     * Search inventory items
-     */
-    public function search(Request $request): JsonResponse
+    public function search(Request $request): AnonymousResourceCollection
     {
         try {
             $searchTerm = $request->input('q', '');
             $perPage = $this->getPerPage($request);
 
             if (empty($searchTerm)) {
-                return response()->json(['message' => 'Search term is required.'], 400);
+                abort(400, 'Search term is required.');
             }
 
             $items = $this->inventoryItemService->searchInventoryItems($searchTerm, $perPage);
 
-            return response()->json($items);
+            return InventoryItemResource::collection($items);
         } catch (\Exception $e) {
             report($e);
-            return response()->json(['message' => 'An unexpected error occurred. Please try again.'], 500);
+            abort(500, 'An unexpected error occurred. Please try again.');
         }
     }
 
-    /**
-     * Get all inventory items with current stock balances
-     */
     public function withBalances(): JsonResponse
     {
         try {
             $items = $this->inventoryItemService->getInventoryItemsWithCurrentBalance();
 
             return response()->json(['data' => $items]);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json(['message' => 'Record not found.'], 404);
         } catch (\Exception $e) {
             report($e);
             return response()->json(['message' => 'An unexpected error occurred. Please try again.'], 500);
         }
     }
 
-    /**
-     * Get low stock items
-     */
     public function lowStock(Request $request): JsonResponse
     {
         try {
@@ -180,21 +167,22 @@ class InventoryItemController extends Controller
             $items = $this->inventoryItemService->getLowStockItems($threshold);
 
             return response()->json(['data' => $items]);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json(['message' => 'Record not found.'], 404);
         } catch (\Exception $e) {
             report($e);
             return response()->json(['message' => 'An unexpected error occurred. Please try again.'], 500);
         }
     }
 
-    /**
-     * Get inventory statistics
-     */
     public function statistics(): JsonResponse
     {
         try {
             $stats = $this->inventoryItemService->getInventoryStatistics();
 
             return response()->json(['data' => $stats]);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json(['message' => 'Record not found.'], 404);
         } catch (\Exception $e) {
             report($e);
             return response()->json(['message' => 'An unexpected error occurred. Please try again.'], 500);

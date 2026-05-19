@@ -39,6 +39,8 @@ class TrainingController extends Controller
             $trainings = $this->trainingService->getAllTrainings($filters, $perPage);
 
             return response()->json($trainings);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json(['message' => 'Record not found.'], 404);
         } catch (\Exception $e) {
             report($e);
             return response()->json(['message' => 'An unexpected error occurred. Please try again.'], 500);
@@ -59,6 +61,8 @@ class TrainingController extends Controller
             }
 
             return response()->json(['data' => $training]);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json(['message' => 'Record not found.'], 404);
         } catch (\Exception $e) {
             report($e);
             return response()->json(['message' => 'An unexpected error occurred. Please try again.'], 500);
@@ -79,6 +83,8 @@ class TrainingController extends Controller
             $trainings = $this->trainingService->getTrainingsByEmployee($id, $perPage);
 
             return response()->json($trainings);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json(['message' => 'Record not found.'], 404);
         } catch (\Exception $e) {
             report($e);
             return response()->json(['message' => 'An unexpected error occurred. Please try again.'], 500);
@@ -98,6 +104,8 @@ class TrainingController extends Controller
             $trainings = $this->trainingService->getCompletedTrainings($id);
 
             return response()->json(['data' => $trainings]);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json(['message' => 'Record not found.'], 404);
         } catch (\Exception $e) {
             report($e);
             return response()->json(['message' => 'An unexpected error occurred. Please try again.'], 500);
@@ -116,6 +124,8 @@ class TrainingController extends Controller
                 'message' => 'Training record created successfully.',
                 'data' => $training,
             ], 201);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json(['message' => 'Record not found.'], 404);
         } catch (\Exception $e) {
             report($e);
             return response()->json(['message' => 'An unexpected error occurred. Please try again.'], 500);
@@ -135,6 +145,8 @@ class TrainingController extends Controller
                 'message' => 'Training record updated successfully.',
                 'data' => $training,
             ]);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json(['message' => 'Record not found.'], 404);
         } catch (\Exception $e) {
             report($e);
             return response()->json(['message' => 'An unexpected error occurred. Please try again.'], 500);
@@ -155,6 +167,8 @@ class TrainingController extends Controller
             }
 
             return response()->json(['message' => 'Training record deleted successfully.']);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json(['message' => 'Record not found.'], 404);
         } catch (\Exception $e) {
             report($e);
             return response()->json(['message' => 'An unexpected error occurred. Please try again.'], 500);
@@ -171,6 +185,8 @@ class TrainingController extends Controller
             $trainings = $this->trainingService->getTrainingsByType($type, $perPage);
 
             return response()->json($trainings);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json(['message' => 'Record not found.'], 404);
         } catch (\Exception $e) {
             report($e);
             return response()->json(['message' => 'An unexpected error occurred. Please try again.'], 500);
@@ -187,6 +203,8 @@ class TrainingController extends Controller
             $trainings = $this->trainingService->getTrainingsByYear($year, $perPage);
 
             return response()->json($trainings);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json(['message' => 'Record not found.'], 404);
         } catch (\Exception $e) {
             report($e);
             return response()->json(['message' => 'An unexpected error occurred. Please try again.'], 500);
@@ -203,6 +221,8 @@ class TrainingController extends Controller
             $stats = $this->trainingService->getTrainingStatistics($employeeId);
 
             return response()->json(['data' => $stats]);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json(['message' => 'Record not found.'], 404);
         } catch (\Exception $e) {
             report($e);
             return response()->json(['message' => 'An unexpected error occurred. Please try again.'], 500);

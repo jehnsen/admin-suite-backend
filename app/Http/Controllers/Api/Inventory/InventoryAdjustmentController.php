@@ -3,9 +3,11 @@
 namespace App\Http\Controllers\Api\Inventory;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\Inventory\InventoryAdjustmentResource;
 use App\Services\Inventory\InventoryAdjustmentService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use App\Http\Requests\Inventory\RejectInventoryAdjustmentRequest;
 use App\Http\Requests\Inventory\StoreInventoryAdjustmentRequest;
 use App\Http\Requests\Inventory\UpdateInventoryAdjustmentRequest;
@@ -19,22 +21,16 @@ class InventoryAdjustmentController extends Controller
         $this->adjustmentService = $adjustmentService;
     }
 
-    /**
-     * Get all inventory adjustments
-     */
-    public function index(Request $request): JsonResponse
+    public function index(Request $request): AnonymousResourceCollection
     {
         $filters = $request->only(['inventory_item_id', 'adjustment_type', 'status']);
         $perPage = $this->getPerPage($request);
 
         $adjustments = $this->adjustmentService->getAllAdjustments($filters, $perPage);
 
-        return response()->json($adjustments);
+        return InventoryAdjustmentResource::collection($adjustments);
     }
 
-    /**
-     * Get adjustment by ID
-     */
     public function show(string $uuid): JsonResponse
     {
         $id = \App\Models\InventoryAdjustment::where('uuid', $uuid)->value('id') ?? 0;
@@ -44,12 +40,9 @@ class InventoryAdjustmentController extends Controller
             return response()->json(['message' => 'Inventory adjustment not found.'], 404);
         }
 
-        return response()->json(['data' => $adjustment]);
+        return response()->json(['data' => new InventoryAdjustmentResource($adjustment)]);
     }
 
-    /**
-     * Create new inventory adjustment
-     */
     public function store(StoreInventoryAdjustmentRequest $request): JsonResponse
     {
         try {
@@ -57,17 +50,16 @@ class InventoryAdjustmentController extends Controller
 
             return response()->json([
                 'message' => 'Inventory adjustment created successfully.',
-                'data'    => $adjustment,
+                'data'    => new InventoryAdjustmentResource($adjustment),
             ], 201);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json(['message' => 'Record not found.'], 404);
         } catch (\Exception $e) {
             report($e);
             return response()->json(['message' => 'An unexpected error occurred. Please try again.'], 500);
         }
     }
 
-    /**
-     * Update inventory adjustment
-     */
     public function update(UpdateInventoryAdjustmentRequest $request, string $uuid): JsonResponse
     {
         $id = \App\Models\InventoryAdjustment::where('uuid', $uuid)->value('id') ?? 0;
@@ -76,17 +68,16 @@ class InventoryAdjustmentController extends Controller
 
             return response()->json([
                 'message' => 'Inventory adjustment updated successfully.',
-                'data'    => $adjustment,
+                'data'    => new InventoryAdjustmentResource($adjustment),
             ]);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json(['message' => 'Record not found.'], 404);
         } catch (\Exception $e) {
             report($e);
             return response()->json(['message' => 'An unexpected error occurred. Please try again.'], 500);
         }
     }
 
-    /**
-     * Delete inventory adjustment
-     */
     public function destroy(string $uuid): JsonResponse
     {
         $id = \App\Models\InventoryAdjustment::where('uuid', $uuid)->value('id') ?? 0;
@@ -94,16 +85,14 @@ class InventoryAdjustmentController extends Controller
             $this->adjustmentService->deleteAdjustment($id);
 
             return response()->json(['message' => 'Inventory adjustment deleted successfully.']);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json(['message' => 'Record not found.'], 404);
         } catch (\Exception $e) {
             report($e);
             return response()->json(['message' => 'An unexpected error occurred. Please try again.'], 500);
         }
     }
 
-    /**
-     * Approve inventory adjustment
-     * The authenticated user is always recorded as the approver.
-     */
     public function approve(Request $request, string $uuid): JsonResponse
     {
         $id = \App\Models\InventoryAdjustment::where('uuid', $uuid)->value('id') ?? 0;
@@ -112,17 +101,16 @@ class InventoryAdjustmentController extends Controller
 
             return response()->json([
                 'message' => 'Inventory adjustment approved successfully. Stock card entry created.',
-                'data'    => $adjustment,
+                'data'    => new InventoryAdjustmentResource($adjustment),
             ]);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json(['message' => 'Record not found.'], 404);
         } catch (\Exception $e) {
             report($e);
             return response()->json(['message' => 'An unexpected error occurred. Please try again.'], 500);
         }
     }
 
-    /**
-     * Reject inventory adjustment
-     */
     public function reject(RejectInventoryAdjustmentRequest $request, string $uuid): JsonResponse
     {
         $id = \App\Models\InventoryAdjustment::where('uuid', $uuid)->value('id') ?? 0;
@@ -135,22 +123,21 @@ class InventoryAdjustmentController extends Controller
 
             return response()->json([
                 'message' => 'Inventory adjustment rejected.',
-                'data'    => $adjustment,
+                'data'    => new InventoryAdjustmentResource($adjustment),
             ]);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json(['message' => 'Record not found.'], 404);
         } catch (\Exception $e) {
             report($e);
             return response()->json(['message' => 'An unexpected error occurred. Please try again.'], 500);
         }
     }
 
-    /**
-     * Get pending adjustments
-     */
-    public function pending(Request $request): JsonResponse
+    public function pending(Request $request): AnonymousResourceCollection
     {
         $perPage = $this->getPerPage($request);
         $adjustments = $this->adjustmentService->getPendingAdjustments($perPage);
 
-        return response()->json($adjustments);
+        return InventoryAdjustmentResource::collection($adjustments);
     }
 }

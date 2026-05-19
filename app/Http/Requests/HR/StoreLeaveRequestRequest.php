@@ -57,6 +57,18 @@ class StoreLeaveRequestRequest extends FormRequest
         ];
     }
 
+    public function withValidator($validator): void
+    {
+        $validator->after(function ($validator) {
+            if ($this->user()->hasRole('Teacher/Staff')) {
+                $userEmployee = $this->user()->employee;
+                if (!$userEmployee || (int) $userEmployee->id !== (int) $this->input('employee_id')) {
+                    $validator->errors()->add('employee_id', 'You can only create leave requests for your own employee record.');
+                }
+            }
+        });
+    }
+
     /**
      * Get custom messages for validator errors.
      */

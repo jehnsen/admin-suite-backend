@@ -2,14 +2,17 @@
 
 namespace App\Models;
 
+use App\Traits\HasUuid;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 class Issuance extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, HasUuid, SoftDeletes, LogsActivity;
 
     /**
      * The attributes that are mass assignable.
@@ -17,6 +20,7 @@ class Issuance extends Model
      * @var array<int, string>
      */
     protected $fillable = [
+        'document_type',
         'inventory_item_id',
         'issued_to_employee_id',
         'issuance_number',
@@ -47,6 +51,14 @@ class Issuance extends Model
         'actual_return_date' => 'date',
         'acknowledged_at' => 'datetime',
     ];
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logFillable()
+            ->logOnlyDirty()
+            ->setDescriptionForEvent(fn (string $eventName) => "Issuance {$this->issuance_number} was {$eventName}");
+    }
 
     /**
      * Get the inventory item for this issuance.

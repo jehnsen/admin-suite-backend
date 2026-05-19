@@ -3,12 +3,14 @@
 namespace App\Http\Controllers\Api\Financial;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\Financial\DisbursementResource;
 use App\Http\Requests\Financial\MarkPaidDisbursementRequest;
 use App\Http\Requests\Financial\StoreDisbursementRequest;
 use App\Http\Requests\Financial\UpdateDisbursementRequest;
 use App\Services\Financial\DisbursementService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
 class DisbursementController extends Controller
 {
@@ -19,22 +21,16 @@ class DisbursementController extends Controller
         $this->disbursementService = $disbursementService;
     }
 
-    /**
-     * Get all disbursements
-     */
-    public function index(Request $request): JsonResponse
+    public function index(Request $request): AnonymousResourceCollection
     {
         $filters = $request->only(['payee', 'fund_source', 'status', 'date_from', 'date_to']);
         $perPage = $this->getPerPage($request);
 
         $disbursements = $this->disbursementService->getAllDisbursements($filters, $perPage);
 
-        return response()->json($disbursements);
+        return DisbursementResource::collection($disbursements);
     }
 
-    /**
-     * Get disbursement by ID
-     */
     public function show(string $uuid): JsonResponse
     {
         $id = \App\Models\Disbursement::where('uuid', $uuid)->value('id') ?? 0;
@@ -44,12 +40,9 @@ class DisbursementController extends Controller
             return response()->json(['message' => 'Disbursement not found.'], 404);
         }
 
-        return response()->json(['data' => $disbursement]);
+        return response()->json(['data' => new DisbursementResource($disbursement)]);
     }
 
-    /**
-     * Create new disbursement voucher
-     */
     public function store(StoreDisbursementRequest $request): JsonResponse
     {
         try {
@@ -57,17 +50,16 @@ class DisbursementController extends Controller
 
             return response()->json([
                 'message' => 'Disbursement voucher created successfully.',
-                'data'    => $disbursement,
+                'data'    => new DisbursementResource($disbursement),
             ], 201);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json(['message' => 'Record not found.'], 404);
         } catch (\Exception $e) {
             report($e);
             return response()->json(['message' => 'An unexpected error occurred. Please try again.'], 500);
         }
     }
 
-    /**
-     * Update disbursement voucher
-     */
     public function update(UpdateDisbursementRequest $request, string $uuid): JsonResponse
     {
         $id = \App\Models\Disbursement::where('uuid', $uuid)->value('id') ?? 0;
@@ -76,17 +68,16 @@ class DisbursementController extends Controller
 
             return response()->json([
                 'message' => 'Disbursement voucher updated successfully.',
-                'data'    => $disbursement,
+                'data'    => new DisbursementResource($disbursement),
             ]);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json(['message' => 'Record not found.'], 404);
         } catch (\Exception $e) {
             report($e);
             return response()->json(['message' => 'An unexpected error occurred. Please try again.'], 500);
         }
     }
 
-    /**
-     * Delete disbursement voucher
-     */
     public function destroy(string $uuid): JsonResponse
     {
         $id = \App\Models\Disbursement::where('uuid', $uuid)->value('id') ?? 0;
@@ -94,16 +85,14 @@ class DisbursementController extends Controller
             $this->disbursementService->deleteDisbursement($id);
 
             return response()->json(['message' => 'Disbursement voucher deleted successfully.']);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json(['message' => 'Record not found.'], 404);
         } catch (\Exception $e) {
             report($e);
             return response()->json(['message' => 'An unexpected error occurred. Please try again.'], 500);
         }
     }
 
-    /**
-     * Certify disbursement voucher
-     * The authenticated user is always the certifier.
-     */
     public function certify(Request $request, string $uuid): JsonResponse
     {
         $id = \App\Models\Disbursement::where('uuid', $uuid)->value('id') ?? 0;
@@ -112,18 +101,16 @@ class DisbursementController extends Controller
 
             return response()->json([
                 'message' => 'Disbursement voucher certified successfully.',
-                'data'    => $disbursement,
+                'data'    => new DisbursementResource($disbursement),
             ]);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json(['message' => 'Record not found.'], 404);
         } catch (\Exception $e) {
             report($e);
             return response()->json(['message' => 'An unexpected error occurred. Please try again.'], 500);
         }
     }
 
-    /**
-     * Approve disbursement voucher
-     * The authenticated user is always the approver.
-     */
     public function approve(Request $request, string $uuid): JsonResponse
     {
         $id = \App\Models\Disbursement::where('uuid', $uuid)->value('id') ?? 0;
@@ -132,52 +119,45 @@ class DisbursementController extends Controller
 
             return response()->json([
                 'message' => 'Disbursement voucher approved successfully.',
-                'data'    => $disbursement,
+                'data'    => new DisbursementResource($disbursement),
             ]);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json(['message' => 'Record not found.'], 404);
         } catch (\Exception $e) {
             report($e);
             return response()->json(['message' => 'An unexpected error occurred. Please try again.'], 500);
         }
     }
 
-    /**
-     * Mark disbursement as paid
-     * The authenticated user is always recorded as the one who marked it paid.
-     */
     public function markPaid(MarkPaidDisbursementRequest $request, string $uuid): JsonResponse
     {
         $id = \App\Models\Disbursement::where('uuid', $uuid)->value('id') ?? 0;
         try {
             $disbursement = $this->disbursementService->markAsPaid(
                 $id,
-                $request->user()->id,
-                $request->input('payment_date')
+                $request->user()->id
             );
 
             return response()->json([
                 'message' => 'Disbursement marked as paid successfully.',
-                'data'    => $disbursement,
+                'data'    => new DisbursementResource($disbursement),
             ]);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json(['message' => 'Record not found.'], 404);
         } catch (\Exception $e) {
             report($e);
             return response()->json(['message' => 'An unexpected error occurred. Please try again.'], 500);
         }
     }
 
-    /**
-     * Get pending disbursements
-     */
-    public function pending(Request $request): JsonResponse
+    public function pending(Request $request): AnonymousResourceCollection
     {
         $perPage = $this->getPerPage($request);
         $disbursements = $this->disbursementService->getPendingDisbursements($perPage);
 
-        return response()->json($disbursements);
+        return DisbursementResource::collection($disbursements);
     }
 
-    /**
-     * Get disbursement statistics
-     */
     public function statistics(): JsonResponse
     {
         $statistics = $this->disbursementService->getDisbursementStatistics();

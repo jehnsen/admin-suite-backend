@@ -3,9 +3,11 @@
 namespace App\Http\Controllers\Api\Procurement;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\Procurement\PurchaseOrderResource;
 use App\Services\Procurement\PurchaseOrderService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use App\Http\Requests\Procurement\StorePurchaseOrderRequest;
 use App\Http\Requests\Procurement\UpdatePurchaseOrderRequest;
 
@@ -18,22 +20,16 @@ class PurchaseOrderController extends Controller
         $this->poService = $poService;
     }
 
-    /**
-     * Get all purchase orders
-     */
-    public function index(Request $request): JsonResponse
+    public function index(Request $request): AnonymousResourceCollection
     {
         $filters = $request->only(['status', 'supplier_id', 'fund_source', 'date_from', 'date_to', 'search']);
         $perPage = $this->getPerPage($request);
 
         $purchaseOrders = $this->poService->getAllPurchaseOrders($filters, $perPage);
 
-        return response()->json($purchaseOrders);
+        return PurchaseOrderResource::collection($purchaseOrders);
     }
 
-    /**
-     * Get purchase order by ID
-     */
     public function show(string $uuid): JsonResponse
     {
         $id = \App\Models\PurchaseOrder::where('uuid', $uuid)->value('id') ?? 0;
@@ -43,12 +39,9 @@ class PurchaseOrderController extends Controller
             return response()->json(['message' => 'Purchase order not found.'], 404);
         }
 
-        return response()->json(['data' => $po]);
+        return response()->json(['data' => new PurchaseOrderResource($po)]);
     }
 
-    /**
-     * Create new purchase order
-     */
     public function store(StorePurchaseOrderRequest $request): JsonResponse
     {
         try {
@@ -60,17 +53,16 @@ class PurchaseOrderController extends Controller
 
             return response()->json([
                 'message' => 'Purchase order created successfully.',
-                'data'    => $po,
+                'data'    => new PurchaseOrderResource($po),
             ], 201);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json(['message' => 'Record not found.'], 404);
         } catch (\Exception $e) {
             report($e);
             return response()->json(['message' => 'An unexpected error occurred. Please try again.'], 500);
         }
     }
 
-    /**
-     * Update purchase order
-     */
     public function update(UpdatePurchaseOrderRequest $request, string $uuid): JsonResponse
     {
         $id = \App\Models\PurchaseOrder::where('uuid', $uuid)->value('id') ?? 0;
@@ -79,17 +71,16 @@ class PurchaseOrderController extends Controller
 
             return response()->json([
                 'message' => 'Purchase order updated successfully.',
-                'data'    => $po,
+                'data'    => new PurchaseOrderResource($po),
             ]);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json(['message' => 'Record not found.'], 404);
         } catch (\Exception $e) {
             report($e);
             return response()->json(['message' => 'An unexpected error occurred. Please try again.'], 500);
         }
     }
 
-    /**
-     * Delete purchase order
-     */
     public function destroy(string $uuid): JsonResponse
     {
         $id = \App\Models\PurchaseOrder::where('uuid', $uuid)->value('id') ?? 0;
@@ -97,16 +88,14 @@ class PurchaseOrderController extends Controller
             $this->poService->deletePurchaseOrder($id);
 
             return response()->json(['message' => 'Purchase order deleted successfully.']);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json(['message' => 'Record not found.'], 404);
         } catch (\Exception $e) {
             report($e);
             return response()->json(['message' => 'An unexpected error occurred. Please try again.'], 500);
         }
     }
 
-    /**
-     * Approve purchase order
-     * The authenticated user is always recorded as the approver.
-     */
     public function approve(Request $request, string $uuid): JsonResponse
     {
         $id = \App\Models\PurchaseOrder::where('uuid', $uuid)->value('id') ?? 0;
@@ -115,17 +104,16 @@ class PurchaseOrderController extends Controller
 
             return response()->json([
                 'message' => 'Purchase order approved successfully.',
-                'data'    => $po,
+                'data'    => new PurchaseOrderResource($po),
             ]);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json(['message' => 'Record not found.'], 404);
         } catch (\Exception $e) {
             report($e);
             return response()->json(['message' => 'An unexpected error occurred. Please try again.'], 500);
         }
     }
 
-    /**
-     * Send PO to supplier
-     */
     public function sendToSupplier(string $uuid): JsonResponse
     {
         $id = \App\Models\PurchaseOrder::where('uuid', $uuid)->value('id') ?? 0;
@@ -134,17 +122,16 @@ class PurchaseOrderController extends Controller
 
             return response()->json([
                 'message' => 'Purchase order sent to supplier successfully.',
-                'data'    => $po,
+                'data'    => new PurchaseOrderResource($po),
             ]);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json(['message' => 'Record not found.'], 404);
         } catch (\Exception $e) {
             report($e);
             return response()->json(['message' => 'An unexpected error occurred. Please try again.'], 500);
         }
     }
 
-    /**
-     * Cancel purchase order
-     */
     public function cancel(Request $request, string $uuid): JsonResponse
     {
         $id = \App\Models\PurchaseOrder::where('uuid', $uuid)->value('id') ?? 0;
@@ -157,28 +144,24 @@ class PurchaseOrderController extends Controller
 
             return response()->json([
                 'message' => 'Purchase order cancelled.',
-                'data'    => $po,
+                'data'    => new PurchaseOrderResource($po),
             ]);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json(['message' => 'Record not found.'], 404);
         } catch (\Exception $e) {
             report($e);
             return response()->json(['message' => 'An unexpected error occurred. Please try again.'], 500);
         }
     }
 
-    /**
-     * Get pending purchase orders
-     */
-    public function pending(Request $request): JsonResponse
+    public function pending(Request $request): AnonymousResourceCollection
     {
         $perPage = $this->getPerPage($request);
         $pos = $this->poService->getPendingPurchaseOrders($perPage);
 
-        return response()->json($pos);
+        return PurchaseOrderResource::collection($pos);
     }
 
-    /**
-     * Get purchase order statistics
-     */
     public function statistics(): JsonResponse
     {
         $statistics = $this->poService->getPurchaseOrderStatistics();

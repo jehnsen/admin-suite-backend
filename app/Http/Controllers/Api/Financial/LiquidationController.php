@@ -3,12 +3,14 @@
 namespace App\Http\Controllers\Api\Financial;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\Financial\LiquidationResource;
 use App\Http\Requests\Financial\AddLiquidationItemRequest;
 use App\Http\Requests\Financial\StoreLiquidationRequest;
 use App\Http\Requests\Financial\UpdateLiquidationRequest;
 use App\Services\Financial\LiquidationService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
 class LiquidationController extends Controller
 {
@@ -19,22 +21,16 @@ class LiquidationController extends Controller
         $this->liquidationService = $liquidationService;
     }
 
-    /**
-     * Get all liquidations
-     */
-    public function index(Request $request): JsonResponse
+    public function index(Request $request): AnonymousResourceCollection
     {
         $filters = $request->only(['cash_advance_id', 'employee_id', 'status', 'date_from', 'date_to']);
         $perPage = $this->getPerPage($request);
 
         $liquidations = $this->liquidationService->getAllLiquidations($filters, $perPage);
 
-        return response()->json($liquidations);
+        return LiquidationResource::collection($liquidations);
     }
 
-    /**
-     * Get liquidation by ID
-     */
     public function show(string $uuid): JsonResponse
     {
         $id = \App\Models\Liquidation::where('uuid', $uuid)->value('id') ?? 0;
@@ -44,12 +40,9 @@ class LiquidationController extends Controller
             return response()->json(['message' => 'Liquidation not found.'], 404);
         }
 
-        return response()->json(['data' => $liquidation]);
+        return response()->json(['data' => new LiquidationResource($liquidation)]);
     }
 
-    /**
-     * Create new liquidation
-     */
     public function store(StoreLiquidationRequest $request): JsonResponse
     {
         try {
@@ -57,17 +50,16 @@ class LiquidationController extends Controller
 
             return response()->json([
                 'message' => 'Liquidation created successfully.',
-                'data'    => $liquidation,
+                'data'    => new LiquidationResource($liquidation),
             ], 201);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json(['message' => 'Record not found.'], 404);
         } catch (\Exception $e) {
             report($e);
             return response()->json(['message' => 'An unexpected error occurred. Please try again.'], 500);
         }
     }
 
-    /**
-     * Update liquidation
-     */
     public function update(UpdateLiquidationRequest $request, string $uuid): JsonResponse
     {
         $id = \App\Models\Liquidation::where('uuid', $uuid)->value('id') ?? 0;
@@ -76,17 +68,16 @@ class LiquidationController extends Controller
 
             return response()->json([
                 'message' => 'Liquidation updated successfully.',
-                'data'    => $liquidation,
+                'data'    => new LiquidationResource($liquidation),
             ]);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json(['message' => 'Record not found.'], 404);
         } catch (\Exception $e) {
             report($e);
             return response()->json(['message' => 'An unexpected error occurred. Please try again.'], 500);
         }
     }
 
-    /**
-     * Delete liquidation
-     */
     public function destroy(string $uuid): JsonResponse
     {
         $id = \App\Models\Liquidation::where('uuid', $uuid)->value('id') ?? 0;
@@ -94,15 +85,14 @@ class LiquidationController extends Controller
             $this->liquidationService->deleteLiquidation($id);
 
             return response()->json(['message' => 'Liquidation deleted successfully.']);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json(['message' => 'Record not found.'], 404);
         } catch (\Exception $e) {
             report($e);
             return response()->json(['message' => 'An unexpected error occurred. Please try again.'], 500);
         }
     }
 
-    /**
-     * Add item to liquidation
-     */
     public function addItem(AddLiquidationItemRequest $request, string $uuid): JsonResponse
     {
         $id = \App\Models\Liquidation::where('uuid', $uuid)->value('id') ?? 0;
@@ -113,16 +103,14 @@ class LiquidationController extends Controller
                 'message' => 'Liquidation item added successfully.',
                 'data'    => $item,
             ], 201);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json(['message' => 'Record not found.'], 404);
         } catch (\Exception $e) {
             report($e);
             return response()->json(['message' => 'An unexpected error occurred. Please try again.'], 500);
         }
     }
 
-    /**
-     * Approve liquidation
-     * The authenticated user is always recorded as the approver.
-     */
     public function approve(Request $request, string $uuid): JsonResponse
     {
         $id = \App\Models\Liquidation::where('uuid', $uuid)->value('id') ?? 0;
@@ -131,17 +119,16 @@ class LiquidationController extends Controller
 
             return response()->json([
                 'message' => 'Liquidation approved successfully. Cash advance status updated.',
-                'data'    => $liquidation,
+                'data'    => new LiquidationResource($liquidation),
             ]);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json(['message' => 'Record not found.'], 404);
         } catch (\Exception $e) {
             report($e);
             return response()->json(['message' => 'An unexpected error occurred. Please try again.'], 500);
         }
     }
 
-    /**
-     * Reject liquidation
-     */
     public function reject(Request $request, string $uuid): JsonResponse
     {
         $id = \App\Models\Liquidation::where('uuid', $uuid)->value('id') ?? 0;
@@ -158,32 +145,28 @@ class LiquidationController extends Controller
 
             return response()->json([
                 'message' => 'Liquidation rejected.',
-                'data'    => $liquidation,
+                'data'    => new LiquidationResource($liquidation),
             ]);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json(['message' => 'Record not found.'], 404);
         } catch (\Exception $e) {
             report($e);
             return response()->json(['message' => 'An unexpected error occurred. Please try again.'], 500);
         }
     }
 
-    /**
-     * Get pending liquidations
-     */
-    public function pending(Request $request): JsonResponse
+    public function pending(Request $request): AnonymousResourceCollection
     {
         $perPage = $this->getPerPage($request);
         $liquidations = $this->liquidationService->getPendingLiquidations($perPage);
 
-        return response()->json($liquidations);
+        return LiquidationResource::collection($liquidations);
     }
 
-    /**
-     * Get liquidations by cash advance
-     */
     public function byCashAdvance(int $caId): JsonResponse
     {
         $liquidations = $this->liquidationService->getLiquidationsByCashAdvance($caId);
 
-        return response()->json(['data' => $liquidations]);
+        return response()->json(['data' => LiquidationResource::collection($liquidations)]);
     }
 }

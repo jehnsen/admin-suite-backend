@@ -3,9 +3,11 @@
 namespace App\Http\Controllers\Api\Procurement;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\Procurement\SupplierResource;
 use App\Services\Procurement\SupplierService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use App\Http\Requests\Procurement\StoreSupplierRequest;
 use App\Http\Requests\Procurement\UpdateSupplierRequest;
 
@@ -18,10 +20,7 @@ class SupplierController extends Controller
         $this->supplierService = $supplierService;
     }
 
-    /**
-     * Get all suppliers
-     */
-    public function index(Request $request): JsonResponse
+    public function index(Request $request): AnonymousResourceCollection
     {
         try {
             $filters = $request->only(['status', 'business_type', 'classification', 'search']);
@@ -29,16 +28,13 @@ class SupplierController extends Controller
 
             $suppliers = $this->supplierService->getAllSuppliers($filters, $perPage);
 
-            return response()->json($suppliers);
+            return SupplierResource::collection($suppliers);
         } catch (\Exception $e) {
             report($e);
-            return response()->json(['message' => 'An unexpected error occurred. Please try again.'], 500);
+            abort(500, 'An unexpected error occurred. Please try again.');
         }
     }
 
-    /**
-     * Get supplier by ID
-     */
     public function show(string $uuid): JsonResponse
     {
         $id = \App\Models\Supplier::where('uuid', $uuid)->value('id') ?? 0;
@@ -49,16 +45,15 @@ class SupplierController extends Controller
                 return response()->json(['message' => 'Supplier not found.'], 404);
             }
 
-            return response()->json(['data' => $supplier]);
+            return response()->json(['data' => new SupplierResource($supplier)]);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json(['message' => 'Record not found.'], 404);
         } catch (\Exception $e) {
             report($e);
             return response()->json(['message' => 'An unexpected error occurred. Please try again.'], 500);
         }
     }
 
-    /**
-     * Create new supplier
-     */
     public function store(StoreSupplierRequest $request): JsonResponse
     {
         try {
@@ -66,17 +61,16 @@ class SupplierController extends Controller
 
             return response()->json([
                 'message' => 'Supplier created successfully.',
-                'data' => $supplier,
+                'data'    => new SupplierResource($supplier),
             ], 201);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json(['message' => 'Record not found.'], 404);
         } catch (\Exception $e) {
             report($e);
             return response()->json(['message' => 'An unexpected error occurred. Please try again.'], 500);
         }
     }
 
-    /**
-     * Update supplier
-     */
     public function update(UpdateSupplierRequest $request, string $uuid): JsonResponse
     {
         $id = \App\Models\Supplier::where('uuid', $uuid)->value('id') ?? 0;
@@ -85,17 +79,16 @@ class SupplierController extends Controller
 
             return response()->json([
                 'message' => 'Supplier updated successfully.',
-                'data' => $supplier,
+                'data'    => new SupplierResource($supplier),
             ]);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json(['message' => 'Record not found.'], 404);
         } catch (\Exception $e) {
             report($e);
             return response()->json(['message' => 'An unexpected error occurred. Please try again.'], 500);
         }
     }
 
-    /**
-     * Delete supplier
-     */
     public function destroy(string $uuid): JsonResponse
     {
         $id = \App\Models\Supplier::where('uuid', $uuid)->value('id') ?? 0;
@@ -103,32 +96,28 @@ class SupplierController extends Controller
             $this->supplierService->deleteSupplier($id);
 
             return response()->json(['message' => 'Supplier deleted successfully.']);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json(['message' => 'Record not found.'], 404);
         } catch (\Exception $e) {
             report($e);
             return response()->json(['message' => 'An unexpected error occurred. Please try again.'], 500);
         }
     }
 
-    /**
-     * Get active suppliers
-     */
-    public function active(Request $request): JsonResponse
+    public function active(Request $request): AnonymousResourceCollection
     {
         try {
             $perPage = $this->getPerPage($request);
             $suppliers = $this->supplierService->getActiveSuppliers($perPage);
 
-            return response()->json($suppliers);
+            return SupplierResource::collection($suppliers);
         } catch (\Exception $e) {
             report($e);
-            return response()->json(['message' => 'An unexpected error occurred. Please try again.'], 500);
+            abort(500, 'An unexpected error occurred. Please try again.');
         }
     }
 
-    /**
-     * Search suppliers
-     */
-    public function search(Request $request): JsonResponse
+    public function search(Request $request): AnonymousResourceCollection
     {
         try {
             $keyword = $request->input('keyword', '');
@@ -136,22 +125,21 @@ class SupplierController extends Controller
 
             $suppliers = $this->supplierService->searchSuppliers($keyword, $perPage);
 
-            return response()->json($suppliers);
+            return SupplierResource::collection($suppliers);
         } catch (\Exception $e) {
             report($e);
-            return response()->json(['message' => 'An unexpected error occurred. Please try again.'], 500);
+            abort(500, 'An unexpected error occurred. Please try again.');
         }
     }
 
-    /**
-     * Get supplier statistics
-     */
     public function statistics(): JsonResponse
     {
         try {
             $statistics = $this->supplierService->getSupplierStatistics();
 
             return response()->json(['data' => $statistics]);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json(['message' => 'Record not found.'], 404);
         } catch (\Exception $e) {
             report($e);
             return response()->json(['message' => 'An unexpected error occurred. Please try again.'], 500);

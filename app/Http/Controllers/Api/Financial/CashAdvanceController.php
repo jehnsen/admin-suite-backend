@@ -3,11 +3,13 @@
 namespace App\Http\Controllers\Api\Financial;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\Financial\CashAdvanceResource;
 use App\Http\Requests\Financial\StoreCashAdvanceRequest;
 use App\Http\Requests\Financial\UpdateCashAdvanceRequest;
 use App\Services\Financial\CashAdvanceService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
 class CashAdvanceController extends Controller
 {
@@ -18,22 +20,16 @@ class CashAdvanceController extends Controller
         $this->cashAdvanceService = $cashAdvanceService;
     }
 
-    /**
-     * Get all cash advances
-     */
-    public function index(Request $request): JsonResponse
+    public function index(Request $request): AnonymousResourceCollection
     {
         $filters = $request->only(['employee_id', 'status', 'purpose', 'date_from', 'date_to']);
         $perPage = $this->getPerPage($request);
 
         $cashAdvances = $this->cashAdvanceService->getAllCashAdvances($filters, $perPage);
 
-        return response()->json($cashAdvances);
+        return CashAdvanceResource::collection($cashAdvances);
     }
 
-    /**
-     * Get cash advance by ID
-     */
     public function show(string $uuid): JsonResponse
     {
         $id = \App\Models\CashAdvance::where('uuid', $uuid)->value('id') ?? 0;
@@ -43,12 +39,9 @@ class CashAdvanceController extends Controller
             return response()->json(['message' => 'Cash advance not found.'], 404);
         }
 
-        return response()->json(['data' => $cashAdvance]);
+        return response()->json(['data' => new CashAdvanceResource($cashAdvance)]);
     }
 
-    /**
-     * Create new cash advance
-     */
     public function store(StoreCashAdvanceRequest $request): JsonResponse
     {
         try {
@@ -59,17 +52,16 @@ class CashAdvanceController extends Controller
 
             return response()->json([
                 'message' => 'Cash advance created successfully.',
-                'data'    => $cashAdvance,
+                'data'    => new CashAdvanceResource($cashAdvance),
             ], 201);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json(['message' => 'Record not found.'], 404);
         } catch (\Exception $e) {
             report($e);
             return response()->json(['message' => 'An unexpected error occurred. Please try again.'], 500);
         }
     }
 
-    /**
-     * Update cash advance
-     */
     public function update(UpdateCashAdvanceRequest $request, string $uuid): JsonResponse
     {
         $id = \App\Models\CashAdvance::where('uuid', $uuid)->value('id') ?? 0;
@@ -78,17 +70,16 @@ class CashAdvanceController extends Controller
 
             return response()->json([
                 'message' => 'Cash advance updated successfully.',
-                'data'    => $cashAdvance,
+                'data'    => new CashAdvanceResource($cashAdvance),
             ]);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json(['message' => 'Record not found.'], 404);
         } catch (\Exception $e) {
             report($e);
             return response()->json(['message' => 'An unexpected error occurred. Please try again.'], 500);
         }
     }
 
-    /**
-     * Delete cash advance
-     */
     public function destroy(string $uuid): JsonResponse
     {
         $id = \App\Models\CashAdvance::where('uuid', $uuid)->value('id') ?? 0;
@@ -96,15 +87,14 @@ class CashAdvanceController extends Controller
             $this->cashAdvanceService->deleteCashAdvance($id);
 
             return response()->json(['message' => 'Cash advance deleted successfully.']);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json(['message' => 'Record not found.'], 404);
         } catch (\Exception $e) {
             report($e);
             return response()->json(['message' => 'An unexpected error occurred. Please try again.'], 500);
         }
     }
 
-    /**
-     * Approve cash advance
-     */
     public function approve(Request $request, string $uuid): JsonResponse
     {
         $id = \App\Models\CashAdvance::where('uuid', $uuid)->value('id') ?? 0;
@@ -113,17 +103,16 @@ class CashAdvanceController extends Controller
 
             return response()->json([
                 'message' => 'Cash advance approved successfully.',
-                'data'    => $cashAdvance,
+                'data'    => new CashAdvanceResource($cashAdvance),
             ]);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json(['message' => 'Record not found.'], 404);
         } catch (\Exception $e) {
             report($e);
             return response()->json(['message' => 'An unexpected error occurred. Please try again.'], 500);
         }
     }
 
-    /**
-     * Release cash advance
-     */
     public function release(Request $request, string $uuid): JsonResponse
     {
         $id = \App\Models\CashAdvance::where('uuid', $uuid)->value('id') ?? 0;
@@ -132,50 +121,40 @@ class CashAdvanceController extends Controller
 
             return response()->json([
                 'message' => 'Cash advance released successfully.',
-                'data'    => $cashAdvance,
+                'data'    => new CashAdvanceResource($cashAdvance),
             ]);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json(['message' => 'Record not found.'], 404);
         } catch (\Exception $e) {
             report($e);
             return response()->json(['message' => 'An unexpected error occurred. Please try again.'], 500);
         }
     }
 
-    /**
-     * Get pending cash advances
-     */
-    public function pending(Request $request): JsonResponse
+    public function pending(Request $request): AnonymousResourceCollection
     {
         $perPage = $this->getPerPage($request);
         $cashAdvances = $this->cashAdvanceService->getPendingCashAdvances($perPage);
 
-        return response()->json($cashAdvances);
+        return CashAdvanceResource::collection($cashAdvances);
     }
 
-    /**
-     * Get overdue cash advances
-     */
-    public function overdue(Request $request): JsonResponse
+    public function overdue(Request $request): AnonymousResourceCollection
     {
         $perPage = $this->getPerPage($request);
         $cashAdvances = $this->cashAdvanceService->getOverdueCashAdvances($perPage);
 
-        return response()->json($cashAdvances);
+        return CashAdvanceResource::collection($cashAdvances);
     }
 
-    /**
-     * Get cash advances by employee
-     */
-    public function byEmployee(string $employeeId): JsonResponse
+    public function byEmployee(Request $request, string $employeeId): AnonymousResourceCollection
     {
         $id = \App\Models\Employee::where('uuid', $employeeId)->value('id') ?? 0;
-        $cashAdvances = $this->cashAdvanceService->getCashAdvancesByEmployee($id);
+        $cashAdvances = $this->cashAdvanceService->getByEmployee($id, $this->getPerPage($request));
 
-        return response()->json(['data' => $cashAdvances]);
+        return CashAdvanceResource::collection($cashAdvances);
     }
 
-    /**
-     * Get cash advance statistics
-     */
     public function statistics(): JsonResponse
     {
         $statistics = $this->cashAdvanceService->getCashAdvanceStatistics();

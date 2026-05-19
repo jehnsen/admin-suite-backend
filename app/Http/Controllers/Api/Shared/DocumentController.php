@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\Shared;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Shared\UploadDocumentRequest;
+use App\Http\Resources\Shared\DocumentResource;
 use App\Services\Shared\DocumentService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -17,9 +18,6 @@ class DocumentController extends Controller
         $this->documentService = $documentService;
     }
 
-    /**
-     * Upload a document
-     */
     public function upload(UploadDocumentRequest $request): JsonResponse
     {
         try {
@@ -30,24 +28,19 @@ class DocumentController extends Controller
 
             return response()->json([
                 'message' => 'Document uploaded successfully.',
-                'data' => $document->load('uploadedBy'),
+                'data'    => new DocumentResource($document->load('uploadedBy')),
             ], 201);
         } catch (\Exception $e) {
             report($e);
-            return response()->json([
-                'message' => 'Failed to upload document.',
-            ], 500);
+            return response()->json(['message' => 'Failed to upload document.'], 500);
         }
     }
 
-    /**
-     * List documents (optionally filter by entity)
-     */
     public function index(Request $request): JsonResponse
     {
         $request->validate([
             'documentable_type' => 'nullable|string',
-            'documentable_id' => 'nullable|integer',
+            'documentable_id'   => 'nullable|integer',
         ]);
 
         if ($request->has('documentable_type') && $request->has('documentable_id')) {
@@ -61,36 +54,23 @@ class DocumentController extends Controller
             ], 400);
         }
 
-        return response()->json([
-            'data' => $documents,
-        ]);
+        return response()->json(['data' => DocumentResource::collection($documents)]);
     }
 
-    /**
-     * Show document metadata
-     */
     public function show(string $uuid): JsonResponse
     {
         $id = \App\Models\Document::where('uuid', $uuid)->value('id') ?? 0;
         $document = $this->documentService->getDocumentById($id);
 
         if (!$document) {
-            return response()->json([
-                'message' => 'Document not found.',
-            ], 404);
+            return response()->json(['message' => 'Document not found.'], 404);
         }
 
-        // Authorization check
         $this->authorize('view', $document);
 
-        return response()->json([
-            'data' => $document,
-        ]);
+        return response()->json(['data' => new DocumentResource($document)]);
     }
 
-    /**
-     * Download document file
-     */
     public function download(string $uuid)
     {
         $id = \App\Models\Document::where('uuid', $uuid)->value('id') ?? 0;
@@ -98,50 +78,35 @@ class DocumentController extends Controller
             $document = $this->documentService->getDocumentById($id);
 
             if (!$document) {
-                return response()->json([
-                    'message' => 'Document not found.',
-                ], 404);
+                return response()->json(['message' => 'Document not found.'], 404);
             }
 
-            // Authorization check
             $this->authorize('view', $document);
 
             return $this->documentService->downloadDocument($id);
         } catch (\Exception $e) {
             report($e);
-            return response()->json([
-                'message' => 'Failed to download document.',
-            ], 500);
+            return response()->json(['message' => 'Failed to download document.'], 500);
         }
     }
 
-    /**
-     * Delete document (soft delete)
-     */
     public function destroy(string $uuid): JsonResponse
     {
         $id = \App\Models\Document::where('uuid', $uuid)->value('id') ?? 0;
         $document = $this->documentService->getDocumentById($id);
 
         if (!$document) {
-            return response()->json([
-                'message' => 'Document not found.',
-            ], 404);
+            return response()->json(['message' => 'Document not found.'], 404);
         }
 
-        // Authorization check
         $this->authorize('delete', $document);
 
         $deleted = $this->documentService->deleteDocument($id);
 
         if ($deleted) {
-            return response()->json([
-                'message' => 'Document deleted successfully.',
-            ]);
+            return response()->json(['message' => 'Document deleted successfully.']);
         }
 
-        return response()->json([
-            'message' => 'Failed to delete document.',
-        ], 500);
+        return response()->json(['message' => 'Failed to delete document.'], 500);
     }
 }

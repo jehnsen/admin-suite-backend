@@ -71,6 +71,15 @@ return Application::configure(basePath: dirname(__DIR__))
             }
         });
 
+        // 403 - Laravel policy denied (authorize() converts to AccessDeniedHttpException)
+        $exceptions->render(function (\Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException $e, $request) {
+            if ($request->is('api/*')) {
+                return response()->json([
+                    'message' => $e->getMessage() ?: 'You do not have permission to perform this action.',
+                ], 403);
+            }
+        });
+
         // 422 - Validation failure (standardized format)
         $exceptions->render(function (ValidationException $e, $request) {
             if ($request->is('api/*')) {

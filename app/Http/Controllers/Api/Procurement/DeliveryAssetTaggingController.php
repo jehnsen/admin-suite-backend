@@ -23,7 +23,10 @@ class DeliveryAssetTaggingController extends Controller
      */
     public function getPendingAssets(string $deliveryUuid): JsonResponse
     {
-        $deliveryId = \App\Models\Delivery::where('uuid', $deliveryUuid)->value('id') ?? 0;
+        $deliveryId = \App\Models\Delivery::where('uuid', $deliveryUuid)->value('id');
+        if (!$deliveryId) {
+            return response()->json(['success' => false, 'message' => 'Delivery not found.'], 404);
+        }
         try {
             $delivery = Delivery::with(['items.inventoryItems'])->findOrFail($deliveryId);
 
@@ -68,7 +71,10 @@ class DeliveryAssetTaggingController extends Controller
      */
     public function tagAssets(TagDeliveryAssetsRequest $request, string $deliveryUuid): JsonResponse
     {
-        $deliveryId = \App\Models\Delivery::where('uuid', $deliveryUuid)->value('id') ?? 0;
+        $deliveryId = \App\Models\Delivery::where('uuid', $deliveryUuid)->value('id');
+        if (!$deliveryId) {
+            return response()->json(['success' => false, 'message' => 'Delivery not found.'], 404);
+        }
         try {
             $delivery = Delivery::findOrFail($deliveryId);
 

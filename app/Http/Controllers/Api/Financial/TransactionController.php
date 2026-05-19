@@ -3,107 +3,57 @@
 namespace App\Http\Controllers\Api\Financial;
 
 use App\Http\Controllers\Controller;
-use App\Models\Transaction;
-use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
+use App\Http\Resources\Financial\TransactionResource;
 use App\Http\Requests\Financial\StoreTransactionRequest;
 use App\Http\Requests\Financial\UpdateTransactionRequest;
-use Illuminate\Support\Facades\DB;
+use App\Models\Transaction;
+use App\Services\Financial\TransactionService;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
 class TransactionController extends Controller
 {
-    /**
-     * Get all transactions with filters
-     */
-    public function index(Request $request): JsonResponse
+    public function __construct(protected TransactionService $transactionService) {}
+
+    public function index(Request $request): AnonymousResourceCollection
     {
         try {
-            $query = Transaction::with([
-                'budget',
-                'expense',
-                'employee',
-                'verifiedBy'
-            ]);
+            $filters = $request->only(['type', 'category', 'fund_source', 'status', 'date_from', 'date_to', 'search']);
+            $transactions = $this->transactionService->getAllTransactions($filters, $this->getPerPage($request));
 
-            // Filters
-            if ($request->has('type')) {
-                $query->where('type', $request->type);
-            }
-
-            if ($request->has('category')) {
-                $query->where('category', $request->category);
-            }
-
-            if ($request->has('fund_source')) {
-                $query->where('fund_source', $request->fund_source);
-            }
-
-            if ($request->has('status')) {
-                $query->where('status', $request->status);
-            }
-
-            if ($request->has('date_from') && $request->has('date_to')) {
-                $query->dateRange($request->date_from, $request->date_to);
-            }
-
-            if ($request->has('search')) {
-                $query->where(function ($q) use ($request) {
-                    $q->where('transaction_number', 'like', '%' . $request->search . '%')
-                      ->orWhere('description', 'like', '%' . $request->search . '%')
-                      ->orWhere('reference_number', 'like', '%' . $request->search . '%');
-                });
-            }
-
-            $perPage = $this->getPerPage($request);
-            $transactions = $query->latest('transaction_date')->paginate($perPage);
-
-            return response()->json($transactions);
+            return TransactionResource::collection($transactions);
         } catch (\Exception $e) {
             report($e);
-            return response()->json(['message' => 'An unexpected error occurred. Please try again.'], 500);
+            abort(500, 'An unexpected error occurred. Please try again.');
         }
     }
 
-    /**
-     * Get transaction by ID
-     */
     public function show(string $uuid): JsonResponse
     {
-        $id = \App\Models\Transaction::where('uuid', $uuid)->value('id') ?? 0;
+        $id = Transaction::where('uuid', $uuid)->value('id') ?? 0;
         try {
-            $transaction = Transaction::with([
-                'budget',
-                'expense',
-                'disbursement',
-                'cashAdvance',
-                'purchaseOrder',
-                'employee',
-                'verifiedBy'
-            ])->findOrFail($id);
+            $transaction = $this->transactionService->getTransactionById($id);
 
-            return response()->json(['data' => $transaction]);
+            if (!$transaction) {
+                return response()->json(['message' => 'Record not found.'], 404);
+            }
+
+            return response()->json(['data' => new TransactionResource($transaction)]);
         } catch (\Exception $e) {
             report($e);
             return response()->json(['message' => 'An unexpected error occurred. Please try again.'], 500);
         }
     }
 
-    /**
-     * Create new transaction
-     */
     public function store(StoreTransactionRequest $request): JsonResponse
     {
         try {
-            $validated = array_merge($request->validated(), [
-                'transaction_number' => $this->generateTransactionNumber(),
-                'status'             => 'Completed',
-            ]);
-
-            $transaction = Transaction::create($validated);
+            $transaction = $this->transactionService->createTransaction($request->validated());
 
             return response()->json([
                 'message' => 'Transaction created successfully.',
-                'data' => $transaction,
+                'data'    => new TransactionResource($transaction),
             ], 201);
         } catch (\Exception $e) {
             report($e);
@@ -111,76 +61,44 @@ class TransactionController extends Controller
         }
     }
 
-    /**
-     * Update transaction
-     */
     public function update(UpdateTransactionRequest $request, string $uuid): JsonResponse
     {
-        $id = \App\Models\Transaction::where('uuid', $uuid)->value('id') ?? 0;
+        $id = Transaction::where('uuid', $uuid)->value('id') ?? 0;
         try {
-            $transaction = Transaction::findOrFail($id);
-            $transaction->update($request->validated());
+            $transaction = $this->transactionService->updateTransaction($id, $request->validated());
 
             return response()->json([
                 'message' => 'Transaction updated successfully.',
-                'data' => $transaction->fresh(),
+                'data'    => new TransactionResource($transaction),
             ]);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json(['message' => 'Record not found.'], 404);
         } catch (\Exception $e) {
             report($e);
             return response()->json(['message' => 'An unexpected error occurred. Please try again.'], 500);
         }
     }
 
-    /**
-     * Delete transaction
-     */
     public function destroy(string $uuid): JsonResponse
     {
-        $id = \App\Models\Transaction::where('uuid', $uuid)->value('id') ?? 0;
+        $id = Transaction::where('uuid', $uuid)->value('id') ?? 0;
         try {
-            $transaction = Transaction::findOrFail($id);
-            $transaction->delete();
+            $this->transactionService->deleteTransaction($id);
 
             return response()->json(['message' => 'Transaction deleted successfully.']);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json(['message' => 'Record not found.'], 404);
         } catch (\Exception $e) {
             report($e);
             return response()->json(['message' => 'An unexpected error occurred. Please try again.'], 500);
         }
     }
 
-    /**
-     * Get transaction statistics
-     */
     public function statistics(Request $request): JsonResponse
     {
         try {
-            $dateFrom = $request->input('date_from');
-            $dateTo = $request->input('date_to');
-
-            $query = Transaction::query();
-
-            if ($dateFrom && $dateTo) {
-                $query->dateRange($dateFrom, $dateTo);
-            }
-
-            $stats = [
-                'total_transactions' => $query->count(),
-                'total_income' => (float) $query->clone()->income()->sum('amount'),
-                'total_expenses' => (float) $query->clone()->expense()->sum('amount'),
-                'by_type' => $query->clone()->select('type', DB::raw('count(*) as count'), DB::raw('sum(amount) as total'))
-                    ->groupBy('type')
-                    ->get(),
-                'by_category' => $query->clone()->select('category', DB::raw('count(*) as count'), DB::raw('sum(amount) as total'))
-                    ->groupBy('category')
-                    ->get(),
-                'by_fund_source' => $query->clone()->select('fund_source', DB::raw('count(*) as count'), DB::raw('sum(amount) as total'))
-                    ->whereNotNull('fund_source')
-                    ->groupBy('fund_source')
-                    ->get(),
-                'by_status' => $query->clone()->select('status', DB::raw('count(*) as count'))
-                    ->groupBy('status')
-                    ->get(),
-            ];
+            $filters = $request->only(['date_from', 'date_to']);
+            $stats = $this->transactionService->getTransactionStatistics($filters);
 
             return response()->json(['data' => $stats]);
         } catch (\Exception $e) {
@@ -189,68 +107,34 @@ class TransactionController extends Controller
         }
     }
 
-    /**
-     * Get recent transactions
-     */
     public function recent(Request $request): JsonResponse
     {
         try {
-            $limit = $request->input('limit', 10);
+            $limit = (int) $request->input('limit', 10);
+            $transactions = $this->transactionService->getRecentTransactions($limit);
 
-            $transactions = Transaction::with(['budget', 'employee'])
-                ->latest('transaction_date')
-                ->limit($limit)
-                ->get();
-
-            return response()->json(['data' => $transactions]);
+            return response()->json(['data' => TransactionResource::collection($transactions)]);
         } catch (\Exception $e) {
             report($e);
             return response()->json(['message' => 'An unexpected error occurred. Please try again.'], 500);
         }
     }
 
-    /**
-     * Verify transaction
-     */
     public function verify(Request $request, string $uuid): JsonResponse
     {
-        $id = \App\Models\Transaction::where('uuid', $uuid)->value('id') ?? 0;
+        $id = Transaction::where('uuid', $uuid)->value('id') ?? 0;
         try {
-            $transaction = Transaction::findOrFail($id);
-
-            $transaction->update([
-                'verified_by' => $request->user()->id,
-                'verified_at' => now(),
-                'status' => 'Completed',
-            ]);
+            $transaction = $this->transactionService->verifyTransaction($id, $request->user()->id);
 
             return response()->json([
                 'message' => 'Transaction verified successfully.',
-                'data' => $transaction->fresh(),
+                'data'    => new TransactionResource($transaction),
             ]);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json(['message' => 'Record not found.'], 404);
         } catch (\Exception $e) {
             report($e);
             return response()->json(['message' => 'An unexpected error occurred. Please try again.'], 500);
         }
-    }
-
-    /**
-     * Generate unique transaction number
-     */
-    private function generateTransactionNumber(): string
-    {
-        $date = now()->format('Ymd');
-        $lastTransaction = Transaction::whereDate('created_at', today())
-            ->orderBy('transaction_number', 'desc')
-            ->first();
-
-        if ($lastTransaction) {
-            $lastNumber = (int) substr($lastTransaction->transaction_number, -4);
-            $newNumber = str_pad($lastNumber + 1, 4, '0', STR_PAD_LEFT);
-        } else {
-            $newNumber = '0001';
-        }
-
-        return "TXN-{$date}-{$newNumber}";
     }
 }
