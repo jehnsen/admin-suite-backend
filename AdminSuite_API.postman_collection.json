@@ -2828,7 +2828,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"issuance_type\": \"PAR\",\n    \"employee_id\": 1,\n    \"issuance_date\": \"2025-02-15\",\n    \"items\": [\n        {\"inventory_item_id\": 1, \"quantity\": 1, \"unit_cost\": 15000.00, \"remarks\": \"Newly procured laptop\"}\n    ]\n}"
+							"raw": "{\n    \"document_type\": \"PAR\",\n    \"inventory_item_id\": 1,\n    \"issued_to_employee_id\": 1,\n    \"issued_by\": 1,\n    \"issued_date\": \"2025-02-15\",\n    \"purpose\": \"Official Use\",\n    \"custodianship_type\": \"Permanent\",\n    \"remarks\": \"Newly procured laptop\"\n}"
 						},
 						"url": {"raw": "{{base_url}}/api/issuances", "host": ["{{base_url}}"], "path": ["api", "issuances"]}
 					},
