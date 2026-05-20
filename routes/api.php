@@ -32,6 +32,7 @@ use App\Http\Controllers\Api\Shared\DocumentController;
 use App\Http\Controllers\Api\Shared\AuditController;
 use App\Http\Controllers\Api\Admin\UserManagementController;
 use App\Http\Controllers\Api\DashboardController;
+use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Api\Attendance\AttendanceController;
 use App\Http\Controllers\Api\Report\ReportController;
 
@@ -59,6 +60,14 @@ Route::prefix('auth')->group(function () {
 Route::middleware(['auth:sanctum', 'throttle:api'])->group(function () {
     // Authentication
     Route::post('/auth/logout', [LogoutController::class, 'logout']);
+
+    // Notifications
+    Route::prefix('notifications')->group(function () {
+        Route::get('/',                          [NotificationController::class, 'index']);
+        Route::patch('/{uuid}/read',             [NotificationController::class, 'markRead']);
+        Route::patch('/read-all',                [NotificationController::class, 'markAllRead']);
+        Route::delete('/{uuid}',                 [NotificationController::class, 'dismiss']);
+    });
 
     // Dashboard - Administrative Officer Command Center
     Route::prefix('dashboard')->group(function () {
