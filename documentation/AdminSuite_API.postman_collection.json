@@ -2835,6 +2835,22 @@
 					"response": []
 				},
 				{
+					"name": "Batch Create Issuances",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Authorization", "value": "Bearer {{auth_token}}"},
+							{"key": "Content-Type", "value": "application/json"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"issued_to_employee_id\": 1,\n    \"issued_by\": 1,\n    \"issued_date\": \"2025-02-15\",\n    \"purpose\": \"Official Use\",\n    \"custodianship_type\": \"Permanent\",\n    \"items\": [\n        {\"document_type\": \"PAR\", \"inventory_item_id\": 1, \"remarks\": \"Laptop\"},\n        {\"document_type\": \"PAR\", \"inventory_item_id\": 2, \"remarks\": \"Printer\"},\n        {\"document_type\": \"ICS\", \"inventory_item_id\": 3, \"remarks\": \"Office chair\"}\n    ]\n}"
+						},
+						"url": {"raw": "{{base_url}}/api/issuances/batch", "host": ["{{base_url}}"], "path": ["api", "issuances", "batch"]}
+					},
+					"response": []
+				},
+				{
 					"name": "Acknowledge Issuance",
 					"request": {
 						"method": "PUT",

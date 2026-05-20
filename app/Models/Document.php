@@ -68,7 +68,7 @@ class Document extends Model
             return \URL::temporarySignedRoute(
                 'documents.download',
                 now()->addMinutes(30),
-                ['id' => $this->id]
+                ['id' => $this->uuid]
             );
         }
 

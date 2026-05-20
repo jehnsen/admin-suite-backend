@@ -16,10 +16,10 @@ class StoreIssuanceRequest extends FormRequest
     {
         return [
             'document_type'         => ['required', Rule::in(['PAR', 'ICS', 'General'])],
-            'inventory_item_id'     => ['required', 'integer', 'exists:inventory_items,id'],
-            'issued_to_employee_id' => ['required', 'integer', 'exists:employees,id'],
-            'issued_by'             => ['required', 'integer', 'exists:employees,id'],
-            'approved_by'           => ['nullable', 'integer', 'exists:employees,id'],
+            'inventory_item_id'     => ['required', 'string', 'exists:inventory_items,uuid'],
+            'issued_to_employee_id' => ['required', 'string', 'exists:employees,uuid'],
+            'issued_by'             => ['required', 'string', 'exists:employees,uuid'],
+            'approved_by'           => ['nullable', 'string', 'exists:employees,uuid'],
             'issuance_number'       => ['nullable', 'string', 'max:50', 'unique:issuances,issuance_number'],
             'issued_date'           => ['required', 'date'],
             'expected_return_date'  => ['nullable', 'date', 'after:issued_date'],

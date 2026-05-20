@@ -14,7 +14,7 @@ class TransferIssuanceRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'new_employee_id' => ['required', 'integer', 'exists:employees,id'],
+            'new_employee_id' => ['required', 'string', 'exists:employees,uuid'],
             'remarks'         => ['nullable', 'string', 'max:1000'],
         ];
     }

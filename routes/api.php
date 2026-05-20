@@ -333,6 +333,7 @@ Route::middleware(['auth:sanctum', 'throttle:api'])->group(function () {
         Route::get('/{id}', [IssuanceController::class, 'show']);
 
         Route::post('/', [IssuanceController::class, 'store'])->middleware('permission:create_issuances');
+        Route::post('/batch', [IssuanceController::class, 'storeBatch'])->middleware('permission:create_issuances');
         Route::put('/{id}', [IssuanceController::class, 'update'])->middleware('permission:edit_issuances');
         Route::delete('/{id}', [IssuanceController::class, 'destroy'])->middleware('permission:delete_issuances');
         Route::put('/{id}/acknowledge', [IssuanceController::class, 'acknowledge'])->middleware('permission:edit_issuances');
@@ -453,7 +454,6 @@ Route::middleware(['auth:sanctum', 'throttle:api'])->group(function () {
         Route::get('/', [DocumentController::class, 'index']);
         Route::get('/{id}', [DocumentController::class, 'show']);
         Route::get('/{id}/download', [DocumentController::class, 'download'])
-            ->middleware('signed')  // Require signed URL for download (security for sensitive docs)
             ->name('documents.download');
 
         Route::post('/upload', [DocumentController::class, 'upload'])->middleware('permission:upload_documents');

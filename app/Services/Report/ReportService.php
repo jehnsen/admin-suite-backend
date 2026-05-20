@@ -79,7 +79,7 @@ class ReportService
             'slip' => [
                 'id'         => $slip->uuid,
                 'ris_number' => $slip->ris_number,
-                'date'       => $slip->date?->format('Y-m-d') ?? $slip->created_at?->format('Y-m-d'),
+                'date'       => $slip->requested_date?->format('Y-m-d') ?? $slip->created_at?->format('Y-m-d'),
                 'purpose'    => $slip->purpose,
                 'status'     => $slip->status,
                 'remarks'    => $slip->remarks ?? null,

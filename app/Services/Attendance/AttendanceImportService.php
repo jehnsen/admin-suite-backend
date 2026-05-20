@@ -239,7 +239,7 @@ class AttendanceImportService
         // Build a holiday set for the period
         $holidaySet = Holiday::inRange($periodStart, $periodEnd)
             ->pluck('type', 'holiday_date')
-            ->mapKeys(fn($v, $k) => Carbon::parse($k)->toDateString())
+            ->mapWithKeys(fn($type, $date) => [Carbon::parse($date)->toDateString() => $type])
             ->all();
 
         // Cache employee schedule settings

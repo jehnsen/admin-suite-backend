@@ -90,7 +90,7 @@ yarn.lock
 
 # Claude Code
 .claude/
-CLAUDE.md
+# CLAUDE.md
 
 # docu
 ARCHITECTURE.md

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\Inventory;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Inventory\AcknowledgeIssuanceRequest;
 use App\Http\Requests\Inventory\ReturnIssuanceRequest;
+use App\Http\Requests\Inventory\StoreBatchIssuanceRequest;
 use App\Http\Requests\Inventory\StoreIssuanceRequest;
 use App\Http\Requests\Inventory\TransferIssuanceRequest;
 use App\Http\Requests\Inventory\UpdateIssuanceRequest;
@@ -59,6 +60,23 @@ class IssuanceController extends Controller
             return response()->json(['data' => new IssuanceResource($issuance)]);
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             return response()->json(['message' => 'Record not found.'], 404);
+        } catch (\Exception $e) {
+            report($e);
+            return response()->json(['message' => 'An unexpected error occurred. Please try again.'], 500);
+        }
+    }
+
+    public function storeBatch(StoreBatchIssuanceRequest $request): JsonResponse
+    {
+        try {
+            $validated = $request->validated();
+            $shared    = array_diff_key($validated, ['items' => null]);
+            $issuances = $this->issuanceService->createBatch($shared, $validated['items']);
+
+            return response()->json([
+                'message' => "{$issuances->count()} issuance record(s) created successfully.",
+                'data'    => IssuanceResource::collection($issuances),
+            ], 201);
         } catch (\Exception $e) {
             report($e);
             return response()->json(['message' => 'An unexpected error occurred. Please try again.'], 500);

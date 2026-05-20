@@ -21,4 +21,5 @@ interface IssuanceRepositoryInterface
     public function transfer(int $id, int $newEmployeeId, string $remarks): Issuance;
     public function getStatistics(): array;
     public function generateIssuanceNumber(string $type): string;
+    public function createBatch(array $shared, array $items): \Illuminate\Support\Collection;
 }

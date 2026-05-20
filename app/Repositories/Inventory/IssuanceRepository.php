@@ -182,6 +182,32 @@ class IssuanceRepository implements IssuanceRepositoryInterface
         ];
     }
 
+    public function createBatch(array $shared, array $items): \Illuminate\Support\Collection
+    {
+        return DB::transaction(function () use ($shared, $items) {
+            $created = collect();
+
+            foreach ($items as $item) {
+                $data = array_merge($shared, [
+                    'document_type'     => $item['document_type'],
+                    'inventory_item_id' => $item['inventory_item_id'],
+                    'issuance_number'   => $this->generateIssuanceNumber($item['document_type']),
+                ]);
+
+                if (isset($item['purpose'])) {
+                    $data['purpose'] = $item['purpose'];
+                }
+                if (isset($item['remarks'])) {
+                    $data['remarks'] = $item['remarks'];
+                }
+
+                $created->push(Issuance::create($data));
+            }
+
+            return $created->load(['inventoryItem', 'issuedToEmployee', 'issuedByEmployee', 'approvedByEmployee']);
+        });
+    }
+
     public function generateIssuanceNumber(string $type = 'General'): string
     {
         $prefix = match ($type) {

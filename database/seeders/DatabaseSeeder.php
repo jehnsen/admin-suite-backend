@@ -26,6 +26,7 @@ class DatabaseSeeder extends Seeder
             PurchaseOrderSeeder::class,
             TrainingSeeder::class,
             FinancialSeeder::class,
+            HolidaySeeder::class,
         ]);
     }
 }
